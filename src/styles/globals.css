@@ -1,45 +1,159 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @config "../../tailwind.config.js";
  
 @plugin 'tailwindcss-animate';
+
+@source "../../src/**/*.{js,jsx,ts,tsx}";
  
 @custom-variant dark (&:is(.dark *));
  
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: rgba(223, 21, 140, 1);
-  --primary-foreground: rgba(255, 255, 255, 1);
-  --secondary: rgba(11, 95, 146, 1);
-  --secondary-foreground: rgba(255, 255, 255, 1);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: rgba(211, 47, 47, 1);
-  --destructive-foreground: rgba(255, 255, 255, 1);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  /* Digital Twin Colors */
+  --digital-twin-1: #FDF3F9;
+  --digital-twin-2: #FCE8F4;
+  --digital-twin-3: #F9D0E8;
+  --digital-twin-4: #F5B9DD;
+  --digital-twin-5: #F2A1D1;
+  --digital-twin-6: #EC73BA;
+  --digital-twin-7: #E544A3;
+  --digital-twin-8: #DF158C;
+  --digital-twin-9: #B21170;
+  --digital-twin-10: #860D54;
+
+  /* Classify Colors */
+  --classify-1: #FCF6F3;
+  --classify-2: #F9EEE8;
+  --classify-3: #F4DCD0;
+  --classify-4: #EECBB9;
+  --classify-5: #E8B9A1;
+  --classify-6: #DD9673;
+  --classify-7: #D17344;
+  --classify-8: #C65015;
+  --classify-9: #9E4011;
+  --classify-10: #3B1806;
+
+  /* Assure Colors */
+  --assure-1: #EDF9F7;
+  --assure-2: #DCF3EF;
+  --assure-3: #C3E7E1;
+  --assure-4: #ABDCD4;
+  --assure-5: #92D0C6;
+  --assure-6: #62B8AA;
+  --assure-7: #31A18F;
+  --assure-8: #008973;
+  --assure-9: #005245;
+  --assure-10: #002923;
+
+  /* Neutral Colors */
+  --neutral-0: #FFFFFF;
+  --neutral-05: #F9F9F9;
+  --neutral-1: #F3F3F3;
+  --neutral-2: #EBEBEB;
+  --neutral-3: #DCDCDC;
+  --neutral-4: #B8B8B8;
+  --neutral-5: #999999;
+  --neutral-6: #707070;
+  --neutral-7: #5D5D5D;
+  --neutral-8: #3E3E3E;
+  --neutral-9: #1D1D1D;
+  --neutral-10: #000000;
+
+  /* Alert Colors */
+  --alert-1: #FDF5F5;
+  --alert-2: #FBEAEA;
+  --alert-3: #F2C1C1;
+  --alert-4: #EDACAC;
+  --alert-5: #E58282;
+  --alert-6: #DC5959;
+  --alert-7: #D32F2F;
+  --alert-8: #A92626;
+  --alert-9: #7F1C1C;
+  --alert-10: #3F0E0E;
+
+  /* Warning Colors */
+  --warning-1: #FEF6E9;
+  --warning-2: #FEEED3;
+  --warning-3: #FDE5BE;
+  --warning-4: #FDDCA8;
+  --warning-5: #FBCB7C;
+  --warning-6: #FAB951;
+  --warning-7: #F9A825;
+  --warning-8: #C7861E;
+  --warning-9: #BD7E19;
+  --warning-10: #64430F;
+
+  /* Positive Colors */
+  --positive-1: #F4F9F3;
+  --positive-2: #E8F3E8;
+  --positive-3: #D1E7D1;
+  --positive-4: #BADBB9;
+  --positive-5: #76B874;
+  --positive-6: #48A045;
+  --positive-7: #1A8817;
+  --positive-8: #156D12;
+  --positive-9: #10520E;
+  --positive-10: #082907;
+
+  /* Secondary Colors - Blue */
+  --blue-1: #ECF5FB;
+  --blue-2: #D9EBF7;
+  --blue-3: #ACD1E9;
+  --blue-4: #95C4E2;
+  --blue-5: #68ABD3;
+  --blue-6: #3B91C5;
+  --blue-7: #0E77B7;
+  --blue-8: #0B5F92;
+  --blue-9: #08476E;
+  --blue-10: #042437;
+
+  /* Secondary Colors - Violet */
+  --violet-1: #F8EFFB;
+  --violet-2: #F1DEF7;
+  --violet-3: #E6C7F0;
+  --violet-4: #DBB1EA;
+  --violet-5: #D09AE3;
+  --violet-6: #BA6CD5;
+  --violet-7: #A43FC8;
+  --violet-8: #8E11BA;
+  --violet-9: #720E95;
+  --violet-10: #2B0538;
+
+  /* Legacy theme variables (keeping for compatibility) */
+  --background: var(--neutral-0);
+  --foreground: var(--neutral-9);
+  --card: var(--neutral-0);
+  --card-foreground: var(--neutral-9);
+  --popover: var(--neutral-0);
+  --popover-foreground: var(--neutral-9);
+  --primary: var(--digital-twin-8);
+  --primary-foreground: var(--neutral-0);
+  --secondary: var(--blue-7);
+  --secondary-foreground: var(--neutral-0);
+  --muted: var(--neutral-1);
+  --muted-foreground: var(--neutral-6);
+  --accent: var(--neutral-1);
+  --accent-foreground: var(--neutral-8);
+  --destructive: var(--alert-7);
+  --destructive-foreground: var(--neutral-0);
+  --border: var(--neutral-2);
+  --input: var(--neutral-2);
+  --ring: var(--neutral-7);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: var(--neutral-05);
+  --sidebar-foreground: var(--neutral-9);
+  --sidebar-primary: var(--neutral-8);
+  --sidebar-primary-foreground: var(--neutral-05);
+  --sidebar-accent: var(--neutral-1);
+  --sidebar-accent-foreground: var(--neutral-8);
+  --sidebar-border: var(--neutral-2);
+  --sidebar-ring: var(--neutral-7);
 }
  
 .dark {
