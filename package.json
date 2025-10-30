@@ -1,5 +1,5 @@
 {
-  "name": "ipa-ui",
+  "name": "@invicara/ipa-ui",
   "version": "1.0.0",
   "description": "Invicara's design system implementation",
   "main": "dist/cjs/index.js",
@@ -76,5 +76,12 @@
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
-  }
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+     "type": "git",
+     "url": "git+https://github.com/Invicara/Twinit-IPA-UI.git"
+   }
 }
