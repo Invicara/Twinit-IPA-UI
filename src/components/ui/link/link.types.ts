@@ -1,6 +1,4 @@
 import { type VariantProps } from "class-variance-authority"
-import { LinkProps as NextLinkProps } from "next/link"
-
 import { linkVariants } from "./link"
 
 export interface LinkProps
