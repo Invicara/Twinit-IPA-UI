@@ -1,30 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
-import { Dropdown } from './dropdown';
+import { SingleSelect, MultiSelect } from './index';
 
-const meta: Meta<typeof Dropdown> = {
+const meta: Meta<typeof SingleSelect> = {
   title: 'UI/Dropdown',
-  component: Dropdown,
+  component: SingleSelect,
   parameters: {
     layout: 'centered',
   },
   argTypes: {
-    variant: {
-      control: { type: 'select' },
-      options: ['single', 'multiselect'],
-      description: 'Dropdown variant - single select or multiselect',
-    },
     placeholder: {
       control: { type: 'text' },
       description: 'Placeholder text shown when no option is selected',
     },
-    maxDisplayBadges: {
-      control: { type: 'number' },
-      description: 'Maximum number of badges to display before showing +N',
-    },
     disabled: {
       control: { type: 'boolean' },
       description: 'Disable the dropdown',
+    },
+    filter: {
+      control: { type: 'boolean' },
+      description: 'Enable search/filter functionality',
     },
     className: {
       control: { type: 'text' },
@@ -52,20 +47,53 @@ const defaultOptions = [
 export const Default: Story = {
   args: {
     options: defaultOptions,
-    variant: 'single',
     placeholder: 'Select an option',
   },
   render: (args) => {
     const [value, setValue] = useState<string>('');
     return (
-      <Dropdown
+      <SingleSelect
         options={args.options}
-        variant={args.variant}
         placeholder={args.placeholder}
         disabled={args.disabled}
         className={args.className}
         value={value}
-        onChange={(val) => setValue(val as string)}
+        onChange={(val) => setValue(val)}
+      />
+    );
+  },
+};
+
+const filterOptions = [
+  { value: 'fruit1', label: 'Apple orange kiwi pear' },
+  { value: 'fruit2', label: 'Kiwi apple orange' },
+  { value: 'fruit3', label: 'Pear orange apple kiwi' },
+  { value: 'fruit4', label: 'Orange pear kiwi apple' },
+  { value: 'fruit5', label: 'Apple kiwi orange pear' },
+  { value: 'fruit6', label: 'Kiwi pear apple orange' },
+  { value: 'fruit7', label: 'Orange apple pear kiwi' },
+  { value: 'fruit8', label: 'Pear kiwi orange apple' },
+  { value: 'ipsum1', label: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod' },
+  { value: 'ipsum2', label: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua' },
+];
+
+export const Filter: Story = {
+  args: {
+    options: filterOptions,
+    placeholder: 'Type to search...',
+    filter: true,
+  },
+  render: (args) => {
+    const [value, setValue] = useState<string>('');
+    return (
+      <SingleSelect
+        options={args.options}
+        placeholder={args.placeholder}
+        disabled={args.disabled}
+        filter={args.filter}
+        className={args.className}
+        value={value}
+        onChange={(val) => setValue(val)}
       />
     );
   },
@@ -74,22 +102,18 @@ export const Default: Story = {
 export const Multiselect: Story = {
   args: {
     options: defaultOptions,
-    variant: 'multiselect',
     placeholder: 'Select multiple options',
-    maxDisplayBadges: 2,
   },
   render: (args) => {
     const [value, setValue] = useState<string[]>([]);
     return (
-      <Dropdown
+      <MultiSelect
         options={args.options}
-        variant={args.variant}
         placeholder={args.placeholder}
-        maxDisplayBadges={args.maxDisplayBadges}
         disabled={args.disabled}
         className={args.className}
         value={value}
-        onChange={(val) => setValue(val as string[])}
+        onChange={(val) => setValue(val)}
       />
     );
   },

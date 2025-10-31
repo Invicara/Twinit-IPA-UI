@@ -7,7 +7,10 @@ export interface DropdownOption {
 export interface DropdownProps {
   className?: string;
   options: DropdownOption[];
-  value?: string;
-  onChange?: (value: string) => void;
+  value?: string | string[];
+  onChange?: (value: string | string[]) => void;
   disabled?: boolean;
+  variant?: 'single' | 'multiselect' | 'filter';
+  placeholder?: string;
+  maxDisplayBadges?: number;
 }
