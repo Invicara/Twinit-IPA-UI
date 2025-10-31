@@ -71,16 +71,16 @@ const RadioGroup = React.forwardRef<
                   id={`${groupId}-${option.value}`}
                   disabled={isDisabled}
                   className={cn(
-                    "group relative h-[16px] w-[16px] rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-digital-twin-3",
+                    "group relative h-[16px] w-[16px] rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand-3",
                     isDisabled 
                       ? "border-neutral-4 bg-neutral-1 cursor-not-allowed"
-                      : "border-neutral-5 hover:border-digital-twin-8 data-[state=checked]:border-digital-twin-8 data-[state=checked]:bg-white"
+                      : "border-neutral-5 hover:border-brand-8 data-[state=checked]:border-brand-8 data-[state=checked]:bg-white"
                   )}
                 >
                   <RadioGroupPrimitive.Indicator 
                     className={cn(
                       "flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-[8px] after:h-[8px] after:rounded-full",
-                      isDisabled ? "after:bg-neutral-5" : "after:bg-digital-twin-8"
+                      isDisabled ? "after:bg-neutral-5" : "after:bg-brand-8"
                     )}
                   />
                 </RadioGroupPrimitive.Item>

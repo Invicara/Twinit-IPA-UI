@@ -13,7 +13,7 @@ const inputVariants = cva(
   {
     variants: {
       state: {
-        default: "border-neutral-5 hover:border-neutral-7 focus:border-digital-twin-6",
+        default: "border-neutral-5 hover:border-neutral-7 focus:border-brand-6",
         error: "border-alert-7 focus:border-alert-5",
         success: "border-positive-7 focus:border-positive-5",
         warning: "border-warning-9 focus:border-warning-7",

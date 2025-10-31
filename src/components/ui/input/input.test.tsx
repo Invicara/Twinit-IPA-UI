@@ -62,7 +62,7 @@ describe("Input", () => {
     const input = screen.getByTestId("input");
     expect(input).toHaveClass("border-neutral-5");
     // Focus styling is applied via CSS :focus pseudo-class
-    expect(input).toHaveClass("focus:border-digital-twin-6");
+    expect(input).toHaveClass("focus:border-brand-6");
   });
 
   test("applies correct state classes for error state", () => {

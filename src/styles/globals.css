@@ -10,6 +10,18 @@
 @custom-variant dark (&:is(.dark *));
  
 :root {
+  /* Brand Colors (can replace with custom colors) */
+  --brand-1: #FDF3F9;
+  --brand-2: #FCE8F4;
+  --brand-3: #F9D0E8;
+  --brand-4: #F5B9DD;
+  --brand-5: #F2A1D1;
+  --brand-6: #EC73BA;
+  --brand-7: #E544A3;
+  --brand-8: #DF158C;
+  --brand-9: #B21170;
+  --brand-10: #860D54;
+
   /* Digital Twin Colors */
   --digital-twin-1: #FDF3F9;
   --digital-twin-2: #FCE8F4;
@@ -127,7 +139,7 @@
   --card-foreground: var(--neutral-9);
   --popover: var(--neutral-0);
   --popover-foreground: var(--neutral-9);
-  --primary: var(--digital-twin-8);
+  --primary: var(--brand-8);
   --primary-foreground: var(--neutral-0);
   --secondary: var(--blue-7);
   --secondary-foreground: var(--neutral-0);

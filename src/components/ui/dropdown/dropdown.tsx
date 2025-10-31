@@ -136,7 +136,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
             onClick={() => setIsOpen(!isOpen)}
             disabled={disabled}
             className={cn(
-              "flex items-center justify-between rounded-[4px] border border-neutral-6 bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[19px] text-neutral-6 transition-colors focus-visible:outline-none focus:border-digital-twin-6 focus-visible:border-digital-twin-6 hover:border-neutral-6",
+              "flex items-center justify-between rounded-[4px] border border-neutral-6 bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[19px] text-neutral-6 transition-colors focus-visible:outline-none focus:border-brand-6 focus-visible:border-brand-6 hover:border-neutral-6",
               "min-h-[36px] w-[284px]",
               disabled && "border-neutral-5 bg-neutral-1 text-neutral-5 cursor-not-allowed",
               className
@@ -150,7 +150,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
                     {visibleBadges.map((option) => (
                       <div
                         key={option.value}
-                        className="inline-flex items-center gap-1 bg-digital-twin-3 text-digital-twin-8 px-2 py-1 rounded-[4px] text-xs font-medium"
+                        className="inline-flex items-center gap-1 bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium"
                       >
                         <span>{truncateText(option.label)}</span>
                         <span
@@ -158,14 +158,14 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
                             e.stopPropagation();
                             handleRemoveBadge(option.value);
                           }}
-                          className="hover:bg-digital-twin-8/20 rounded-[4px] p-0.5 cursor-pointer"
+                          className="hover:bg-brand-8/20 rounded-[4px] p-0.5 cursor-pointer"
                         >
-                          <XIcon className="text-digital-twin-8" />
+                          <XIcon className="text-brand-8" />
                         </span>
                       </div>
                     ))}
                     {remainingCount > 0 && (
-                      <div className="inline-flex items-center bg-digital-twin-3 text-digital-twin-8 px-2 py-1 rounded-[4px] text-xs font-medium">
+                      <div className="inline-flex items-center bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium">
                         +{remainingCount}
                       </div>
                     )}
@@ -238,7 +238,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
                         className={cn(
                           "w-4 h-4 rounded-[4px] flex items-center justify-center border",
                           selectedValues.includes(option.value) 
-                            ? "bg-digital-twin-8 border-digital-twin-8" 
+                            ? "bg-brand-8 border-brand-8" 
                             : "bg-white border-neutral-5"
                         )}
                       >
@@ -291,7 +291,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
         >
           <Select.Trigger
             className={cn(
-              "flex items-center justify-between rounded-[4px] border border-neutral-6 bg-neutral-0 px-[12px] py-[8px] font-sans text-[14px] font-normal leading-[19px] text-neutral-6 transition-colors focus-visible:outline-none focus:border-digital-twin-6 focus-visible:border-digital-twin-6 hover:border-neutral-6 data-[state=open]:border-digital-twin-6",
+              "flex items-center justify-between rounded-[4px] border border-neutral-6 bg-neutral-0 px-[12px] py-[8px] font-sans text-[14px] font-normal leading-[19px] text-neutral-6 transition-colors focus-visible:outline-none focus:border-brand-6 focus-visible:border-brand-6 hover:border-neutral-6 data-[state=open]:border-brand-6",
               isMultiselect ? "min-h-[36px] w-[284px]" : "h-[36px] w-[284px]",
               disabled && "border-neutral-5 bg-neutral-1 text-neutral-5 cursor-not-allowed",
               className

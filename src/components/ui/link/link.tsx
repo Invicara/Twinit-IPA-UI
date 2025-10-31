@@ -11,8 +11,8 @@ const linkVariants = cva(
   {
     variants: {
       variant: {
-        default: "text-digital-twin-8 hover:text-digital-twin-6 active:text-digital-twin-9 focus:text-digital-twin-6 flex items-center gap-[4px]",
-        inline: "text-digital-twin-8 hover:text-digital-twin-6 active:text-digital-twin-9 focus:text-digital-twin-6 underline hover:no-underline underline-offset-2",
+        default: "text-brand-8 hover:text-brand-6 active:text-brand-9 focus:text-brand-6 flex items-center gap-[4px]",
+        inline: "text-brand-8 hover:text-brand-6 active:text-brand-9 focus:text-brand-6 underline hover:no-underline underline-offset-2",
       },
       disabled: {
         true: "text-neutral-5 cursor-not-allowed pointer-events-none",

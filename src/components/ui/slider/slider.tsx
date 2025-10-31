@@ -118,7 +118,7 @@ const Slider = React.forwardRef<
                 <SliderPrimitive.Range
                   className={cn(
                     "absolute h-full rounded-full",
-                    disabled ? "bg-neutral-5" : "bg-digital-twin-8"
+                    disabled ? "bg-neutral-5" : "bg-brand-8"
                   )}
                 />
               </SliderPrimitive.Track>
@@ -127,10 +127,10 @@ const Slider = React.forwardRef<
                 <SliderPrimitive.Thumb
                   key={index}
                   className={cn(
-                    "block w-[20px] h-[20px] rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-digital-twin-8 focus-visible:ring-offset-0",
+                    "block w-[20px] h-[20px] rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-8 focus-visible:ring-offset-0",
                     disabled 
                       ? "bg-neutral-5 cursor-not-allowed"
-                      : "bg-digital-twin-8 hover:bg-digital-twin-7 cursor-grab active:cursor-grabbing"
+                      : "bg-brand-8 hover:bg-brand-7 cursor-grab active:cursor-grabbing"
                   )}
                 />
               ))}
@@ -157,7 +157,7 @@ const Slider = React.forwardRef<
                   "w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none",
                   disabled
                     ? "border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed"
-                    : "border-neutral-5 hover:border-neutral-7 focus:border-digital-twin-6"
+                    : "border-neutral-5 hover:border-neutral-7 focus:border-brand-6"
                 )}
               />
               <input
@@ -172,7 +172,7 @@ const Slider = React.forwardRef<
                   "w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none",
                   disabled
                     ? "border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed"
-                    : "border-neutral-5 hover:border-neutral-7 focus:border-digital-twin-6"
+                    : "border-neutral-5 hover:border-neutral-7 focus:border-brand-6"
                 )}
               />
             </>
@@ -190,7 +190,7 @@ const Slider = React.forwardRef<
                   "w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none",
                   disabled
                     ? "border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed"
-                    : "border-neutral-5 hover:border-neutral-7 focus:border-digital-twin-6"
+                    : "border-neutral-5 hover:border-neutral-7 focus:border-brand-6"
                 )}
               />
             </div>

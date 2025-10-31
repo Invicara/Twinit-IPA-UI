@@ -15,6 +15,19 @@ module.exports = {
         '3xl': '1920px',
       },
       colors: {
+        // Brand Colors
+        'brand': {
+          1: 'var(--brand-1)',
+          2: 'var(--brand-2)',
+          3: 'var(--brand-3)',
+          4: 'var(--brand-4)',
+          5: 'var(--brand-5)',
+          6: 'var(--brand-6)',
+          7: 'var(--brand-7)',
+          8: 'var(--brand-8)',
+          9: 'var(--brand-9)',
+          10: 'var(--brand-10)',
+        },
         // Digital Twin Colors
         'digital-twin': {
           1: 'var(--digital-twin-1)',
