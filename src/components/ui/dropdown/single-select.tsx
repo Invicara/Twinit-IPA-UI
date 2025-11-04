@@ -399,7 +399,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             setSearchQuery('');
             setIsInputFocused(false);
             setFocusedIndex(-1);
-          }} footer={!hideFooter} popAbove={popAbove} className={classNames?.popup}>
+          }} footer={false} popAbove={popAbove} className={classNames?.popup}>
             <div className={cn("px-[12px] py-[8px] text-[14px] text-neutral-5 text-center", classNames?.noResults)}>
               No options found
             </div>
