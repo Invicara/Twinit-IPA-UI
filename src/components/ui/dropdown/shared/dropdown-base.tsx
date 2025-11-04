@@ -10,6 +10,7 @@ interface DropdownPopupProps {
   children: ReactNode;
   className?: string;
   footer?: boolean;
+  popAbove?: boolean;
 }
 
 interface DropdownTriggerProps {
@@ -22,6 +23,7 @@ interface DropdownTriggerProps {
   onKeyDown?: (e: React.KeyboardEvent) => void;
   customIcon?: ReactNode;
   iconClassName?: string;
+  enableIconAnimation?: boolean;
 }
 
 export function DropdownTrigger({
@@ -33,7 +35,8 @@ export function DropdownTrigger({
   customTrigger,
   onKeyDown,
   customIcon,
-  iconClassName
+  iconClassName,
+  enableIconAnimation = true
 }: DropdownTriggerProps) {
   if (customTrigger) {
     return <>{customTrigger}</>;
@@ -55,8 +58,8 @@ export function DropdownTrigger({
       {children}
       {customIcon ? (
         <div className={cn(
-          "transition-transform duration-200",
-          isOpen && "rotate-180",
+          enableIconAnimation && "transition-transform duration-200",
+          enableIconAnimation && isOpen && "rotate-180",
           iconClassName
         )}>
           {customIcon}
@@ -64,7 +67,8 @@ export function DropdownTrigger({
       ) : (
         <ChevronDownIcon className={cn(
           "h-5 w-5 stroke-[1.5] text-neutral-5",
-          isOpen && "rotate-180",
+          enableIconAnimation && "transition-transform duration-200",
+          enableIconAnimation && isOpen && "rotate-180",
           iconClassName
         )} />
       )}
@@ -77,28 +81,40 @@ export function DropdownPopup({
   onClose,
   children,
   className,
-  footer = true
+  footer = true,
+  popAbove = false
 }: DropdownPopupProps) {
   if (!isOpen) return null;
 
+  const footerElement = footer && (
+    <div className={DROPDOWN_STYLES.footer} onClick={onClose}>
+      <ChevronDownIcon className="h-5 w-5 text-neutral-5 stroke-[1.5] group-hover:rotate-180 transition-transform duration-200" />
+    </div>
+  );
+
   return (
-    <div className={cn(DROPDOWN_STYLES.popup, className)}>
+    <div className={cn(
+      DROPDOWN_STYLES.popup,
+      popAbove ? "bottom-full mb-1 flex-col-reverse" : "top-full mt-1",
+      className
+    )}>
+      {popAbove && footerElement}
       {children}
-      {footer && (
-        <div className={DROPDOWN_STYLES.footer} onClick={onClose}>
-          <ChevronDownIcon className="h-5 w-5 text-neutral-5 stroke-[1.5] group-hover:rotate-180 transition-transform duration-200" />
-        </div>
-      )}
+      {!popAbove && footerElement}
     </div>
   );
 }
 
 export function DropdownScrollableContent({ 
   children,
-  className
-}: { children: ReactNode; className?: string }) {
+  className,
+  scrollable = true
+}: { children: ReactNode; className?: string; scrollable?: boolean }) {
   return (
-    <div className={cn(DROPDOWN_STYLES.scrollContent, className)}>
+    <div className={cn(
+      scrollable ? DROPDOWN_STYLES.scrollContent : "flex-1",
+      className
+    )}>
       {children}
     </div>
   );

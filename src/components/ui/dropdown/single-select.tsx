@@ -8,6 +8,7 @@ import { startTextAnimation, stopTextAnimation } from "./shared/dropdown-text-ut
 import '../../../output.css';
 
 export interface SingleSelectProps {
+  // Core Props
   className?: string;
   options: Array<{ value: string; label: string; disabled?: boolean }>;
   value?: string;
@@ -15,15 +16,31 @@ export interface SingleSelectProps {
   disabled?: boolean;
   placeholder?: string;
   filter?: boolean;
+  
+  // Feature Toggles & Behavior Options
+  hideFooter?: boolean;
+  hideRowHighlight?: boolean;
+  hideEllipsis?: boolean;
+  disableKeyboardNavigation?: boolean;
+  disableIconAnimation?: boolean;
+  disableTextAnimation?: boolean;
+  disableScrolling?: boolean;
+  disableCloseOnOutsideClick?: boolean;
+  closeOnInputClick?: boolean;
+  popAbove?: boolean;
+
+  // Icons
   icons?: {
-    trigger?: React.ReactNode;
-    footer?: React.ReactNode;
+    trigger?: React.ReactNode; 
+    footer?: React.ReactNode;  
   };
+  
+  // Styling
   classNames?: {
     container?: string;
     trigger?: string;
-    icon?: string;
-    iconChevron?: string;
+    triggerIconContainer?: string;
+    triggerIcon?: string;
     popup?: string;
     scrollContent?: string;
     item?: string;
@@ -48,6 +65,16 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       disabled,
       placeholder,
       filter = false,
+      hideFooter,
+      hideRowHighlight,
+      hideEllipsis,
+      disableKeyboardNavigation,
+      disableIconAnimation,
+      disableTextAnimation,
+      disableScrolling,
+      disableCloseOnOutsideClick,
+      closeOnInputClick,
+      popAbove,
       icons,
       classNames,
       ...props
@@ -68,10 +95,12 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
     const searchInputRef = React.useRef<HTMLInputElement | null>(null);
 
     useClickOutside(dropdownRef, () => {
-      setIsSearchOpen(false);
-      setSearchQuery('');
-      setIsInputFocused(false);
-    }, isSearchOpen);
+      if (!disableCloseOnOutsideClick) {
+        setIsSearchOpen(false);
+        setSearchQuery('');
+        setIsInputFocused(false);
+      }
+    }, isSearchOpen && !disableCloseOnOutsideClick);
 
     const filteredOptions = options.filter(option =>
       option.label.toLowerCase().includes(searchQuery.toLowerCase())
@@ -141,6 +170,8 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
     }, [isSearchOpen]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (disableKeyboardNavigation) return;
+      
       // Set keyboard mode on any key press
       setIsKeyboardMode(true);
       if (e.key === 'Enter' && !isSearchOpen && filteredOptions.length > 0) {
@@ -225,13 +256,20 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             }}
             onFocus={() => {
               setIsInputFocused(true);
-              setIsSearchOpen(true);
+              if (!closeOnInputClick || !isSearchOpen) {
+                setIsSearchOpen(true);
+              }
               if (!filter) {
                 setSearchQuery('');
               } else if (selectedOption) {
                 setSearchQuery('');
               }
               setFocusedIndex(-1);
+            }}
+            onClick={() => {
+              if (closeOnInputClick && isSearchOpen) {
+                setIsSearchOpen(false);
+              }
             }}
             onBlur={() => {
               setIsInputFocused(false);
@@ -253,34 +291,35 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
               classNames?.trigger
             )}
           />
-          <div className={cn("absolute right-[12px] top-1/2 -translate-y-1/2 pointer-events-none", classNames?.icon)}>
+          <div className={cn("absolute right-[12px] top-1/2 -translate-y-1/2 pointer-events-none", classNames?.triggerIconContainer)}>
             {icons?.trigger ? (
               <div className={cn(
-                "transition-transform duration-200",
-                isSearchOpen && "rotate-180",
-                classNames?.iconChevron
+                !disableIconAnimation && "transition-transform duration-200",
+                !disableIconAnimation && isSearchOpen && "rotate-180",
+                classNames?.triggerIcon
               )}>
                 {icons.trigger}
               </div>
             ) : (
               <ChevronDownIcon className={cn(
-                "h-5 w-5 stroke-[1.5] text-neutral-5 transition-transform duration-200", 
-                isSearchOpen && "rotate-180",
-                classNames?.iconChevron
+                "h-5 w-5 stroke-[1.5] text-neutral-5",
+                !disableIconAnimation && "transition-transform duration-200", 
+                !disableIconAnimation && isSearchOpen && "rotate-180",
+                classNames?.triggerIcon
               )} />
             )}
           </div>
         </div>
         
         {isSearchOpen && filteredOptions.length > 0 && (
-          <DropdownPopup isOpen={true} onClose={() => setIsSearchOpen(false)} className={classNames?.popup}>
-            <DropdownScrollableContent className={classNames?.scrollContent}>
+          <DropdownPopup isOpen={true} onClose={() => setIsSearchOpen(false)} className={classNames?.popup} footer={!hideFooter} popAbove={popAbove}>
+            <DropdownScrollableContent className={classNames?.scrollContent} scrollable={!disableScrolling}>
               {filteredOptions.map((option, index) => (
                 <button
                   key={option.value}
                   ref={(el) => {
                     itemRefs.current[index] = el;
-                    if (el) {
+                    if (!hideEllipsis && el) {
                       const textElement = el.querySelector('.scrollable-text') as HTMLElement;
                       const ellipsisElement = el.querySelector('.ellipsis-indicator') as HTMLElement;
                       if (textElement && ellipsisElement && textElement.scrollWidth <= textElement.clientWidth) {
@@ -306,31 +345,35 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                     if (!isKeyboardMode) {
                       setFocusedIndex(index);
                     }
-                    const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
-                    const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
-                    if (textElement && textElement.scrollWidth > textElement.clientWidth) {
-                      startTextAnimation(textElement);
-                      if (ellipsisElement) {
-                        ellipsisElement.style.opacity = '0';
+                    if (!disableTextAnimation) {
+                      const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
+                      const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
+                      if (textElement && textElement.scrollWidth > textElement.clientWidth) {
+                        startTextAnimation(textElement);
+                        if (ellipsisElement) {
+                          ellipsisElement.style.opacity = '0';
+                        }
                       }
                     }
                   }}
                   onMouseLeave={(e) => {
-                    const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
-                    const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
-                    if (textElement) {
-                      stopTextAnimation(textElement);
-                    }
-                    if (ellipsisElement) {
-                      ellipsisElement.style.opacity = '1';
+                    if (!disableTextAnimation) {
+                      const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
+                      const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
+                      if (textElement) {
+                        stopTextAnimation(textElement);
+                      }
+                      if (ellipsisElement) {
+                        ellipsisElement.style.opacity = '1';
+                      }
                     }
                   }}
                   className={cn(
                     DROPDOWN_STYLES.itemBase,
-                    focusedIndex === index && "bg-brand-1",
-                    !isKeyboardMode && "hover:bg-brand-1",
+                    !hideRowHighlight && focusedIndex === index && "bg-brand-1",
+                    !hideRowHighlight && !isKeyboardMode && "hover:bg-brand-1",
                     classNames?.item,
-                    focusedIndex === index && classNames?.itemFocused,
+                    !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
                     option.disabled && classNames?.itemDisabled
                   )}
                 >
@@ -338,9 +381,11 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                     <span className={cn("scrollable-text whitespace-nowrap block text-left", classNames?.itemText)}>
                       {filter ? highlightMatch(option.label, searchQuery) : option.label}
                     </span>
-                    <span className={cn("ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6", classNames?.ellipsis)}>
-                      ..
-                    </span>
+                    {!hideEllipsis && (
+                      <span className={cn("ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6", classNames?.ellipsis)}>
+                        ..
+                      </span>
+                    )}
                   </div>
                 </button>
               ))}
@@ -354,24 +399,56 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             setSearchQuery('');
             setIsInputFocused(false);
             setFocusedIndex(-1);
-          }} footer={false} className={classNames?.popup}>
+          }} footer={!hideFooter} popAbove={popAbove} className={classNames?.popup}>
             <div className={cn("px-[12px] py-[8px] text-[14px] text-neutral-5 text-center", classNames?.noResults)}>
               No options found
             </div>
-            <div className={cn(DROPDOWN_STYLES.footer, classNames?.footer)} onClick={() => {
-              setIsSearchOpen(false);
-              setSearchQuery('');
-              setIsInputFocused(false);
-              setFocusedIndex(-1);
-            }}>
-              {icons?.footer ? (
-                <div className={cn("group-hover:rotate-180 transition-transform duration-200", classNames?.footerIcon)}>
-                  {icons.footer}
-                </div>
-              ) : (
-                <ChevronDownIcon className={cn("h-5 w-5 text-neutral-5 stroke-[1.5] group-hover:rotate-180 transition-transform duration-200", classNames?.footerIcon)} />
-              )}
-            </div>
+            {!popAbove && !hideFooter && (
+              <div className={cn(DROPDOWN_STYLES.footer, classNames?.footer)} onClick={() => {
+                setIsSearchOpen(false);
+                setSearchQuery('');
+                setIsInputFocused(false);
+                setFocusedIndex(-1);
+              }}>
+                {icons?.footer ? (
+                  <div className={cn(
+                    !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
+                    classNames?.footerIcon
+                  )}>
+                    {icons.footer}
+                  </div>
+                ) : (
+                  <ChevronDownIcon className={cn(
+                    "h-5 w-5 text-neutral-5 stroke-[1.5]",
+                    !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
+                    classNames?.footerIcon
+                  )} />
+                )}
+              </div>
+            )}
+            {popAbove && !hideFooter && (
+              <div className={cn(DROPDOWN_STYLES.footer, classNames?.footer)} onClick={() => {
+                setIsSearchOpen(false);
+                setSearchQuery('');
+                setIsInputFocused(false);
+                setFocusedIndex(-1);
+              }}>
+                {icons?.footer ? (
+                  <div className={cn(
+                    !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
+                    classNames?.footerIcon
+                  )}>
+                    {icons.footer}
+                  </div>
+                ) : (
+                  <ChevronDownIcon className={cn(
+                    "h-5 w-5 text-neutral-5 stroke-[1.5]",
+                    !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
+                    classNames?.footerIcon
+                  )} />
+                )}
+              </div>
+            )}
           </DropdownPopup>
         )}
       </div>

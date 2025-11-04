@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 import { SingleSelect, MultiSelect } from './index';
-import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import { ArrowDownIcon } from '@radix-ui/react-icons';
 
 const meta: Meta<typeof SingleSelect> = {
   title: 'UI/Dropdown',
@@ -128,22 +128,23 @@ export const Multiselect: Story = {
   },
 };
 
-// Define custom styles outside to avoid Storybook serialization issues
-const customMultiselectIcons = { trigger: <ArrowUpIcon className="h-3 w-3 text-orange-500 stroke-[4.5]" />};
+const customMultiselectIcons = {
+  trigger: <ArrowDownIcon className="h-4 w-4 stroke-orange-500 stroke-1"/>
+};
 
 const customMultiselectClassNames = {
   container: 'font-mono',
-  trigger: 'rounded-none w-[350px] focus:border-orange-500 focus:border-[2px] focus-visible:border-orange-500 focus-visible:outline-none cursor-crosshair min-h-[44px] hover:border-orange-400',
+  trigger: 'rounded-none w-[360px] focus:border-orange-500 focus:border-[2px] focus-visible:border-orange-500 focus-visible:outline-none cursor-crosshair min-h-[44px] hover:border-orange-400',
   triggerIcon: 'text-orange-500 stroke-[2.5]',
   badge: 'rounded-none bg-orange-100 text-orange-700',
   badgeText: 'font-bold',
   badgeRemove: 'rounded-none hover:bg-orange-300',
   badgeRemoveIcon: 'text-orange-600 stroke-[2]',
-  remainingBadge: 'rounded-none bg-orange-200 text-orange-800',
-  popup: 'shadow-none rounded-none w-[350px] border-2 border-orange-500',
-  header: 'bg-orange-50 border-b-2 border-orange-200',
-  item: 'font-mono hover:bg-yellow-200 cursor-crosshair',
-  itemFocused: 'bg-yellow-200',
+  remainingBadge: 'rounded-none bg-orange-180 text-orange-800',
+  popup: 'shadow-none rounded-none w-[200px] border-2 border-orange-500 left-0 text-orange-600',
+  scrollContent: 'cursor-copy',
+  header: 'bg-orange-50 border-b-2 border-orange-200 text-orange-200',
+  item: 'font-arial cursor-crosshair text-orange-700',
   checkbox: 'w-3 h-3 rounded-full border-2 border-orange-500 bg-white',
   checkboxChecked: 'bg-orange-500 border-orange-600',
   checkIcon: 'hidden',
@@ -165,14 +166,21 @@ export const CustomMultiselect: Story = {
     const [value, setValue] = useState<string[]>(['option2', 'option5']);
     
     return (
-      <MultiSelect
-        options={args.options}
-        placeholder={args.placeholder}
-        value={value}
-        onChange={(val) => setValue(val)}
-        icons={customMultiselectIcons}
-        classNames={customMultiselectClassNames}
-      />
+      <div className="pt-64">
+        <MultiSelect
+          options={args.options}
+          placeholder={args.placeholder}
+          value={value}
+          onChange={(val) => setValue(val)}
+          maxDisplayBadges={3}
+          hideFooter
+          hideRowHighlight
+          rightAlignCheckboxes
+          popAbove
+          icons={customMultiselectIcons}
+          classNames={customMultiselectClassNames}
+        />
+      </div>
     );
   },
 };

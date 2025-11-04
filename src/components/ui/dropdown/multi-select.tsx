@@ -9,6 +9,7 @@ import { startTextAnimation, stopTextAnimation, truncateText } from "./shared/dr
 import '../../../output.css';
 
 export interface MultiSelectProps {
+  // Core Props
   className?: string;
   options: Array<{ value: string; label: string; disabled?: boolean }>;
   value?: string[];
@@ -16,14 +17,44 @@ export interface MultiSelectProps {
   disabled?: boolean;
   placeholder?: string;
   maxDisplayBadges?: number;
+  
+  // Feature Toggles & Behavior Options
+  hideFooter?: boolean;
+  hideRowHighlight?: boolean;
+  hideEllipsis?: boolean;
+  hideRemainingBadge?: boolean;
+  hideSelectionCount?: boolean;
+  hideCheckboxes?: boolean;
+  hideBadgeRemove?: boolean;
+  disableKeyboardNavigation?: boolean;
+  disableIconAnimation?: boolean;
+  disableTextAnimation?: boolean;
+  disableScrolling?: boolean;
+  disableCloseOnOutsideClick?: boolean;
+  disableCloseOnTriggerClick?: boolean;
+  rightAlignCheckboxes?: boolean;
+  wrapBadges?: boolean;
+  popAbove?: boolean;
+
+  // Icons
   icons?: {
     trigger?: React.ReactNode;
-    close?: React.ReactNode;
+    badgeClose?: React.ReactNode;
     check?: React.ReactNode;
   };
+  
+  // Styling
   classNames?: {
     container?: string;
     trigger?: string;
+    popup?: string;
+    scrollContent?: string;
+    item?: string;
+    itemFocused?: string;
+    itemDisabled?: string;
+    itemText?: string;
+    ellipsis?: string;
+    footer?: string;
     triggerContent?: string;
     triggerIcon?: string;
     badge?: string;
@@ -32,18 +63,10 @@ export interface MultiSelectProps {
     badgeRemoveIcon?: string;
     remainingBadge?: string;
     placeholder?: string;
-    popup?: string;
     header?: string;
-    scrollContent?: string;
-    item?: string;
-    itemFocused?: string;
-    itemDisabled?: string;
     checkbox?: string;
     checkboxChecked?: string;
     checkIcon?: string;
-    itemText?: string;
-    ellipsis?: string;
-    footer?: string;
   };
 }
 
@@ -57,6 +80,22 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       disabled,
       placeholder = 'Select multiple options',
       maxDisplayBadges = 2,
+      hideFooter,
+      hideRowHighlight,
+      hideEllipsis,
+      hideRemainingBadge,
+      hideSelectionCount,
+      hideCheckboxes,
+      hideBadgeRemove,
+      disableKeyboardNavigation,
+      disableIconAnimation,
+      disableTextAnimation,
+      disableScrolling,
+      disableCloseOnOutsideClick,
+      disableCloseOnTriggerClick,
+      rightAlignCheckboxes,
+      wrapBadges,
+      popAbove,
       icons,
       classNames,
       ...props
@@ -84,9 +123,11 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     });
 
     useClickOutside(dropdownRef, () => {
-      setIsOpen(false);
-      resetFocus();
-    }, isOpen);
+      if (!disableCloseOnOutsideClick) {
+        setIsOpen(false);
+        resetFocus();
+      }
+    }, isOpen && !disableCloseOnOutsideClick);
 
     const getSelectedOptions = () => {
       return options.filter(option => value.includes(option.value));
@@ -115,6 +156,8 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     const { visibleBadges, remainingCount } = getDisplayBadges();
 
     const triggerKeyDown = (e: React.KeyboardEvent) => {
+      if (disableKeyboardNavigation) return;
+      
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         if (!isOpen) {
@@ -143,41 +186,54 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
         {...props}
       >
         <DropdownTrigger
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            if (isOpen && !disableCloseOnTriggerClick) {
+              setIsOpen(false);
+            } else {
+              setIsOpen(!isOpen);
+            }
+          }}
           onKeyDown={triggerKeyDown}
           disabled={disabled}
           isOpen={isOpen}
           className={cn("min-h-[36px]", className, classNames?.trigger)}
           customIcon={icons?.trigger}
           iconClassName={classNames?.triggerIcon}
+          enableIconAnimation={!disableIconAnimation}
         >
-          <div className={cn("flex flex-wrap gap-1 flex-1 min-w-0", classNames?.triggerContent)}>
+          <div className={cn(
+            "flex gap-1 flex-1 min-w-0",
+            wrapBadges ? "flex-wrap" : "overflow-x-hidden",
+            classNames?.triggerContent
+          )}>
             {visibleBadges.map((option) => (
               <div
                 key={option.value}
                 className={cn(
-                  "inline-flex items-center gap-1 bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium",
+                  "inline-flex items-center gap-1 bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium whitespace-nowrap",
                   classNames?.badge
                 )}
               >
-                <span className={classNames?.badgeText}>{truncateText(option.label)}</span>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveBadge(option.value);
-                  }}
-                  className={cn(
-                    "hover:bg-brand-8/20 rounded-[4px] p-0.5 cursor-pointer",
-                    classNames?.badgeRemove
-                  )}
-                >
-                  {icons?.close || <XIcon className={cn("text-brand-8", classNames?.badgeRemoveIcon)} />}
-                </span>
+                <span className={cn("whitespace-nowrap", classNames?.badgeText)}>{truncateText(option.label)}</span>
+                {!hideBadgeRemove && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveBadge(option.value);
+                    }}
+                    className={cn(
+                      "hover:bg-brand-8/20 rounded-[4px] p-0.5 cursor-pointer",
+                      classNames?.badgeRemove
+                    )}
+                  >
+                    {icons?.badgeClose || <XIcon className={cn("text-brand-8", classNames?.badgeRemoveIcon)} />}
+                  </span>
+                )}
               </div>
             ))}
-            {remainingCount > 0 && (
+            {!hideRemainingBadge && remainingCount > 0 && (
               <div className={cn(
-                "inline-flex items-center bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium",
+                "inline-flex items-center bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium whitespace-nowrap",
                 classNames?.remainingBadge
               )}>
                 +{remainingCount}
@@ -189,16 +245,18 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           </div>
         </DropdownTrigger>
         
-        <DropdownPopup isOpen={isOpen} onClose={() => setIsOpen(false)} className={classNames?.popup}>
-          {/* Static Header */}
-          <div className={cn("px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0", classNames?.header)}>
-            <span className="px-[6px] text-[13px] text-neutral-4">
-              {value.length} selected
-            </span>
-          </div>
+        <DropdownPopup isOpen={isOpen} onClose={() => setIsOpen(false)} className={classNames?.popup} footer={!hideFooter} popAbove={popAbove}>
+          {/* Header - shown at top when popBelow (default), at bottom when popAbove */}
+          {!popAbove && !hideSelectionCount && (
+            <div className={cn("px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0", classNames?.header)}>
+              <span className="px-[6px] text-[13px] text-neutral-4">
+                {value.length} selected
+              </span>
+            </div>
+          )}
           
           {/* Scrollable Content */}
-          <DropdownScrollableContent className={classNames?.scrollContent}>
+          <DropdownScrollableContent className={classNames?.scrollContent} scrollable={!disableScrolling}>
             {options.map((option, index) => (
               <button
                 key={option.value}
@@ -207,15 +265,16 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 onClick={() => handleMultiSelect(option.value)}
                 className={cn(
                   DROPDOWN_STYLES.itemBase,
-                  focusedIndex === index && "bg-brand-1",
-                  !isKeyboardMode && "hover:bg-brand-1",
+                  !hideRowHighlight && focusedIndex === index && "bg-brand-1",
+                  !hideRowHighlight && !isKeyboardMode && "hover:bg-brand-1",
                   classNames?.item,
-                  focusedIndex === index && classNames?.itemFocused,
-                  option.disabled && classNames?.itemDisabled
+                  !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
+                  option.disabled && classNames?.itemDisabled,
+                  rightAlignCheckboxes && 'flex-row-reverse'
                 )}
                 ref={(el) => {
                   setItemRef(el, index);
-                  if (el) {
+                  if (!hideEllipsis && el) {
                     const textElement = el.querySelector('.scrollable-text') as HTMLElement;
                     const ellipsisElement = el.querySelector('.ellipsis-indicator') as HTMLElement;
                     if (textElement && ellipsisElement && textElement.scrollWidth <= textElement.clientWidth) {
@@ -225,69 +284,89 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 }}
                 onMouseEnter={(e) => {
                   handleMouseEnter(index);
-                  const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
-                  const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
-                  if (textElement && textElement.scrollWidth > textElement.clientWidth) {
-                    startTextAnimation(textElement);
-                    if (ellipsisElement) {
-                      ellipsisElement.style.opacity = '0';
+                  if (!disableTextAnimation) {
+                    const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
+                    const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
+                    if (textElement && textElement.scrollWidth > textElement.clientWidth) {
+                      startTextAnimation(textElement);
+                      if (ellipsisElement) {
+                        ellipsisElement.style.opacity = '0';
+                      }
                     }
                   }
                 }}
                 onMouseLeave={(e) => {
-                  const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
-                  const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
-                  if (textElement) {
-                    stopTextAnimation(textElement);
-                  }
-                  if (ellipsisElement) {
-                    ellipsisElement.style.opacity = '1';
+                  if (!disableTextAnimation) {
+                    const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
+                    const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
+                    if (textElement) {
+                      stopTextAnimation(textElement);
+                    }
+                    if (ellipsisElement) {
+                      ellipsisElement.style.opacity = '1';
+                    }
                   }
                 }}
               >
-                <div className="mr-3 flex items-center justify-center">
-                  <div
-                    className={cn(
-                      "w-4 h-4 rounded-[4px] flex items-center justify-center border",
-                      value.includes(option.value) 
-                        ? "bg-brand-8 border-brand-8" 
-                        : "bg-white border-neutral-5",
-                      classNames?.checkbox,
-                      value.includes(option.value) && classNames?.checkboxChecked
-                    )}
-                  >
-                    {value.includes(option.value) && (
-                      icons?.check || (
-                        <svg 
-                          width="12" 
-                          height="12" 
-                          viewBox="0 0 12 12" 
-                          fill="none" 
-                          className={cn("text-white", classNames?.checkIcon)}
-                        >
-                          <path 
-                            d="M2 6.5L4.5 9L10 3.5" 
-                            stroke="currentColor" 
-                            strokeWidth="2.5" 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      )
-                    )}
+                {!hideCheckboxes && (
+                  <div className={cn(
+                    "mr-3 flex items-center justify-center",
+                    rightAlignCheckboxes && 'mr-0 ml-3'
+                  )}>
+                    <div
+                      className={cn(
+                        "w-4 h-4 rounded-[4px] flex items-center justify-center border",
+                        value.includes(option.value) 
+                          ? "bg-brand-8 border-brand-8" 
+                          : "bg-white border-neutral-5",
+                        classNames?.checkbox,
+                        value.includes(option.value) && classNames?.checkboxChecked
+                      )}
+                    >
+                      {value.includes(option.value) && (
+                        icons?.check || (
+                          <svg 
+                            width="12" 
+                            height="12" 
+                            viewBox="0 0 12 12" 
+                            fill="none" 
+                            className={cn("text-white", classNames?.checkIcon)}
+                          >
+                            <path 
+                              d="M2 6.5L4.5 9L10 3.5" 
+                              stroke="currentColor" 
+                              strokeWidth="2.5" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        )
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="flex-1 overflow-hidden relative">
                   <span className={cn("scrollable-text whitespace-nowrap block text-left", classNames?.itemText)}>
                     {option.label}
                   </span>
-                  <span className={cn("ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6", classNames?.ellipsis)}>
-                    ..
-                  </span>
+                  {!hideEllipsis && (
+                    <span className={cn("ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6", classNames?.ellipsis)}>
+                      ..
+                    </span>
+                  )}
                 </div>
               </button>
             ))}
           </DropdownScrollableContent>
+          
+          {/* Header - shown at bottom when popAbove */}
+          {popAbove && !hideSelectionCount && (
+            <div className={cn("px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0", classNames?.header)}>
+              <span className="px-[6px] text-[13px] text-neutral-4">
+                {value.length} selected
+              </span>
+            </div>
+          )}
         </DropdownPopup>
       </div>
     );
