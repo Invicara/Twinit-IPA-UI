@@ -15,6 +15,27 @@ export interface SingleSelectProps {
   disabled?: boolean;
   placeholder?: string;
   filter?: boolean;
+  icons?: {
+    trigger?: React.ReactNode;
+    footer?: React.ReactNode;
+  };
+  classNames?: {
+    container?: string;
+    trigger?: string;
+    icon?: string;
+    iconChevron?: string;
+    popup?: string;
+    scrollContent?: string;
+    item?: string;
+    itemFocused?: string;
+    itemDisabled?: string;
+    itemText?: string;
+    ellipsis?: string;
+    highlightedText?: string;
+    noResults?: string;
+    footer?: string;
+    footerIcon?: string;
+  };
 }
 
 export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
@@ -27,6 +48,8 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       disabled,
       placeholder,
       filter = false,
+      icons,
+      classNames,
       ...props
     },
     ref
@@ -70,7 +93,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       return (
         <>
           {before}
-          <span className="font-bold">{match}</span>
+          <span className={cn("font-bold", classNames?.highlightedText)}>{match}</span>
           {after}
         </>
       );
@@ -174,7 +197,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
 
     return (
       <div 
-        className="relative" 
+        className={cn("relative", classNames?.container)} 
         ref={(node) => {
           dropdownRef.current = node;
           if (ref) {
@@ -226,20 +249,32 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
               filter && isSearchOpen && "cursor-text",
               filter && !isSearchOpen && "cursor-pointer",
               !filter && "cursor-pointer",
-              className
+              className,
+              classNames?.trigger
             )}
           />
-          <div className="absolute right-[12px] top-1/2 -translate-y-1/2 pointer-events-none">
-            <ChevronDownIcon className={cn(
-              "h-5 w-5 stroke-[1.5] text-neutral-5 transition-transform duration-200", 
-              isSearchOpen && "rotate-180"
-            )} />
+          <div className={cn("absolute right-[12px] top-1/2 -translate-y-1/2 pointer-events-none", classNames?.icon)}>
+            {icons?.trigger ? (
+              <div className={cn(
+                "transition-transform duration-200",
+                isSearchOpen && "rotate-180",
+                classNames?.iconChevron
+              )}>
+                {icons.trigger}
+              </div>
+            ) : (
+              <ChevronDownIcon className={cn(
+                "h-5 w-5 stroke-[1.5] text-neutral-5 transition-transform duration-200", 
+                isSearchOpen && "rotate-180",
+                classNames?.iconChevron
+              )} />
+            )}
           </div>
         </div>
         
         {isSearchOpen && filteredOptions.length > 0 && (
-          <DropdownPopup isOpen={true} onClose={() => setIsSearchOpen(false)}>
-            <DropdownScrollableContent>
+          <DropdownPopup isOpen={true} onClose={() => setIsSearchOpen(false)} className={classNames?.popup}>
+            <DropdownScrollableContent className={classNames?.scrollContent}>
               {filteredOptions.map((option, index) => (
                 <button
                   key={option.value}
@@ -293,14 +328,17 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                   className={cn(
                     DROPDOWN_STYLES.itemBase,
                     focusedIndex === index && "bg-brand-1",
-                    !isKeyboardMode && "hover:bg-brand-1"
+                    !isKeyboardMode && "hover:bg-brand-1",
+                    classNames?.item,
+                    focusedIndex === index && classNames?.itemFocused,
+                    option.disabled && classNames?.itemDisabled
                   )}
                 >
                   <div className="flex-1 overflow-hidden relative">
-                    <span className="scrollable-text whitespace-nowrap block text-left">
+                    <span className={cn("scrollable-text whitespace-nowrap block text-left", classNames?.itemText)}>
                       {filter ? highlightMatch(option.label, searchQuery) : option.label}
                     </span>
-                    <span className="ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6">
+                    <span className={cn("ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6", classNames?.ellipsis)}>
                       ..
                     </span>
                   </div>
@@ -316,17 +354,23 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             setSearchQuery('');
             setIsInputFocused(false);
             setFocusedIndex(-1);
-          }} footer={false}>
-            <div className="px-[12px] py-[8px] text-[14px] text-neutral-5 text-center">
+          }} footer={false} className={classNames?.popup}>
+            <div className={cn("px-[12px] py-[8px] text-[14px] text-neutral-5 text-center", classNames?.noResults)}>
               No options found
             </div>
-            <div className={DROPDOWN_STYLES.footer} onClick={() => {
+            <div className={cn(DROPDOWN_STYLES.footer, classNames?.footer)} onClick={() => {
               setIsSearchOpen(false);
               setSearchQuery('');
               setIsInputFocused(false);
               setFocusedIndex(-1);
             }}>
-              <ChevronDownIcon className="h-5 w-5 text-neutral-5 stroke-[1.5] group-hover:rotate-180 transition-transform duration-200" />
+              {icons?.footer ? (
+                <div className={cn("group-hover:rotate-180 transition-transform duration-200", classNames?.footerIcon)}>
+                  {icons.footer}
+                </div>
+              ) : (
+                <ChevronDownIcon className={cn("h-5 w-5 text-neutral-5 stroke-[1.5] group-hover:rotate-180 transition-transform duration-200", classNames?.footerIcon)} />
+              )}
             </div>
           </DropdownPopup>
         )}

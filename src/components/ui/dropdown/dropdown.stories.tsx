@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 import { SingleSelect, MultiSelect } from './index';
+import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 
 const meta: Meta<typeof SingleSelect> = {
   title: 'UI/Dropdown',
@@ -24,6 +25,14 @@ const meta: Meta<typeof SingleSelect> = {
     className: {
       control: { type: 'text' },
       description: 'Additional CSS classes',
+    },
+    icons: {
+      control: false,
+      description: 'Custom icon components (not editable in controls)',
+    },
+    classNames: {
+      control: false,
+      description: 'Custom class names for sub-components (not editable in controls)',
     },
   },
 };
@@ -114,6 +123,55 @@ export const Multiselect: Story = {
         className={args.className}
         value={value}
         onChange={(val) => setValue(val)}
+      />
+    );
+  },
+};
+
+// Define custom styles outside to avoid Storybook serialization issues
+const customMultiselectIcons = { trigger: <ArrowUpIcon className="h-3 w-3 text-orange-500 stroke-[4.5]" />};
+
+const customMultiselectClassNames = {
+  container: 'font-mono',
+  trigger: 'rounded-none w-[350px] focus:border-orange-500 focus:border-[2px] focus-visible:border-orange-500 focus-visible:outline-none cursor-crosshair min-h-[44px] hover:border-orange-400',
+  triggerIcon: 'text-orange-500 stroke-[2.5]',
+  badge: 'rounded-none bg-orange-100 text-orange-700',
+  badgeText: 'font-bold',
+  badgeRemove: 'rounded-none hover:bg-orange-300',
+  badgeRemoveIcon: 'text-orange-600 stroke-[2]',
+  remainingBadge: 'rounded-none bg-orange-200 text-orange-800',
+  popup: 'shadow-none rounded-none w-[350px] border-2 border-orange-500',
+  header: 'bg-orange-50 border-b-2 border-orange-200',
+  item: 'font-mono hover:bg-yellow-200 cursor-crosshair',
+  itemFocused: 'bg-yellow-200',
+  checkbox: 'w-3 h-3 rounded-full border-2 border-orange-500 bg-white',
+  checkboxChecked: 'bg-orange-500 border-orange-600',
+  checkIcon: 'hidden',
+};
+
+export const CustomMultiselect: Story = {
+  parameters: {
+    docs: {
+      source: {
+        type: 'code',
+      },
+    },
+  },
+  args: {
+    options: defaultOptions,
+    placeholder: 'Custom styled multiselect',
+  },
+  render: (args) => {
+    const [value, setValue] = useState<string[]>(['option2', 'option5']);
+    
+    return (
+      <MultiSelect
+        options={args.options}
+        placeholder={args.placeholder}
+        value={value}
+        onChange={(val) => setValue(val)}
+        icons={customMultiselectIcons}
+        classNames={customMultiselectClassNames}
       />
     );
   },

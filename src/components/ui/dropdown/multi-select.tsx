@@ -1,5 +1,4 @@
 import * as React from "react";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { cn } from "../../../lib/utils";
 import { XIcon } from "../../icons";
 import { DROPDOWN_STYLES } from "./shared/dropdown-styles";
@@ -17,6 +16,35 @@ export interface MultiSelectProps {
   disabled?: boolean;
   placeholder?: string;
   maxDisplayBadges?: number;
+  icons?: {
+    trigger?: React.ReactNode;
+    close?: React.ReactNode;
+    check?: React.ReactNode;
+  };
+  classNames?: {
+    container?: string;
+    trigger?: string;
+    triggerContent?: string;
+    triggerIcon?: string;
+    badge?: string;
+    badgeText?: string;
+    badgeRemove?: string;
+    badgeRemoveIcon?: string;
+    remainingBadge?: string;
+    placeholder?: string;
+    popup?: string;
+    header?: string;
+    scrollContent?: string;
+    item?: string;
+    itemFocused?: string;
+    itemDisabled?: string;
+    checkbox?: string;
+    checkboxChecked?: string;
+    checkIcon?: string;
+    itemText?: string;
+    ellipsis?: string;
+    footer?: string;
+  };
 }
 
 export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
@@ -29,6 +57,8 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       disabled,
       placeholder = 'Select multiple options',
       maxDisplayBadges = 2,
+      icons,
+      classNames,
       ...props
     },
     ref
@@ -99,7 +129,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
 
     return (
       <div 
-        className="relative" 
+        className={cn("relative", classNames?.container)} 
         ref={(node) => {
           dropdownRef.current = node;
           if (ref) {
@@ -117,47 +147,58 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           onKeyDown={triggerKeyDown}
           disabled={disabled}
           isOpen={isOpen}
-          className={cn("min-h-[36px]", className)}
+          className={cn("min-h-[36px]", className, classNames?.trigger)}
+          customIcon={icons?.trigger}
+          iconClassName={classNames?.triggerIcon}
         >
-          <div className="flex flex-wrap gap-1 flex-1 min-w-0">
+          <div className={cn("flex flex-wrap gap-1 flex-1 min-w-0", classNames?.triggerContent)}>
             {visibleBadges.map((option) => (
               <div
                 key={option.value}
-                className="inline-flex items-center gap-1 bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium"
+                className={cn(
+                  "inline-flex items-center gap-1 bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium",
+                  classNames?.badge
+                )}
               >
-                <span>{truncateText(option.label)}</span>
+                <span className={classNames?.badgeText}>{truncateText(option.label)}</span>
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
                     handleRemoveBadge(option.value);
                   }}
-                  className="hover:bg-brand-8/20 rounded-[4px] p-0.5 cursor-pointer"
+                  className={cn(
+                    "hover:bg-brand-8/20 rounded-[4px] p-0.5 cursor-pointer",
+                    classNames?.badgeRemove
+                  )}
                 >
-                  <XIcon className="text-brand-8" />
+                  {icons?.close || <XIcon className={cn("text-brand-8", classNames?.badgeRemoveIcon)} />}
                 </span>
               </div>
             ))}
             {remainingCount > 0 && (
-              <div className="inline-flex items-center bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium">
+              <div className={cn(
+                "inline-flex items-center bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium",
+                classNames?.remainingBadge
+              )}>
                 +{remainingCount}
               </div>
             )}
             {value.length === 0 && (
-              <span className="text-neutral-4">{placeholder}</span>
+              <span className={cn("text-neutral-4", classNames?.placeholder)}>{placeholder}</span>
             )}
           </div>
         </DropdownTrigger>
         
-        <DropdownPopup isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <DropdownPopup isOpen={isOpen} onClose={() => setIsOpen(false)} className={classNames?.popup}>
           {/* Static Header */}
-          <div className="px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0">
+          <div className={cn("px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0", classNames?.header)}>
             <span className="px-[6px] text-[13px] text-neutral-4">
               {value.length} selected
             </span>
           </div>
           
           {/* Scrollable Content */}
-          <DropdownScrollableContent>
+          <DropdownScrollableContent className={classNames?.scrollContent}>
             {options.map((option, index) => (
               <button
                 key={option.value}
@@ -167,7 +208,10 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 className={cn(
                   DROPDOWN_STYLES.itemBase,
                   focusedIndex === index && "bg-brand-1",
-                  !isKeyboardMode && "hover:bg-brand-1"
+                  !isKeyboardMode && "hover:bg-brand-1",
+                  classNames?.item,
+                  focusedIndex === index && classNames?.itemFocused,
+                  option.disabled && classNames?.itemDisabled
                 )}
                 ref={(el) => {
                   setItemRef(el, index);
@@ -207,33 +251,37 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                       "w-4 h-4 rounded-[4px] flex items-center justify-center border",
                       value.includes(option.value) 
                         ? "bg-brand-8 border-brand-8" 
-                        : "bg-white border-neutral-5"
+                        : "bg-white border-neutral-5",
+                      classNames?.checkbox,
+                      value.includes(option.value) && classNames?.checkboxChecked
                     )}
                   >
                     {value.includes(option.value) && (
-                      <svg 
-                        width="12" 
-                        height="12" 
-                        viewBox="0 0 12 12" 
-                        fill="none" 
-                        className="text-white"
-                      >
-                        <path 
-                          d="M2 6.5L4.5 9L10 3.5" 
-                          stroke="currentColor" 
-                          strokeWidth="2.5" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+                      icons?.check || (
+                        <svg 
+                          width="12" 
+                          height="12" 
+                          viewBox="0 0 12 12" 
+                          fill="none" 
+                          className={cn("text-white", classNames?.checkIcon)}
+                        >
+                          <path 
+                            d="M2 6.5L4.5 9L10 3.5" 
+                            stroke="currentColor" 
+                            strokeWidth="2.5" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )
                     )}
                   </div>
                 </div>
                 <div className="flex-1 overflow-hidden relative">
-                  <span className="scrollable-text whitespace-nowrap block text-left">
+                  <span className={cn("scrollable-text whitespace-nowrap block text-left", classNames?.itemText)}>
                     {option.label}
                   </span>
-                  <span className="ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6">
+                  <span className={cn("ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6", classNames?.ellipsis)}>
                     ..
                   </span>
                 </div>

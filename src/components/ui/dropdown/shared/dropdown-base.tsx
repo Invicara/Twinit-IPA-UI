@@ -20,6 +20,8 @@ interface DropdownTriggerProps {
   className?: string;
   customTrigger?: ReactNode;
   onKeyDown?: (e: React.KeyboardEvent) => void;
+  customIcon?: ReactNode;
+  iconClassName?: string;
 }
 
 export function DropdownTrigger({
@@ -29,7 +31,9 @@ export function DropdownTrigger({
   isOpen = false,
   className,
   customTrigger,
-  onKeyDown
+  onKeyDown,
+  customIcon,
+  iconClassName
 }: DropdownTriggerProps) {
   if (customTrigger) {
     return <>{customTrigger}</>;
@@ -49,10 +53,21 @@ export function DropdownTrigger({
       )}
     >
       {children}
-      <ChevronDownIcon className={cn(
-        "h-5 w-5 stroke-[1.5] text-neutral-5 transition-transform duration-200",
-        isOpen && "rotate-180"
-      )} />
+      {customIcon ? (
+        <div className={cn(
+          "transition-transform duration-200",
+          isOpen && "rotate-180",
+          iconClassName
+        )}>
+          {customIcon}
+        </div>
+      ) : (
+        <ChevronDownIcon className={cn(
+          "h-5 w-5 stroke-[1.5] text-neutral-5",
+          isOpen && "rotate-180",
+          iconClassName
+        )} />
+      )}
     </button>
   );
 }
@@ -79,10 +94,11 @@ export function DropdownPopup({
 }
 
 export function DropdownScrollableContent({ 
-  children 
-}: { children: ReactNode }) {
+  children,
+  className
+}: { children: ReactNode; className?: string }) {
   return (
-    <div className={DROPDOWN_STYLES.scrollContent}>
+    <div className={cn(DROPDOWN_STYLES.scrollContent, className)}>
       {children}
     </div>
   );
