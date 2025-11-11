@@ -61,14 +61,16 @@ export const Default: Story = {
   render: (args) => {
     const [value, setValue] = useState<string>('');
     return (
-      <SingleSelect
-        options={args.options}
-        placeholder={args.placeholder}
-        disabled={args.disabled}
-        className={args.className}
-        value={value}
-        onChange={(val) => setValue(val)}
-      />
+      <div className="min-h-[240px] flex items-start">
+        <SingleSelect
+          options={args.options}
+          placeholder={args.placeholder}
+          disabled={args.disabled}
+          className={args.className}
+          value={value}
+          onChange={(val) => setValue(val)}
+        />
+      </div>
     );
   },
 };
@@ -95,15 +97,17 @@ export const Filter: Story = {
   render: (args) => {
     const [value, setValue] = useState<string>('');
     return (
-      <SingleSelect
-        options={args.options}
-        placeholder={args.placeholder}
-        disabled={args.disabled}
-        filter={args.filter}
-        className={args.className}
-        value={value}
-        onChange={(val) => setValue(val)}
-      />
+      <div className="min-h-[240px] flex items-start">
+        <SingleSelect
+          options={args.options}
+          placeholder={args.placeholder}
+          disabled={args.disabled}
+          filter={args.filter}
+          className={args.className}
+          value={value}
+          onChange={(val) => setValue(val)}
+        />
+      </div>
     );
   },
 };
@@ -116,14 +120,14 @@ export const Multiselect: Story = {
   render: (args) => {
     const [value, setValue] = useState<string[]>([]);
     return (
-      <MultiSelect
-        options={args.options}
-        placeholder={args.placeholder}
-        disabled={args.disabled}
-        className={args.className}
-        value={value}
-        onChange={(val) => setValue(val)}
-      />
+      <div className="min-h-[240px] flex items-start">
+        <MultiSelect
+          options={args.options}
+          placeholder={args.placeholder}
+          value={value}
+          onChange={(val) => setValue(val)}
+        />
+      </div>
     );
   },
 };

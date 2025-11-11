@@ -1,3 +1,4 @@
+import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Slider } from './slider'
 
@@ -83,7 +84,7 @@ describe('Slider', () => {
     const slider = screen.getByRole('slider')
     const input = screen.getByDisplayValue('50')
     
-    expect(slider).toBeDisabled()
+    expect(slider).toHaveAttribute('data-disabled', '')
     expect(input).toBeDisabled()
   })
 

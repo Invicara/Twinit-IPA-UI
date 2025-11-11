@@ -35,6 +35,7 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
       href,
       testIdPrefix,
       children,
+      onClick,
       ...props
     },
     ref
@@ -48,6 +49,15 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         className={cn(linkVariants({ variant, disabled: isDisabled }), className)}
         data-testid={testIdPrefix}
         aria-disabled={isDisabled}
+        onClick={(event) => {
+          if (isDisabled) {
+            event.preventDefault()
+            event.stopPropagation()
+            return
+          }
+
+          onClick?.(event)
+        }}
         {...props}
       >
         {variant === "default" && <Pencil1Icon className="h-[14px] w-[14px]" />}

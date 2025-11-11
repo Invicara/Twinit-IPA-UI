@@ -12,7 +12,6 @@ import {
 export default {
   title: "ui/Breadcrumb",
   component: Breadcrumb,
-  tags: ['autodocs'],
 } as Meta<typeof Breadcrumb>;
 
 const Template: StoryFn<typeof Breadcrumb> = (args) => (<Breadcrumb>

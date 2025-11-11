@@ -10,6 +10,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "jest",
+    "testv": "jest --verbose",
     "test-watch": "jest --watch",
     "tailwind-dev": "npx @tailwindcss/cli -i ./src/styles/globals.css -o ./src/output.css --watch"
   },
@@ -70,6 +71,7 @@
     "clsx": "^2.1.1",
     "esbuild": "^0.25.10",
     "lucide-react": "^0.477.0",
+    "remixicon-react": "^1.0.0",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7"
   },
