@@ -1,6 +1,6 @@
 {
   "name": "@invicara/ipa-ui",
-  "version": "1.0.1-0",
+  "version": "1.0.1-1",
   "description": "Invicara's design system implementation",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
