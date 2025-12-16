@@ -394,7 +394,7 @@ describe("MultiSelect", () => {
     test.each([
       ['hideFooter', { hideFooter: true }],
       ['hideRowHighlight', { hideRowHighlight: true }],
-      ['hideEllipsis', { hideEllipsis: true }],
+      ['hideLongTextEllipsis', { hideLongTextEllipsis: true }],
       ['hideRemainingBadge', { hideRemainingBadge: true }],
       ['hideSelectionCount', { hideSelectionCount: true }],
       ['hideCheckboxes', { hideCheckboxes: true }],
@@ -403,7 +403,7 @@ describe("MultiSelect", () => {
       const user = userEvent.setup();
       const { container } = render(
         <MultiSelect 
-          options={propName === 'hideEllipsis' ? longTextOptions : defaultOptions}
+          options={propName === 'hideLongTextEllipsis' ? longTextOptions : defaultOptions}
           value={propName.includes('Badge') || propName === 'hideBadgeRemove' ? ["option1", "option2", "option3"] : ["option1"]}
           maxDisplayBadges={2}
           {...props}
@@ -421,7 +421,7 @@ describe("MultiSelect", () => {
       } else if (propName === 'hideRowHighlight') {
         // Just verify hideRowHighlight prop is accepted and component renders
         expect(container).toBeInTheDocument();
-      } else if (propName === 'hideEllipsis') {
+      } else if (propName === 'hideLongTextEllipsis') {
         expect(container.querySelector(".ellipsis-indicator")).not.toBeInTheDocument();
       } else if (propName === 'hideRemainingBadge') {
         expect(screen.queryByText("+1")).not.toBeInTheDocument();
@@ -454,9 +454,9 @@ describe("MultiSelect", () => {
   describe("Animation & Behavior Toggles", () => {
     test.each([
       ['disableIconAnimation', { disableIconAnimation: true }],
-      ['disableTextAnimation', { disableTextAnimation: true }],
+      ['enableLongTextAnimation', { enableLongTextAnimation: true }],
       ['disableScrolling', { disableScrolling: true }],
-    ])('%s disables the corresponding feature', async (propName, props) => {
+    ])('%s handles the corresponding feature correctly', async (propName, props) => {
       const user = userEvent.setup();
       const { container } = render(
         <MultiSelect options={longTextOptions} {...props} />
@@ -471,7 +471,7 @@ describe("MultiSelect", () => {
       } else if (propName === 'disableScrolling') {
         expect(container.querySelector('[class*="overflow-y-auto"]')).not.toBeInTheDocument();
       }
-      // For disableTextAnimation, just verify it renders without error
+      // For enableLongTextAnimation, just verify it renders without error
       expect(screen.getByText(longTextOptions[0].label)).toBeInTheDocument();
     });
 
@@ -593,7 +593,7 @@ describe("MultiSelect", () => {
           options={defaultOptions}
           disableKeyboardNavigation
           disableIconAnimation
-          disableTextAnimation
+          enableLongTextAnimation
           disableScrolling
           disableCloseOnOutsideClick
           disableCloseOnTriggerClick
@@ -617,7 +617,7 @@ describe("MultiSelect", () => {
           value={["option1", "option2", "option3"]}
           hideFooter
           hideRowHighlight
-          hideEllipsis
+          hideLongTextEllipsis
           hideRemainingBadge
           hideSelectionCount
           hideCheckboxes

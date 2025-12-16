@@ -9,12 +9,15 @@ export default {
   component: Button,
   argTypes: {
     variant: {
-      options: ['default', 'secondary', 'outline', 'ghost', 'link', 'destructive'],
+      options: ['default', 'secondary', 'tertiary', 'danger'],
       control: { type: 'radio' },
     },
     size: {
       options: ['default', 'sm', 'icon'],
       control: { type: 'radio' },
+    },
+    disabled: {
+      control: { type: 'boolean' },
     },
     children: {
       options: ['text', 'icon'],
@@ -36,7 +39,7 @@ const Template: StoryFn<typeof Button> = (args) => {
   let icon;
   
   if(children.includes("text")) {
-    text = `${capitalizeFirstLetter(args.size)} ${capitalizeFirstLetter(args.variant)}`
+    text = capitalizeFirstLetter(args.variant);
   }
   if(children.includes("icon")) {
     icon = <Loader2 className="animate-spin" />
@@ -45,9 +48,34 @@ const Template: StoryFn<typeof Button> = (args) => {
   return <Button {...args}>{text}{icon}</Button>
 };
 
-export const ButtonDefault = Template.bind({});
-ButtonDefault.args = {
+export const Default = Template.bind({});
+
+Default.args = {
   variant: "default",
+  children: "text",
+  size: "default"
+};
+
+export const Secondary = Template.bind({});
+
+Secondary.args = {
+  variant: "secondary",
+  children: "text",
+  size: "default"
+};
+
+export const Tertiary = Template.bind({});
+
+Tertiary.args = {
+  variant: "tertiary",
+  children: "text",
+  size: "default"
+};
+
+export const Danger = Template.bind({});
+
+Danger.args = {
+  variant: "danger",
   children: "text",
   size: "default"
 };

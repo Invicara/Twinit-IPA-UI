@@ -21,15 +21,17 @@ export interface MultiSelectProps {
   // Feature Toggles & Behavior Options
   hideFooter?: boolean;
   hideRowHighlight?: boolean;
-  hideEllipsis?: boolean;
+  hideLongTextEllipsis?: boolean;
+  hideLongTextTooltip?: boolean;
   hideRemainingBadge?: boolean;
   hideSelectionCount?: boolean;
   hideCheckboxes?: boolean;
   hideBadgeRemove?: boolean;
   disableKeyboardNavigation?: boolean;
   disableIconAnimation?: boolean;
-  disableTextAnimation?: boolean;
+  enableLongTextAnimation?: boolean;
   disableScrolling?: boolean;
+  disableSelectionLooping?: boolean;
   disableCloseOnOutsideClick?: boolean;
   disableCloseOnTriggerClick?: boolean;
   rightAlignCheckboxes?: boolean;
@@ -82,20 +84,22 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       maxDisplayBadges = 2,
       hideFooter,
       hideRowHighlight,
-      hideEllipsis,
+      hideLongTextEllipsis,
+      hideLongTextTooltip = false,
       hideRemainingBadge,
       hideSelectionCount,
       hideCheckboxes,
       hideBadgeRemove,
       disableKeyboardNavigation,
       disableIconAnimation,
-      disableTextAnimation,
+      enableLongTextAnimation = false,
       disableScrolling,
       disableCloseOnOutsideClick,
       disableCloseOnTriggerClick,
       rightAlignCheckboxes,
       wrapBadges,
       popAbove,
+      disableSelectionLooping = false,
       icons,
       classNames,
       ...props
@@ -117,9 +121,11 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       options,
       onSelect: (value) => {
         handleMultiSelect(value);
-        resetFocus();
+        // Don't reset focus - keep the current item highlighted for continued keyboard navigation
       },
-      onClose: () => setIsOpen(false)
+      onClose: () => setIsOpen(false),
+      disableSelectionLooping,
+      isMultiSelect: true
     });
 
     useClickOutside(dropdownRef, () => {
@@ -158,13 +164,40 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     const triggerKeyDown = (e: React.KeyboardEvent) => {
       if (disableKeyboardNavigation) return;
       
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'Enter') {
         e.preventDefault();
         if (!isOpen) {
           setIsOpen(true);
         } else {
           handleKeyDown(e);
         }
+      } else if (e.key === ' ') {
+        // Spacebar: open dropdown if closed, or select item if open
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+          // Highlight first item when opening with spacebar - use requestAnimationFrame to ensure state updates
+          requestAnimationFrame(() => {
+            handleKeyDown({ ...e, key: 'Tab' } as React.KeyboardEvent);
+          });
+        } else {
+          handleKeyDown(e);
+        }
+      } else if (e.key === 'Tab' && options.length > 0) {
+        // If dropdown is already open and an item is highlighted, close dropdown and move to next element
+        if (isOpen && focusedIndex >= 0) {
+          setIsOpen(false);
+          resetFocus();
+          // Don't prevent default - allow Tab to move focus to next element
+          return;
+        }
+        // Otherwise, open dropdown and highlight first item
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+        }
+        // The hook will handle setting focusedIndex to 0
+        handleKeyDown(e);
       } else if (isOpen) {
         handleKeyDown(e);
       }
@@ -266,7 +299,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 className={cn(
                   DROPDOWN_STYLES.itemBase,
                   !hideRowHighlight && focusedIndex === index && "bg-brand-1",
-                  !hideRowHighlight && !isKeyboardMode && "hover:bg-brand-1",
+                  !hideRowHighlight && !isKeyboardMode && "hover:bg-brand-1 group",
                   classNames?.item,
                   !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
                   option.disabled && classNames?.itemDisabled,
@@ -274,17 +307,31 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 )}
                 ref={(el) => {
                   setItemRef(el, index);
-                  if (!hideEllipsis && el) {
+                  if (el) {
                     const textElement = el.querySelector('.scrollable-text') as HTMLElement;
                     const ellipsisElement = el.querySelector('.ellipsis-indicator') as HTMLElement;
-                    if (textElement && ellipsisElement && textElement.scrollWidth <= textElement.clientWidth) {
-                      ellipsisElement.style.display = 'none';
+                    if (textElement) {
+                      const isTruncated = textElement.scrollWidth > textElement.clientWidth;
+                      // Set tooltip on button only if text is truncated
+                      if (!hideLongTextTooltip && isTruncated) {
+                        el.setAttribute('title', option.label);
+                      } else {
+                        el.removeAttribute('title');
+                      }
+                      // Handle ellipsis visibility
+                      if (!hideLongTextEllipsis && ellipsisElement) {
+                        if (isTruncated) {
+                          ellipsisElement.style.display = '';
+                        } else {
+                          ellipsisElement.style.display = 'none';
+                        }
+                      }
                     }
                   }
                 }}
                 onMouseEnter={(e) => {
                   handleMouseEnter(index);
-                  if (!disableTextAnimation) {
+                  if (enableLongTextAnimation) {
                     const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
                     const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
                     if (textElement && textElement.scrollWidth > textElement.clientWidth) {
@@ -296,7 +343,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (!disableTextAnimation) {
+                  if (enableLongTextAnimation) {
                     const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
                     const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
                     if (textElement) {
@@ -346,11 +393,18 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                   </div>
                 )}
                 <div className="flex-1 overflow-hidden relative">
-                  <span className={cn("scrollable-text whitespace-nowrap block text-left", classNames?.itemText)}>
+                  <span 
+                    className={cn("scrollable-text whitespace-nowrap block text-left pointer-events-none", classNames?.itemText)}
+                  >
                     {option.label}
                   </span>
-                  {!hideEllipsis && (
-                    <span className={cn("ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6", classNames?.ellipsis)}>
+                  {!hideLongTextEllipsis && (
+                    <span className={cn(
+                      "ellipsis-indicator absolute right-0 top-0 px-1 text-neutral-6",
+                      !hideRowHighlight && focusedIndex === index ? "bg-brand-1" : "bg-neutral-0",
+                      !hideRowHighlight && !isKeyboardMode && "group-hover:bg-brand-1",
+                      classNames?.ellipsis
+                    )}>
                       ..
                     </span>
                   )}

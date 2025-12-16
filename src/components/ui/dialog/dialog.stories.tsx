@@ -73,7 +73,7 @@ export const Default: Story = {
           onOpenChange={setOpen}
           footer={
             <>
-              <Button variant="outline" onClick={() => setOpen(false)}>
+              <Button variant="secondary" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
               <Button variant="default" onClick={() => setOpen(false)}>

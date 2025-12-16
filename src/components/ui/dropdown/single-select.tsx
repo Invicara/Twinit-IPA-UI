@@ -20,14 +20,16 @@ export interface SingleSelectProps {
   // Feature Toggles & Behavior Options
   hideFooter?: boolean;
   hideRowHighlight?: boolean;
-  hideEllipsis?: boolean;
+  hideLongTextEllipsis?: boolean;
+  hideLongTextTooltip?: boolean;
   disableKeyboardNavigation?: boolean;
   disableIconAnimation?: boolean;
-  disableTextAnimation?: boolean;
+  enableLongTextAnimation?: boolean;
   disableScrolling?: boolean;
   disableCloseOnOutsideClick?: boolean;
   closeOnInputClick?: boolean;
   popAbove?: boolean;
+  disableSelectionLooping?: boolean;
 
   // Icons
   icons?: {
@@ -67,14 +69,16 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       filter = false,
       hideFooter,
       hideRowHighlight,
-      hideEllipsis,
+      hideLongTextEllipsis,
+      hideLongTextTooltip = false,
       disableKeyboardNavigation,
       disableIconAnimation,
-      disableTextAnimation,
+      enableLongTextAnimation = false,
       disableScrolling,
       disableCloseOnOutsideClick,
       closeOnInputClick,
       popAbove,
+      disableSelectionLooping = false,
       icons,
       classNames,
       ...props
@@ -181,18 +185,78 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         return;
       }
 
+      if (e.key === 'Tab' && filteredOptions.length > 0) {
+        // If dropdown is already open and an item is highlighted, close dropdown and move to next element
+        if (isSearchOpen && focusedIndex >= 0) {
+          e.preventDefault();
+          setIsSearchOpen(false);
+          setFocusedIndex(-1);
+          setIsInputFocused(false);
+          
+          // Blur the input and then move focus to next element
+          if (searchInputRef.current) {
+            searchInputRef.current.blur();
+          }
+          
+          // Use requestAnimationFrame to ensure blur completes, then find and focus next element
+          requestAnimationFrame(() => {
+            const focusableElements = Array.from(
+              document.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+              )
+            ).filter(el => {
+              const style = window.getComputedStyle(el);
+              return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+            });
+            
+            const currentIndex = focusableElements.findIndex(el => el === searchInputRef.current);
+            const nextIndex = e.shiftKey ? currentIndex - 1 : currentIndex + 1;
+            
+            if (nextIndex >= 0 && nextIndex < focusableElements.length) {
+              focusableElements[nextIndex]?.focus();
+            }
+          });
+          return;
+        }
+        // Otherwise, open dropdown and highlight first item
+        e.preventDefault();
+        if (!isSearchOpen) {
+          setIsSearchOpen(true);
+        }
+        setFocusedIndex(0);
+        return;
+      }
+
       if (!isSearchOpen || filteredOptions.length === 0) return;
 
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setFocusedIndex((prev) => 
-            prev < filteredOptions.length - 1 ? prev + 1 : prev
-          );
+          if (disableSelectionLooping) {
+            setFocusedIndex((prev) => {
+              if (prev < 0) return 0; // Initialize if no item is focused
+              return prev < filteredOptions.length - 1 ? prev + 1 : prev;
+            });
+          } else {
+            setFocusedIndex((prev) => {
+              if (prev < 0) return 0; // Initialize if no item is focused
+              return prev < filteredOptions.length - 1 ? prev + 1 : 0;
+            });
+          }
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setFocusedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+          if (disableSelectionLooping) {
+            setFocusedIndex((prev) => {
+              if (prev < 0) return 0; // Initialize if no item is focused
+              return prev > 0 ? prev - 1 : 0;
+            });
+          } else {
+            setFocusedIndex((prev) => {
+              if (prev < 0) return filteredOptions.length - 1; // Initialize to last item if no item is focused
+              return prev > 0 ? prev - 1 : filteredOptions.length - 1;
+            });
+          }
           break;
         case 'Enter':
           e.preventDefault();
@@ -207,6 +271,18 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
               searchInputRef.current.blur();
             }
           }
+          break;
+        case ' ':
+          // Spacebar selects item but doesn't dismiss dropdown (only for non-filter mode)
+          if (!filter) {
+            e.preventDefault();
+            if (focusedIndex >= 0 && focusedIndex < filteredOptions.length) {
+              const selectedOption = filteredOptions[focusedIndex];
+              if (onChange) onChange(selectedOption.value);
+              // Keep dropdown open and maintain focus on the selected item
+            }
+          }
+          // If filter mode, allow spacebar to type spaces
           break;
         case 'Escape':
           e.preventDefault();
@@ -319,11 +395,25 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                   key={option.value}
                   ref={(el) => {
                     itemRefs.current[index] = el;
-                    if (!hideEllipsis && el) {
+                    if (el) {
                       const textElement = el.querySelector('.scrollable-text') as HTMLElement;
                       const ellipsisElement = el.querySelector('.ellipsis-indicator') as HTMLElement;
-                      if (textElement && ellipsisElement && textElement.scrollWidth <= textElement.clientWidth) {
-                        ellipsisElement.style.display = 'none';
+                      if (textElement) {
+                        const isTruncated = textElement.scrollWidth > textElement.clientWidth;
+                        // Set tooltip on button only if text is truncated
+                        if (!hideLongTextTooltip && isTruncated) {
+                          el.setAttribute('title', option.label);
+                        } else {
+                          el.removeAttribute('title');
+                        }
+                        // Handle ellipsis visibility
+                        if (!hideLongTextEllipsis && ellipsisElement) {
+                          if (isTruncated) {
+                            ellipsisElement.style.display = '';
+                          } else {
+                            ellipsisElement.style.display = 'none';
+                          }
+                        }
                       }
                     }
                   }}
@@ -345,7 +435,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                     if (!isKeyboardMode) {
                       setFocusedIndex(index);
                     }
-                    if (!disableTextAnimation) {
+                    if (enableLongTextAnimation) {
                       const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
                       const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
                       if (textElement && textElement.scrollWidth > textElement.clientWidth) {
@@ -357,7 +447,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (!disableTextAnimation) {
+                    if (enableLongTextAnimation) {
                       const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
                       const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
                       if (textElement) {
@@ -371,18 +461,25 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                   className={cn(
                     DROPDOWN_STYLES.itemBase,
                     !hideRowHighlight && focusedIndex === index && "bg-brand-1",
-                    !hideRowHighlight && !isKeyboardMode && "hover:bg-brand-1",
+                    !hideRowHighlight && !isKeyboardMode && "hover:bg-brand-1 group",
                     classNames?.item,
                     !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
                     option.disabled && classNames?.itemDisabled
                   )}
                 >
                   <div className="flex-1 overflow-hidden relative">
-                    <span className={cn("scrollable-text whitespace-nowrap block text-left", classNames?.itemText)}>
+                    <span 
+                      className={cn("scrollable-text whitespace-nowrap block text-left pointer-events-none", classNames?.itemText)}
+                    >
                       {filter ? highlightMatch(option.label, searchQuery) : option.label}
                     </span>
-                    {!hideEllipsis && (
-                      <span className={cn("ellipsis-indicator absolute right-0 top-0 bg-neutral-0 px-1 text-neutral-6", classNames?.ellipsis)}>
+                    {!hideLongTextEllipsis && (
+                      <span className={cn(
+                        "ellipsis-indicator absolute right-0 top-0 px-1 text-neutral-6",
+                        !hideRowHighlight && focusedIndex === index ? "bg-brand-1" : "bg-neutral-0",
+                        !hideRowHighlight && !isKeyboardMode && "group-hover:bg-brand-1",
+                        classNames?.ellipsis
+                      )}>
                         ..
                       </span>
                     )}

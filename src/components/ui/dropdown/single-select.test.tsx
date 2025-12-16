@@ -380,11 +380,11 @@ describe("SingleSelect", () => {
     test.each([
       ['hideFooter', { hideFooter: true }],
       ['hideRowHighlight', { hideRowHighlight: true }],
-      ['hideEllipsis', { hideEllipsis: true }],
+      ['hideLongTextEllipsis', { hideLongTextEllipsis: true }],
     ])('%s hides the corresponding UI element', async (propName, props) => {
       const user = userEvent.setup();
       const { container } = render(
-        <SingleSelect options={propName === 'hideEllipsis' ? longTextOptions : defaultOptions} {...props} />
+        <SingleSelect options={propName === 'hideLongTextEllipsis' ? longTextOptions : defaultOptions} {...props} />
       );
       
       const input = screen.getByPlaceholderText("Select an option");
@@ -396,7 +396,7 @@ describe("SingleSelect", () => {
         await user.keyboard("{ArrowDown}");
         const firstOption = screen.getByText("Option 1").closest("button");
         expect(firstOption).not.toHaveClass("bg-brand-1");
-      } else if (propName === 'hideEllipsis') {
+      } else if (propName === 'hideLongTextEllipsis') {
         expect(container.querySelector(".ellipsis-indicator")).not.toBeInTheDocument();
       }
     });
@@ -405,8 +405,8 @@ describe("SingleSelect", () => {
   describe("Animation Toggles", () => {
     test.each([
       ['disableIconAnimation', { disableIconAnimation: true }],
-      ['disableTextAnimation', { disableTextAnimation: true }],
-    ])('%s prevents animations', async (propName, props) => {
+      ['enableLongTextAnimation', { enableLongTextAnimation: true }],
+    ])('%s handles animations correctly', async (propName, props) => {
       const user = userEvent.setup();
       const { container } = render(
         <SingleSelect options={longTextOptions} {...props} />
@@ -419,7 +419,7 @@ describe("SingleSelect", () => {
         const icon = container.querySelector("svg");
         expect(icon).not.toHaveClass("rotate-180");
       }
-      // For disableTextAnimation, just verify it renders without error
+      // For enableLongTextAnimation, just verify it renders without error
       expect(screen.getByText(longTextOptions[0].label)).toBeInTheDocument();
     });
   });

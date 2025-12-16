@@ -22,6 +22,10 @@ const meta: Meta<typeof SingleSelect> = {
       control: { type: 'boolean' },
       description: 'Enable search/filter functionality',
     },
+    disableSelectionLooping: {
+      control: { type: 'boolean' },
+      description: 'Disable looping when navigating with arrow keys (stops at first/last item instead of cycling)',
+    },
     className: {
       control: { type: 'text' },
       description: 'Additional CSS classes',
@@ -67,6 +71,7 @@ export const Default: Story = {
           placeholder={args.placeholder}
           disabled={args.disabled}
           className={args.className}
+          disableSelectionLooping={args.disableSelectionLooping}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -104,6 +109,7 @@ export const Filter: Story = {
           disabled={args.disabled}
           filter={args.filter}
           className={args.className}
+          disableSelectionLooping={args.disableSelectionLooping}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -124,6 +130,7 @@ export const Multiselect: Story = {
         <MultiSelect
           options={args.options}
           placeholder={args.placeholder}
+          disableSelectionLooping={args.disableSelectionLooping}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -181,6 +188,7 @@ export const CustomMultiselect: Story = {
           hideRowHighlight
           rightAlignCheckboxes
           popAbove
+          disableSelectionLooping={args.disableSelectionLooping}
           icons={customMultiselectIcons}
           classNames={customMultiselectClassNames}
         />

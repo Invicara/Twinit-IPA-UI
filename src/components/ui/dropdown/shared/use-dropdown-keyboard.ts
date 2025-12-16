@@ -5,13 +5,17 @@ interface UseDropdownKeyboardOptions {
   options: Array<{ value: string; label: string; disabled?: boolean }>;
   onSelect: (value: string) => void;
   onClose: () => void;
+  disableSelectionLooping?: boolean;
+  isMultiSelect?: boolean;
 }
 
 export function useDropdownKeyboard({
   isOpen,
   options,
   onSelect,
-  onClose
+  onClose,
+  disableSelectionLooping = false,
+  isMultiSelect = false
 }: UseDropdownKeyboardOptions) {
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [isKeyboardMode, setIsKeyboardMode] = useState(false);
@@ -58,24 +62,60 @@ export function useDropdownKeyboard({
   }, [focusedIndex, isOpen]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!isOpen || options.length === 0) return;
+    if (options.length === 0) return;
 
     // Set keyboard navigation mode (will be cleared on actual mouse movement)
     setIsKeyboardMode(true);
 
+    if (e.key === 'Tab') {
+      // If dropdown is already open and an item is highlighted, close dropdown and move to next element
+      if (isOpen && focusedIndex >= 0) {
+        onClose();
+        setFocusedIndex(-1);
+        // Don't prevent default - allow Tab to move focus to next element
+        return;
+      }
+      // Otherwise, highlight first item
+      e.preventDefault();
+      if (!isOpen) {
+        // This case is handled by the component, but we ensure first item is highlighted
+        setFocusedIndex(0);
+      } else {
+        setFocusedIndex(0);
+      }
+      return;
+    }
+
+    if (!isOpen) return;
+
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setFocusedIndex((prev) => 
-          prev < options.length - 1 ? prev + 1 : 0
-        );
+        if (disableSelectionLooping) {
+          setFocusedIndex((prev) => {
+            if (prev < 0) return 0; // Initialize if no item is focused
+            return prev < options.length - 1 ? prev + 1 : prev;
+          });
+        } else {
+          setFocusedIndex((prev) => {
+            if (prev < 0) return 0; // Initialize if no item is focused
+            return prev < options.length - 1 ? prev + 1 : 0;
+          });
+        }
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setFocusedIndex((prev) => {
-          if (prev <= 0) return options.length - 1;
-          return prev - 1;
-        });
+        if (disableSelectionLooping) {
+          setFocusedIndex((prev) => {
+            if (prev < 0) return 0; // Initialize if no item is focused
+            return prev > 0 ? prev - 1 : 0;
+          });
+        } else {
+          setFocusedIndex((prev) => {
+            if (prev < 0) return options.length - 1; // Initialize to last item if no item is focused
+            return prev > 0 ? prev - 1 : options.length - 1;
+          });
+        }
         break;
       case 'Enter':
         e.preventDefault();
@@ -83,7 +123,23 @@ export function useDropdownKeyboard({
           const option = options[focusedIndex];
           if (!option.disabled) {
             onSelect(option.value);
-            setFocusedIndex(-1);
+            // Enter always closes the dropdown, but for multiselect, keep focus on the item for continued navigation
+            onClose();
+            // For multiselect, keep focus index so user can continue navigating when dropdown reopens
+            // For single-select, reset focus
+            if (!isMultiSelect) {
+              setFocusedIndex(-1);
+            }
+          }
+        }
+        break;
+      case ' ':
+        e.preventDefault();
+        if (focusedIndex >= 0 && focusedIndex < options.length) {
+          const option = options[focusedIndex];
+          if (!option.disabled) {
+            onSelect(option.value);
+            // Spacebar selects but doesn't close dropdown - keep focus
           }
         }
         break;
@@ -101,7 +157,7 @@ export function useDropdownKeyboard({
         setFocusedIndex(options.length - 1);
         break;
     }
-  }, [isOpen, options, focusedIndex, onSelect, onClose]);
+  }, [isOpen, options, focusedIndex, onSelect, onClose, disableSelectionLooping, isMultiSelect]);
 
   const handleMouseEnter = useCallback((index: number) => {
     // Ignore mouse events during keyboard navigation
