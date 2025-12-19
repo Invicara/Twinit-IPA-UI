@@ -6,7 +6,10 @@
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "rollup": "rollup -c --bundleConfigAsCjs",
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "npx @tailwindcss/cli -i ./src/styles/globals.css -o ./src/output.css",
+    "build:js": "rollup -c --bundleConfigAsCjs",
+    "prepublishOnly": "npm run build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "jest",
@@ -79,6 +82,11 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
