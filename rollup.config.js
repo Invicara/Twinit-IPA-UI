@@ -25,7 +25,6 @@ export default [
     ],
     plugins: [
       postcss({
-        extract: 'styles.css',  // writes dist/styles.css
         minimize: true,
       }),
       peerDepsExternal(),
