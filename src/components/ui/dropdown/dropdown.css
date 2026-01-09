@@ -1,6 +1,6 @@
 @layer components {
   .ipa-ui-dropdown-shared__container {
-    @apply relative;
+    @apply relative w-fit;
   }
 
   .ipa-ui-dropdown-shared__trigger {
