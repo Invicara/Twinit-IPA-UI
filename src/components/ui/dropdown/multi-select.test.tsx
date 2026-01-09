@@ -193,11 +193,11 @@ describe("MultiSelect", () => {
         expect(screen.getByText("2 selected")).toBeInTheDocument();
       });
       
-      const checkboxes = container.querySelectorAll("div[class*='w-4'][class*='h-4']");
+      const checkboxes = container.querySelectorAll(".ipa-ui-dropdown-multi__checkbox-icon-wrapper");
       expect(checkboxes.length).toBeGreaterThan(0);
       
-      expect(container.querySelector("div[class*='bg-brand-8']")).toBeInTheDocument();
-      expect(container.querySelector("div[class*='bg-white'][class*='border-neutral-5']")).toBeInTheDocument();
+      expect(container.querySelector(".ipa-ui-dropdown-multi__checkbox-icon-wrapper--checked")).toBeInTheDocument();
+      expect(container.querySelector(".ipa-ui-dropdown-multi__checkbox-icon-wrapper--unchecked")).toBeInTheDocument();
     });
 
     test("does not select disabled options", async () => {
@@ -231,12 +231,12 @@ describe("MultiSelect", () => {
       // Navigate down
       await user.keyboard("{ArrowDown}");
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).toHaveClass("bg-brand-1");
+      expect(firstOption).toHaveClass("ipa-ui-dropdown-multi__item--focused");
       
       // Navigate up and down
       await user.keyboard("{ArrowDown}");
       await user.keyboard("{ArrowUp}");
-      expect(firstOption).toHaveClass("bg-brand-1");
+      expect(firstOption).toHaveClass("ipa-ui-dropdown-multi__item--focused");
       
       // Select with Enter
       await user.keyboard("{Enter}");
@@ -259,7 +259,7 @@ describe("MultiSelect", () => {
       await user.keyboard("{ArrowDown}");
       
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveClass("bg-brand-1");
+      expect(firstOption).not.toHaveClass("ipa-ui-dropdown-multi__item--focused");
     });
   });
 
@@ -350,16 +350,14 @@ describe("MultiSelect", () => {
       const trigger = container.querySelector("button");
       await user.click(trigger!);
       
-      expect(container.querySelector(".top-full")).toBeInTheDocument();
-      expect(container.querySelector(".mt-1")).toBeInTheDocument();
+      expect(container.querySelector(".ipa-ui-dropdown-shared__popup--top")).toBeInTheDocument();
       
       await user.keyboard("{Escape}");
       
       rerender(<MultiSelect options={defaultOptions} popAbove />);
       await user.click(trigger!);
       
-      expect(container.querySelector(".bottom-full")).toBeInTheDocument();
-      expect(container.querySelector(".mb-1")).toBeInTheDocument();
+      expect(container.querySelector(".ipa-ui-dropdown-shared__popup--bottom")).toBeInTheDocument();
     });
 
     test("shows header at bottom when popAbove is true", async () => {
@@ -371,7 +369,7 @@ describe("MultiSelect", () => {
       const trigger = screen.getByText("Option 1").closest("button");
       await user.click(trigger!);
       
-      const popup = container.querySelector(".bottom-full");
+      const popup = container.querySelector(".ipa-ui-dropdown-shared__popup--bottom");
       const header = screen.getByText("1 selected").parentElement;
       
       expect(popup).toBeInTheDocument();
@@ -386,7 +384,7 @@ describe("MultiSelect", () => {
       await user.click(trigger!);
       
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).toHaveClass("flex-row-reverse");
+      expect(firstOption).toHaveClass("ipa-ui-dropdown-multi__item--right-align");
     });
   });
 
@@ -422,7 +420,7 @@ describe("MultiSelect", () => {
         // Just verify hideRowHighlight prop is accepted and component renders
         expect(container).toBeInTheDocument();
       } else if (propName === 'hideLongTextEllipsis') {
-        expect(container.querySelector(".ellipsis-indicator")).not.toBeInTheDocument();
+        expect(container.querySelector(".ipa-ui-dropdown-multi__item-content-ellipsis-indicator")).not.toBeInTheDocument();
       } else if (propName === 'hideRemainingBadge') {
         expect(screen.queryByText("+1")).not.toBeInTheDocument();
       } else if (propName === 'hideSelectionCount') {
@@ -446,7 +444,7 @@ describe("MultiSelect", () => {
         />
       );
       
-      const badgeContainer = container.querySelector('[class*="flex-wrap"]');
+      const badgeContainer = container.querySelector(".ipa-ui-dropdown-multi__trigger-content--wrap");
       expect(badgeContainer).toBeInTheDocument();
     });
   });
@@ -467,9 +465,9 @@ describe("MultiSelect", () => {
       
       if (propName === 'disableIconAnimation') {
         const icon = container.querySelector("svg");
-        expect(icon).not.toHaveClass("rotate-180");
+        expect(icon).not.toHaveClass("ipa-ui-dropdown-shared__trigger-icon--rotate-180");
       } else if (propName === 'disableScrolling') {
-        expect(container.querySelector('[class*="overflow-y-auto"]')).not.toBeInTheDocument();
+        expect(container.querySelector(".ipa-ui-dropdown-shared__scroll-content")).not.toBeInTheDocument();
       }
       // For enableLongTextAnimation, just verify it renders without error
       expect(screen.getByText(longTextOptions[0].label)).toBeInTheDocument();
@@ -542,7 +540,7 @@ describe("MultiSelect", () => {
       const trigger = container.querySelector("button");
       await user.click(trigger!);
       
-      expect(container.querySelector(".bottom-full.custom-popup")).toBeInTheDocument();
+      expect(container.querySelector(".ipa-ui-dropdown-shared__popup--bottom.custom-popup")).toBeInTheDocument();
       
       const customItems = container.querySelectorAll(".custom-item");
       expect(customItems.length).toBeGreaterThan(0);
@@ -565,7 +563,7 @@ describe("MultiSelect", () => {
       await user.click(trigger!);
       
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).toHaveClass("flex-row-reverse");
+      expect(firstOption).toHaveClass("ipa-ui-dropdown-multi__item--right-align");
       
       const checkboxes = document.querySelectorAll('[class*="w-4"][class*="h-4"]');
       expect(checkboxes.length).toBe(0);
@@ -582,7 +580,7 @@ describe("MultiSelect", () => {
         />
       );
       
-      expect(container.querySelector('[class*="flex-wrap"]')).toBeInTheDocument();
+      expect(container.querySelector(".ipa-ui-dropdown-multi__trigger-content--wrap")).toBeInTheDocument();
       expect(screen.queryByText("+2")).not.toBeInTheDocument();
     });
 
@@ -606,7 +604,7 @@ describe("MultiSelect", () => {
       trigger!.focus();
       await user.keyboard("{ArrowDown}");
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveClass("bg-brand-1");
+      expect(firstOption).not.toHaveClass("ipa-ui-dropdown-multi__item--focused");
     });
 
     test("works with all hide props together", async () => {
@@ -632,7 +630,7 @@ describe("MultiSelect", () => {
       expect(container.querySelector('[class*="footer"]')).not.toBeInTheDocument();
       expect(screen.queryByText("3 selected")).not.toBeInTheDocument();
       expect(screen.queryByText("+1")).not.toBeInTheDocument();
-      expect(container.querySelector(".ellipsis-indicator")).not.toBeInTheDocument();
+      expect(container.querySelector(".ipa-ui-dropdown-multi__item-content-ellipsis-indicator")).not.toBeInTheDocument();
       
       const checkboxes = container.querySelectorAll('[class*="w-4"][class*="h-4"]');
       expect(checkboxes.length).toBe(0);
