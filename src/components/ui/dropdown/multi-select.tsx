@@ -205,7 +205,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
 
     return (
       <div 
-        className={cn("ipa-ui-dropdown-shared-container", classNames?.container)} 
+        className={cn("ipa-ui-dropdown-shared__container", classNames?.container)} 
         ref={(node) => {
           dropdownRef.current = node;
           if (ref) {
@@ -229,14 +229,14 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           onKeyDown={triggerKeyDown}
           disabled={disabled}
           isOpen={isOpen}
-          className={cn("ipa-ui-dropdown-multi-trigger", className, classNames?.trigger)}
+          className={cn("ipa-ui-dropdown-multi__trigger", className, classNames?.trigger)}
           customIcon={icons?.trigger}
           iconClassName={classNames?.triggerIcon}
           enableIconAnimation={!disableIconAnimation}
         >
           <div className={cn(
-            "ipa-ui-dropdown-multi-trigger-content",
-            wrapBadges ? "ipa-ui-dropdown-multi-trigger-content-wrap" : "ipa-ui-dropdown-multi-trigger-content-no-wrap",
+            "ipa-ui-dropdown-multi__trigger-content",
+            wrapBadges ? "ipa-ui-dropdown-multi__trigger-content--wrap" : "ipa-ui-dropdown-multi__trigger-content--no-wrap",
             classNames?.triggerContent
           )}>
             {visibleBadges.map((option) => (

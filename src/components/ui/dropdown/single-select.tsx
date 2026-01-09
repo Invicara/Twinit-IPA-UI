@@ -358,7 +358,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             className={cn(
               DROPDOWN_STYLES.triggerBase,
               "ipa-ui-dropdown-single__trigger",
-              disabled && "ipa-ui-dropdown-single__trigger--disabled",
+              disabled && "ipa-ui-dropdown-shared__trigger--disabled",
               filter && isSearchOpen && "ipa-ui-dropdown-single__trigger--cursor-text",
               filter && !isSearchOpen && "ipa-ui-dropdown-single__trigger--cursor-pointer",
               !filter && "ipa-ui-dropdown-single__trigger--cursor-pointer",

@@ -95,7 +95,7 @@ export function DropdownPopup({
   return (
     <div className={cn(
       DROPDOWN_STYLES.popup,
-      popAbove ? "ipa-ui-dropdown-single__popup--bottom" : "ipa-ui-dropdown-single__popup--top",
+      popAbove ? "ipa-ui-dropdown-shared__popup--bottom" : "ipa-ui-dropdown-shared__popup--top",
       className
     )}>
       {popAbove && footerElement}
