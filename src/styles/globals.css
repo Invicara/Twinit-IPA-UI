@@ -297,3 +297,26 @@
   }
   
 }
+
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--neutral-1);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--neutral-4);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--neutral-5);
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--neutral-4) var(--neutral-1);
+}
+
+/* Import component styles */
+@import "../components/ui/index.css";

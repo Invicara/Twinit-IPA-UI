@@ -50,7 +50,7 @@ export function DropdownTrigger({
       disabled={disabled}
       className={cn(
         DROPDOWN_STYLES.triggerBase,
-        "h-[36px] w-[284px]",
+        "ipa-ui-dropdown-shared__trigger",
         disabled && DROPDOWN_STYLES.disabled,
         className
       )}
@@ -58,17 +58,17 @@ export function DropdownTrigger({
       {children}
       {customIcon ? (
         <div className={cn(
-          enableIconAnimation && "transition-transform duration-200",
-          enableIconAnimation && isOpen && "rotate-180",
+          enableIconAnimation && "ipa-ui-dropdown-shared__trigger-icon--transition",
+          enableIconAnimation && isOpen && "ipa-ui-dropdown-shared__trigger-icon--rotate-180",
           iconClassName
         )}>
           {customIcon}
         </div>
       ) : (
         <ChevronDownIcon className={cn(
-          "h-5 w-5 stroke-[1.5] text-neutral-5",
-          enableIconAnimation && "transition-transform duration-200",
-          enableIconAnimation && isOpen && "rotate-180",
+          "ipa-ui-dropdown-shared__trigger-icon",
+          enableIconAnimation && "ipa-ui-dropdown-shared__trigger-icon--transition",
+          enableIconAnimation && isOpen && "ipa-ui-dropdown-shared__trigger-icon--rotate-180",
           iconClassName
         )} />
       )}
@@ -88,14 +88,14 @@ export function DropdownPopup({
 
   const footerElement = footer && (
     <div className={DROPDOWN_STYLES.footer} onClick={onClose}>
-      <ChevronDownIcon className="h-5 w-5 text-neutral-5 stroke-[1.5] group-hover:rotate-180 transition-transform duration-200" />
+      <ChevronDownIcon className="ipa-ui-dropdown-single__trigger-icon" />
     </div>
   );
 
   return (
     <div className={cn(
       DROPDOWN_STYLES.popup,
-      popAbove ? "bottom-full mb-1 flex-col-reverse" : "top-full mt-1",
+      popAbove ? "ipa-ui-dropdown-single__popup--bottom" : "ipa-ui-dropdown-single__popup--top",
       className
     )}>
       {popAbove && footerElement}
@@ -112,7 +112,7 @@ export function DropdownScrollableContent({
 }: { children: ReactNode; className?: string; scrollable?: boolean }) {
   return (
     <div className={cn(
-      scrollable ? DROPDOWN_STYLES.scrollContent : "flex-1",
+      scrollable ? DROPDOWN_STYLES.scrollContent : "ipa-ui-dropdown-shared__no-scroll-content",
       className
     )}>
       {children}

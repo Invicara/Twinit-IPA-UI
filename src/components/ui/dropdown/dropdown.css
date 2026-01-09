@@ -1,0 +1,223 @@
+@layer components {
+  .ipa-ui-dropdown-shared__container {
+    @apply relative;
+  }
+
+  .ipa-ui-dropdown-shared__trigger--base {
+    @apply flex items-center justify-between rounded-[4px] border border-neutral-6 bg-neutral-0 px-[12px] py-[8px] font-sans text-[14px] font-normal leading-[19px] text-neutral-6 transition-colors focus-visible:outline-none focus:border-brand-6 focus-visible:border-brand-6 hover:border-neutral-6 cursor-pointer;
+  }
+
+  .ipa-ui-dropdown-shared__trigger--disabled {
+    @apply border-neutral-5 bg-neutral-1 text-neutral-5 cursor-not-allowed;
+  }
+
+  .ipa-ui-dropdown-shared__trigger-icon {
+    @apply h-5 w-5 text-neutral-5 stroke-[1.5];
+  }
+
+  .ipa-ui-dropdown-shared__popup {
+    @apply absolute z-50 w-[284px] overflow-hidden rounded-[4px] bg-neutral-0 shadow-[0_8px_25px_-5px_rgba(0,0,0,0.1),0_4px_10px_-2px_rgba(0,0,0,0.04)] border border-neutral-2 max-h-[200px] flex flex-col;
+  }
+
+  .ipa-ui-dropdown-shared__popup--bottom {
+    @apply bottom-full mb-1 flex-col-reverse;
+  }
+
+  .ipa-ui-dropdown-shared__popup--top {
+    @apply top-full mt-1;
+  }
+
+  .ipa-ui-dropdown-shared__scroll-content {
+    @apply overflow-y-auto flex-1;
+  }
+
+  .ipa-ui-dropdown-shared__no-scroll-content {
+    @apply overflow-y-auto flex-1;
+  }
+
+  .ipa-ui-dropdown-shared__footer {
+    @apply flex justify-center py-[2px] flex-shrink-0 cursor-pointer;
+  }
+
+  .ipa-ui-dropdown-shared__item--base {
+    @apply relative flex w-full cursor-pointer select-none items-center py-[8px] px-[12px] text-[14px] text-neutral-6 outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
+  }
+
+  .ipa-ui-dropdown-multi__trigger {
+    @apply min-h-[36px];
+  }
+
+  .ipa-ui-dropdown-multi__trigger-content {
+    @apply flex gap-1 flex-1 min-w-0;
+  }
+
+  .ipa-ui-dropdown-multi__trigger-content--wrap {
+    @apply flex-wrap;
+  }
+
+  .ipa-ui-dropdown-multi__trigger-content--no-wrap {
+    @apply overflow-x-hidden;
+  }
+
+  .ipa-ui-dropdown-multi__badge {
+    @apply inline-flex items-center gap-1 bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium whitespace-nowrap;
+  }
+
+  .ipa-ui-dropdown-multi__badge-text {
+    @apply whitespace-nowrap;
+  }
+
+  .ipa-ui-dropdown-multi__badge-remove {
+    @apply hover:bg-brand-8/20 rounded-[4px] p-0.5 cursor-pointer;
+  }
+
+  .ipa-ui-dropdown-multi__remaining-badge {
+    @apply inline-flex items-center bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium whitespace-nowrap;
+  }
+
+  .ipa-ui-dropdown-multi__placeholder {
+    @apply text-neutral-4;
+  }
+
+  .ipa-ui-dropdown-multi__header {
+    @apply px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0;
+  }
+
+  .ipa-ui-dropdown-multi__header-text {
+    @apply px-[6px] text-[13px] text-neutral-4;
+  }
+  
+  .ipa-ui-dropdown-multi__item--focused {
+    @apply bg-brand-1;
+  }
+
+  .ipa-ui-dropdown-multi__item--hover {
+    @apply hover:bg-brand-1;
+  }
+
+  .ipa-ui-dropdown-multi__item--right-align {
+    @apply flex-row-reverse;
+  }
+
+  .ipa-ui-dropdown-multi__checkbox {
+    @apply mr-3 flex items-center justify-center;
+  }
+
+  .ipa-ui-dropdown-multi__checkbox--right-align {
+    @apply mr-0 ml-3;
+  }
+
+  .ipa-ui-dropdown-multi__checkbox-icon-wrapper {
+    @apply w-4 h-4 rounded-[4px] flex items-center justify-center border;
+  }
+
+  .ipa-ui-dropdown-multi__checkbox-icon-wrapper--checked {
+    @apply bg-brand-8 border-brand-8;
+  }
+
+  .ipa-ui-dropdown-multi__checkbox-icon-wrapper--unchecked {
+    @apply bg-white border-neutral-5;
+  }
+
+  .ipa-ui-dropdown-multi__checkbox-icon {
+    @apply text-white;
+  }
+
+  .ipa-ui-dropdown-multi__item-content {
+    @apply flex-1 overflow-hidden relative;
+  }
+
+  .ipa-ui-dropdown-multi__item-content-text {
+    @apply whitespace-nowrap block text-left pointer-events-none;
+  }
+
+  .ipa-ui-dropdown-multi__item-content-ellipsis-indicator {
+    @apply absolute right-0 top-0 px-1 text-neutral-6;
+  }
+
+  .ipa-ui-dropdown-multi__item-content-ellipsis-indicator--focused {
+    @apply bg-brand-1;
+  }
+
+  .ipa-ui-dropdown-multi__item-content-ellipsis-indicator--unfocused {
+    @apply bg-neutral-0;
+  }
+
+  .ipa-ui-dropdown-multi__item-content-ellipsis-indicator--hover {
+    @apply group-hover:bg-brand-1;
+  }
+
+  .ipa-ui-dropdown-multi__header {
+    @apply px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0;
+  }
+
+  .ipa-ui-dropdown-multi__header-text {
+    @apply px-[6px] text-[13px] text-neutral-4;
+  }
+
+  .ipa-ui-dropdown-single__highlighted-text {
+    @apply font-bold;
+  }
+
+  .ipa-ui-dropdown-single__trigger {
+    @apply h-[36px] w-[284px];
+    @apply placeholder:text-neutral-4;
+    @apply text-ellipsis overflow-hidden pr-[36px];
+  }
+
+  .ipa-ui-dropdown-single__trigger--cursor-text {
+    @apply cursor-text;
+  }
+
+  .ipa-ui-dropdown-single__trigger--cursor-pointer {
+    @apply cursor-pointer;
+  }
+
+  .ipa-ui-dropdown-single__trigger-icon-container {
+    @apply absolute right-[12px] top-1/2 -translate-y-1/2 pointer-events-none;
+  }
+
+  .ipa-ui-dropdown-single__trigger-icon {
+    @apply h-5 w-5 text-neutral-5 stroke-[1.5];
+  }
+
+  .ipa-ui-dropdown-single__trigger-icon--transition {
+    @apply transition-transform duration-200;
+  }
+
+  .ipa-ui-dropdown-single__trigger-icon--rotate-180 {
+    @apply rotate-180;
+  }
+
+  .ipa-ui-dropdown-single__item--focused {
+    @apply bg-brand-1;
+  }
+
+  .ipa-ui-dropdown-single__item--hover {
+    @apply hover:bg-brand-1;
+  }
+
+  .ipa-ui-dropdown-single__item-content {
+    @apply flex-1 overflow-hidden relative;
+  }
+
+  .ipa-ui-dropdown-single__item-content-text {
+    @apply whitespace-nowrap block text-left pointer-events-none;
+  }
+
+  .ipa-ui-dropdown-single__item-content-ellipsis-indicator {
+    @apply absolute right-0 top-0 px-1 text-neutral-6;
+  }
+
+  .ipa-ui-dropdown-single__item-content-ellipsis-indicator--focused {
+    @apply bg-brand-1;
+  }
+
+  .ipa-ui-dropdown-single__item-content-ellipsis-indicator--unfocused {
+    @apply bg-neutral-0;
+  }
+
+  .ipa-ui-dropdown-single__item-content-ellipsis-indicator--hover {
+    @apply group-hover:bg-brand-1;
+  }
+}

@@ -152,7 +152,7 @@ const customMultiselectClassNames = {
   badgeRemove: 'rounded-none hover:bg-orange-300',
   badgeRemoveIcon: 'text-orange-600 stroke-[2]',
   remainingBadge: 'rounded-none bg-orange-180 text-orange-800',
-  popup: 'shadow-none rounded-none w-[200px] border-2 border-orange-500 left-0 text-orange-600',
+  popup: 'shadow-none rounded-none w-[200px] border-2 border-orange-500 text-orange-600',
   scrollContent: 'cursor-copy',
   header: 'bg-orange-50 border-b-2 border-orange-200 text-orange-200',
   item: 'font-arial cursor-crosshair text-orange-700',

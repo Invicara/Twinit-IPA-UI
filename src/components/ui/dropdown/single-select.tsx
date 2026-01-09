@@ -126,7 +126,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       return (
         <>
           {before}
-          <span className={cn("font-bold", classNames?.highlightedText)}>{match}</span>
+          <span className={cn("ipa-ui-dropdown-single__highlighted-text", classNames?.highlightedText)}>{match}</span>
           {after}
         </>
       );
@@ -304,7 +304,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
 
     return (
       <div 
-        className={cn("relative", classNames?.container)} 
+        className={cn("ipa-ui-dropdown-shared__container", classNames?.container)} 
         ref={(node) => {
           dropdownRef.current = node;
           if (ref) {
@@ -317,7 +317,8 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         }} 
         {...props}
       >
-        <div className="relative">
+        {/* Note:Maybe instead of using the shared container class directly we should use a more specific class name like ipa-ui-dropdown-single__container that @applys the shared container class */}
+        <div className="ipa-ui-dropdown-shared__container">
           <input
             ref={searchInputRef}
             type="text"
@@ -356,31 +357,29 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             readOnly={!filter}
             className={cn(
               DROPDOWN_STYLES.triggerBase,
-              "h-[36px] w-[284px]",
-              "placeholder:text-neutral-4",
-              "text-ellipsis overflow-hidden pr-[36px]",
-              disabled && DROPDOWN_STYLES.disabled,
-              filter && isSearchOpen && "cursor-text",
-              filter && !isSearchOpen && "cursor-pointer",
-              !filter && "cursor-pointer",
+              "ipa-ui-dropdown-single__trigger",
+              disabled && "ipa-ui-dropdown-single__trigger--disabled",
+              filter && isSearchOpen && "ipa-ui-dropdown-single__trigger--cursor-text",
+              filter && !isSearchOpen && "ipa-ui-dropdown-single__trigger--cursor-pointer",
+              !filter && "ipa-ui-dropdown-single__trigger--cursor-pointer",
               className,
               classNames?.trigger
             )}
           />
-          <div className={cn("absolute right-[12px] top-1/2 -translate-y-1/2 pointer-events-none", classNames?.triggerIconContainer)}>
+          <div className={cn("ipa-ui-dropdown-single__trigger-icon-container", classNames?.triggerIconContainer)}>
             {icons?.trigger ? (
               <div className={cn(
-                !disableIconAnimation && "transition-transform duration-200",
-                !disableIconAnimation && isSearchOpen && "rotate-180",
+                !disableIconAnimation && "ipa-ui-dropdown-single__trigger-icon--transition",
+                !disableIconAnimation && isSearchOpen && "ipa-ui-dropdown-single__trigger-icon--rotate-180",
                 classNames?.triggerIcon
               )}>
                 {icons.trigger}
               </div>
             ) : (
               <ChevronDownIcon className={cn(
-                "h-5 w-5 stroke-[1.5] text-neutral-5",
-                !disableIconAnimation && "transition-transform duration-200", 
-                !disableIconAnimation && isSearchOpen && "rotate-180",
+                "ipa-ui-dropdown-single__trigger-icon",
+                !disableIconAnimation && "ipa-ui-dropdown-single__trigger-icon--transition", 
+                !disableIconAnimation && isSearchOpen && "ipa-ui-dropdown-single__trigger-icon--rotate-180",
                 classNames?.triggerIcon
               )} />
             )}
@@ -460,24 +459,24 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                   }}
                   className={cn(
                     DROPDOWN_STYLES.itemBase,
-                    !hideRowHighlight && focusedIndex === index && "bg-brand-1",
-                    !hideRowHighlight && !isKeyboardMode && "hover:bg-brand-1 group",
+                    !hideRowHighlight && focusedIndex === index && "ipa-ui-dropdown-single__item--focused",
+                    !hideRowHighlight && !isKeyboardMode && "ipa-ui-dropdown-single__item--hover group",
                     classNames?.item,
                     !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
                     option.disabled && classNames?.itemDisabled
                   )}
                 >
-                  <div className="flex-1 overflow-hidden relative">
+                  <div className="ipa-ui-dropdown-single__item-content">
                     <span 
-                      className={cn("scrollable-text whitespace-nowrap block text-left pointer-events-none", classNames?.itemText)}
+                      className={cn("ipa-ui-dropdown-single__item-content-text scrollable-text", classNames?.itemText)}
                     >
                       {filter ? highlightMatch(option.label, searchQuery) : option.label}
                     </span>
                     {!hideLongTextEllipsis && (
                       <span className={cn(
-                        "ellipsis-indicator absolute right-0 top-0 px-1 text-neutral-6",
-                        !hideRowHighlight && focusedIndex === index ? "bg-brand-1" : "bg-neutral-0",
-                        !hideRowHighlight && !isKeyboardMode && "group-hover:bg-brand-1",
+                        "ipa-ui-dropdown-single__item-content-ellipsis-indicator ellipsis-indicator",
+                        !hideRowHighlight && focusedIndex === index ? "ipa-ui-dropdown-single__item-content-ellipsis-indicator--focused" : "ipa-ui-dropdown-single__item-content-ellipsis-indicator--unfocused",
+                        !hideRowHighlight && !isKeyboardMode && "ipa-ui-dropdown-single__item-content-ellipsis-indicator--hover",
                         classNames?.ellipsis
                       )}>
                         ..
@@ -497,7 +496,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             setIsInputFocused(false);
             setFocusedIndex(-1);
           }} footer={false} popAbove={popAbove} className={classNames?.popup}>
-            <div className={cn("px-[12px] py-[8px] text-[14px] text-neutral-5 text-center", classNames?.noResults)}>
+            <div className={cn("ipa-ui-dropdown-single__no-results", classNames?.noResults)}>
               No options found
             </div>
             {!popAbove && !hideFooter && (
