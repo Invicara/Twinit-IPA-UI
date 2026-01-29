@@ -1,7 +1,8 @@
 import * as React from "react";
 import { cn } from "../../../lib/utils";
 import { XIcon } from "../../icons";
-import { DROPDOWN_STYLES } from "./shared/dropdown-styles";
+import sharedStyles from "./shared/dropdown-base.module.css";
+import styles from "./multi-select.module.css";
 import { DropdownTrigger, DropdownPopup, DropdownScrollableContent } from "./shared/dropdown-base";
 import { useClickOutside } from "./shared/dropdown-hooks";
 import { useDropdownKeyboard } from "./shared/use-dropdown-keyboard";
@@ -205,7 +206,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
 
     return (
       <div 
-        className={cn("ipa-ui-dropdown-shared__container", classNames?.container)} 
+        className={cn(sharedStyles.container, classNames?.container)} 
         ref={(node) => {
           dropdownRef.current = node;
           if (ref) {
@@ -229,25 +230,25 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           onKeyDown={triggerKeyDown}
           disabled={disabled}
           isOpen={isOpen}
-          className={cn("ipa-ui-dropdown-multi__trigger", className, classNames?.trigger)}
+          className={cn(styles.trigger, className, classNames?.trigger)}
           customIcon={icons?.trigger}
           iconClassName={classNames?.triggerIcon}
           enableIconAnimation={!disableIconAnimation}
         >
           <div className={cn(
-            "ipa-ui-dropdown-multi__trigger-content",
-            wrapBadges ? "ipa-ui-dropdown-multi__trigger-content--wrap" : "ipa-ui-dropdown-multi__trigger-content--no-wrap",
+            styles.triggerContent,
+            wrapBadges ? styles.triggerContentWrap : styles.triggerContentNoWrap,
             classNames?.triggerContent
           )}>
             {visibleBadges.map((option) => (
               <div
                 key={option.value}
                 className={cn(
-                  "ipa-ui-dropdown-multi__badge",
+                  styles.badge,
                   classNames?.badge
                 )}
               >
-                <span className={cn("ipa-ui-dropdown-multi__badge-text", classNames?.badgeText)}>{truncateText(option.label)}</span>
+                <span className={cn(styles.badgeText, classNames?.badgeText)}>{truncateText(option.label)}</span>
                 {!hideBadgeRemove && (
                   <span
                     onClick={(e) => {
@@ -255,7 +256,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                       handleRemoveBadge(option.value);
                     }}
                     className={cn(
-                      "ipa-ui-dropdown-multi__badge-remove",
+                      styles.badgeRemove,
                       classNames?.badgeRemove
                     )}
                   >
@@ -266,14 +267,14 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
             ))}
             {!hideRemainingBadge && remainingCount > 0 && (
               <div className={cn(
-                "ipa-ui-dropdown-multi__remaining-badge",
+                styles.remainingBadge,
                 classNames?.remainingBadge
               )}>
                 +{remainingCount}
               </div>
             )}
             {value.length === 0 && (
-              <span className={cn("ipa-ui-dropdown-multi__placeholder", classNames?.placeholder)}>{placeholder}</span>
+              <span className={cn(styles.placeholder, classNames?.placeholder)}>{placeholder}</span>
             )}
           </div>
         </DropdownTrigger>
@@ -281,8 +282,8 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
         <DropdownPopup isOpen={isOpen} onClose={() => setIsOpen(false)} className={classNames?.popup} footer={!hideFooter} popAbove={popAbove}>
           {/* Header - shown at top when popBelow (default), at bottom when popAbove */}
           {!popAbove && !hideSelectionCount && (
-            <div className={cn("ipa-ui-dropdown-multi__header", classNames?.header)}>
-              <span className="ipa-ui-dropdown-multi__header-text">
+            <div className={cn(styles.header, classNames?.header)}>
+              <span className={styles.headerText}>
                 {value.length} selected
               </span>
             </div>
@@ -297,13 +298,13 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 disabled={option.disabled}
                 onClick={() => handleMultiSelect(option.value)}
                 className={cn(
-                  DROPDOWN_STYLES.itemBase,
-                  !hideRowHighlight && focusedIndex === index && "ipa-ui-dropdown-multi__item--focused",
-                  !hideRowHighlight && !isKeyboardMode && "ipa-ui-dropdown-multi__item--hover group",
+                  sharedStyles.itemBase,
+                  !hideRowHighlight && focusedIndex === index && styles.itemFocused,
+                  !hideRowHighlight && !isKeyboardMode && cn(styles.itemHover, 'group'),
                   classNames?.item,
                   !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
                   option.disabled && classNames?.itemDisabled,
-                  rightAlignCheckboxes && 'ipa-ui-dropdown-multi__item--right-align'
+                  rightAlignCheckboxes && styles.itemRightAlign
                 )}
                 ref={(el) => {
                   setItemRef(el, index);
@@ -357,15 +358,15 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
               >
                 {!hideCheckboxes && (
                   <div className={cn(
-                    "ipa-ui-dropdown-multi__checkbox",
-                    rightAlignCheckboxes && 'ipa-ui-dropdown-multi__checkbox--right-align'
+                    styles.checkbox,
+                    rightAlignCheckboxes && styles.checkboxRightAlign
                   )}>
                     <div
                       className={cn(
-                        "ipa-ui-dropdown-multi__checkbox-icon-wrapper",
+                        styles.checkboxIconWrapper,
                         value.includes(option.value) 
-                          ? "ipa-ui-dropdown-multi__checkbox-icon-wrapper--checked" 
-                          : "ipa-ui-dropdown-multi__checkbox-icon-wrapper--unchecked",
+                          ? styles.checkboxIconWrapperChecked 
+                          : styles.checkboxIconWrapperUnchecked,
                         classNames?.checkbox,
                         value.includes(option.value) && classNames?.checkboxChecked
                       )}
@@ -377,7 +378,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                             height="12" 
                             viewBox="0 0 12 12" 
                             fill="none" 
-                            className={cn("ipa-ui-dropdown-multi__checkbox-icon", classNames?.checkIcon)}
+                            className={cn(styles.checkboxIcon, classNames?.checkIcon)}
                           >
                             <path 
                               d="M2 6.5L4.5 9L10 3.5" 
@@ -392,17 +393,18 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     </div>
                   </div>
                 )}
-                <div className="ipa-ui-dropdown-multi__item-content">
+                <div className={styles.itemContent}>
                   <span 
-                    className={cn("ipa-ui-dropdown-multi__item-content-text scrollable-text", classNames?.itemText)}
+                    className={cn(styles.itemContentText, 'scrollable-text', classNames?.itemText)}
                   >
                     {option.label}
                   </span>
                   {!hideLongTextEllipsis && (
                     <span className={cn(
-                      "ipa-ui-dropdown-multi__item-content-ellipsis-indicator ellipsis-indicator",
-                      !hideRowHighlight && focusedIndex === index ? "ipa-ui-dropdown-multi__item-content-ellipsis-indicator--focused" : "ipa-ui-dropdown-multi__item-content-ellipsis-indicator--unfocused",
-                      !hideRowHighlight && !isKeyboardMode && "ipa-ui-dropdown-multi__item-content-ellipsis-indicator--hover",
+                      styles.itemContentEllipsisIndicator,
+                      'ellipsis-indicator',
+                      !hideRowHighlight && focusedIndex === index ? styles.itemContentEllipsisIndicatorFocused : styles.itemContentEllipsisIndicatorUnfocused,
+                      !hideRowHighlight && !isKeyboardMode && styles.itemContentEllipsisIndicatorHover,
                       classNames?.ellipsis
                     )}>
                       ..
@@ -415,8 +417,8 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           
           {/* Header - shown at bottom when popAbove */}
           {popAbove && !hideSelectionCount && (
-            <div className={cn("ipa-ui-dropdown-multi__header", classNames?.header)}>
-              <span className="ipa-ui-dropdown-multi__header-text">
+            <div className={cn(styles.header, classNames?.header)}>
+              <span className={styles.headerText}>
                 {value.length} selected
               </span>
             </div>

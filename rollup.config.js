@@ -25,6 +25,9 @@ export default [
     ],
     plugins: [
       postcss({
+        modules: {
+          generateScopedName: '[local]_[hash:base64:5]',
+        },
         minimize: true,
       }),
       peerDepsExternal(),

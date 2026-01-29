@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
-import { DROPDOWN_STYLES } from './dropdown-styles';
+import styles from './dropdown-base.module.css';
 import { cn } from '../../../../lib/utils';
 import type { ReactNode } from 'react';
 
@@ -49,26 +49,26 @@ export function DropdownTrigger({
       onKeyDown={onKeyDown}
       disabled={disabled}
       className={cn(
-        DROPDOWN_STYLES.triggerBase,
-        "ipa-ui-dropdown-shared__trigger",
-        disabled && DROPDOWN_STYLES.disabled,
+        styles.triggerBase,
+        styles.trigger,
+        disabled && styles.triggerDisabled,
         className
       )}
     >
       {children}
       {customIcon ? (
         <div className={cn(
-          enableIconAnimation && "ipa-ui-dropdown-shared__trigger-icon--transition",
-          enableIconAnimation && isOpen && "ipa-ui-dropdown-shared__trigger-icon--rotate-180",
+          enableIconAnimation && styles.triggerIconTransition,
+          enableIconAnimation && isOpen && styles.triggerIconRotate180,
           iconClassName
         )}>
           {customIcon}
         </div>
       ) : (
         <ChevronDownIcon className={cn(
-          "ipa-ui-dropdown-shared__trigger-icon",
-          enableIconAnimation && "ipa-ui-dropdown-shared__trigger-icon--transition",
-          enableIconAnimation && isOpen && "ipa-ui-dropdown-shared__trigger-icon--rotate-180",
+          styles.triggerIcon,
+          enableIconAnimation && styles.triggerIconTransition,
+          enableIconAnimation && isOpen && styles.triggerIconRotate180,
           iconClassName
         )} />
       )}
@@ -87,15 +87,15 @@ export function DropdownPopup({
   if (!isOpen) return null;
 
   const footerElement = footer && (
-    <div className={DROPDOWN_STYLES.footer} onClick={onClose}>
-      <ChevronDownIcon className="ipa-ui-dropdown-single__trigger-icon" />
+    <div className={styles.footer} onClick={onClose}>
+      <ChevronDownIcon className={cn(styles.triggerIcon)} />
     </div>
   );
 
   return (
     <div className={cn(
-      DROPDOWN_STYLES.popup,
-      popAbove ? "ipa-ui-dropdown-shared__popup--bottom" : "ipa-ui-dropdown-shared__popup--top",
+      styles.popup,
+      popAbove ? styles.popupBottom : styles.popupTop,
       className
     )}>
       {popAbove && footerElement}
@@ -112,11 +112,10 @@ export function DropdownScrollableContent({
 }: { children: ReactNode; className?: string; scrollable?: boolean }) {
   return (
     <div className={cn(
-      scrollable ? DROPDOWN_STYLES.scrollContent : "ipa-ui-dropdown-shared__no-scroll-content",
+      scrollable ? cn(styles.scrollContent, 'custom-scrollbar') : styles.noScrollContent,
       className
     )}>
       {children}
     </div>
   );
 }
-

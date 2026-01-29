@@ -1,7 +1,8 @@
 import * as React from "react";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { cn } from "../../../lib/utils";
-import { DROPDOWN_STYLES } from "./shared/dropdown-styles";
+import sharedStyles from "./shared/dropdown-base.module.css";
+import styles from "./single-select.module.css";
 import { DropdownPopup, DropdownScrollableContent } from "./shared/dropdown-base";
 import { useClickOutside } from "./shared/dropdown-hooks";
 import { startTextAnimation, stopTextAnimation } from "./shared/dropdown-text-utils";
@@ -126,7 +127,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       return (
         <>
           {before}
-          <span className={cn("ipa-ui-dropdown-single__highlighted-text", classNames?.highlightedText)}>{match}</span>
+          <span className={cn(styles.highlightedText, classNames?.highlightedText)}>{match}</span>
           {after}
         </>
       );
@@ -173,11 +174,27 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       }
     }, [isSearchOpen]);
 
+    const closeSearch = React.useCallback(() => {
+      setIsSearchOpen(false);
+      setSearchQuery('');
+      setIsInputFocused(false);
+      setFocusedIndex(-1);
+      searchInputRef.current?.blur();
+    }, []);
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (disableKeyboardNavigation) return;
       
       // Set keyboard mode on any key press
       setIsKeyboardMode(true);
+
+      // Always allow Escape to close when dropdown is open (even with no results)
+      if (e.key === 'Escape' && isSearchOpen) {
+        e.preventDefault();
+        closeSearch();
+        return;
+      }
+
       if (e.key === 'Enter' && !isSearchOpen && filteredOptions.length > 0) {
         e.preventDefault();
         setIsSearchOpen(true);
@@ -185,20 +202,16 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         return;
       }
 
-      if (e.key === 'Tab' && filteredOptions.length > 0) {
-        // If dropdown is already open and an item is highlighted, close dropdown and move to next element
-        if (isSearchOpen && focusedIndex >= 0) {
+      if (e.key === 'Tab') {
+        // If dropdown is open: select first item if none highlighted, then close and move focus
+        if (isSearchOpen) {
           e.preventDefault();
-          setIsSearchOpen(false);
-          setFocusedIndex(-1);
-          setIsInputFocused(false);
-          
-          // Blur the input and then move focus to next element
-          if (searchInputRef.current) {
-            searchInputRef.current.blur();
+          if (filteredOptions.length > 0) {
+            const indexToSelect = focusedIndex >= 0 && focusedIndex < filteredOptions.length ? focusedIndex : 0;
+            const optionToSelect = filteredOptions[indexToSelect];
+            if (onChange) onChange(optionToSelect.value);
           }
-          
-          // Use requestAnimationFrame to ensure blur completes, then find and focus next element
+          closeSearch();
           requestAnimationFrame(() => {
             const focusableElements = Array.from(
               document.querySelectorAll<HTMLElement>(
@@ -208,22 +221,20 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
               const style = window.getComputedStyle(el);
               return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
             });
-            
             const currentIndex = focusableElements.findIndex(el => el === searchInputRef.current);
             const nextIndex = e.shiftKey ? currentIndex - 1 : currentIndex + 1;
-            
             if (nextIndex >= 0 && nextIndex < focusableElements.length) {
               focusableElements[nextIndex]?.focus();
             }
           });
           return;
         }
-        // Otherwise, open dropdown and highlight first item
-        e.preventDefault();
-        if (!isSearchOpen) {
+        // Dropdown closed: open and highlight first item if there are options
+        if (filteredOptions.length > 0) {
+          e.preventDefault();
           setIsSearchOpen(true);
+          setFocusedIndex(0);
         }
-        setFocusedIndex(0);
         return;
       }
 
@@ -260,17 +271,12 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
           break;
         case 'Enter':
           e.preventDefault();
-          if (focusedIndex >= 0 && focusedIndex < filteredOptions.length) {
-            const selectedOption = filteredOptions[focusedIndex];
+          if (filteredOptions.length > 0) {
+            const indexToSelect = focusedIndex >= 0 && focusedIndex < filteredOptions.length ? focusedIndex : 0;
+            const selectedOption = filteredOptions[indexToSelect];
             if (onChange) onChange(selectedOption.value);
-            setSearchQuery('');
-            setIsSearchOpen(false);
-            setIsInputFocused(false);
-            setFocusedIndex(-1);
-            if (searchInputRef.current) {
-              searchInputRef.current.blur();
-            }
           }
+          closeSearch();
           break;
         case ' ':
           // Spacebar selects item but doesn't dismiss dropdown (only for non-filter mode)
@@ -284,14 +290,6 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
           }
           // If filter mode, allow spacebar to type spaces
           break;
-        case 'Escape':
-          e.preventDefault();
-          setIsSearchOpen(false);
-          setFocusedIndex(-1);
-          if (searchInputRef.current) {
-            searchInputRef.current.blur();
-          }
-          break;
       }
     };
 
@@ -304,7 +302,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
 
     return (
       <div 
-        className={cn("ipa-ui-dropdown-shared__container", classNames?.container)} 
+        className={cn(sharedStyles.container, classNames?.container)} 
         ref={(node) => {
           dropdownRef.current = node;
           if (ref) {
@@ -317,8 +315,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         }} 
         {...props}
       >
-        {/* Note:Maybe instead of using the shared container class directly we should use a more specific class name like ipa-ui-dropdown-single__container that @applys the shared container class */}
-        <div className="ipa-ui-dropdown-shared__container">
+        <div className={sharedStyles.container}>
           <input
             ref={searchInputRef}
             type="text"
@@ -356,30 +353,30 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             placeholder={effectivePlaceholder}
             readOnly={!filter}
             className={cn(
-              DROPDOWN_STYLES.triggerBase,
-              "ipa-ui-dropdown-single__trigger",
-              disabled && "ipa-ui-dropdown-shared__trigger--disabled",
-              filter && isSearchOpen && "ipa-ui-dropdown-single__trigger--cursor-text",
-              filter && !isSearchOpen && "ipa-ui-dropdown-single__trigger--cursor-pointer",
-              !filter && "ipa-ui-dropdown-single__trigger--cursor-pointer",
+              sharedStyles.triggerBase,
+              styles.trigger,
+              disabled && sharedStyles.triggerDisabled,
+              filter && isSearchOpen && styles.triggerCursorText,
+              filter && !isSearchOpen && styles.triggerCursorPointer,
+              !filter && styles.triggerCursorPointer,
               className,
               classNames?.trigger
             )}
           />
-          <div className={cn("ipa-ui-dropdown-single__trigger-icon-container", classNames?.triggerIconContainer)}>
+          <div className={cn(styles.triggerIconContainer, classNames?.triggerIconContainer)}>
             {icons?.trigger ? (
               <div className={cn(
-                !disableIconAnimation && "ipa-ui-dropdown-single__trigger-icon--transition",
-                !disableIconAnimation && isSearchOpen && "ipa-ui-dropdown-single__trigger-icon--rotate-180",
+                !disableIconAnimation && styles.triggerIconTransition,
+                !disableIconAnimation && isSearchOpen && styles.triggerIconRotate180,
                 classNames?.triggerIcon
               )}>
                 {icons.trigger}
               </div>
             ) : (
               <ChevronDownIcon className={cn(
-                "ipa-ui-dropdown-single__trigger-icon",
-                !disableIconAnimation && "ipa-ui-dropdown-single__trigger-icon--transition", 
-                !disableIconAnimation && isSearchOpen && "ipa-ui-dropdown-single__trigger-icon--rotate-180",
+                styles.triggerIcon,
+                !disableIconAnimation && styles.triggerIconTransition, 
+                !disableIconAnimation && isSearchOpen && styles.triggerIconRotate180,
                 classNames?.triggerIcon
               )} />
             )}
@@ -387,7 +384,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         </div>
         
         {isSearchOpen && filteredOptions.length > 0 && (
-          <DropdownPopup isOpen={true} onClose={() => setIsSearchOpen(false)} className={classNames?.popup} footer={!hideFooter} popAbove={popAbove}>
+          <DropdownPopup isOpen={true} onClose={closeSearch} className={classNames?.popup} footer={!hideFooter} popAbove={popAbove}>
             <DropdownScrollableContent className={classNames?.scrollContent} scrollable={!disableScrolling}>
               {filteredOptions.map((option, index) => (
                 <button
@@ -458,25 +455,26 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                     }
                   }}
                   className={cn(
-                    DROPDOWN_STYLES.itemBase,
-                    !hideRowHighlight && focusedIndex === index && "ipa-ui-dropdown-single__item--focused",
-                    !hideRowHighlight && !isKeyboardMode && "ipa-ui-dropdown-single__item--hover group",
+                    sharedStyles.itemBase,
+                    !hideRowHighlight && focusedIndex === index && styles.itemFocused,
+                    !hideRowHighlight && !isKeyboardMode && cn(styles.itemHover, 'group'),
                     classNames?.item,
                     !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
                     option.disabled && classNames?.itemDisabled
                   )}
                 >
-                  <div className="ipa-ui-dropdown-single__item-content">
+                  <div className={styles.itemContent}>
                     <span 
-                      className={cn("ipa-ui-dropdown-single__item-content-text scrollable-text", classNames?.itemText)}
+                      className={cn(styles.itemContentText, 'scrollable-text', classNames?.itemText)}
                     >
                       {filter ? highlightMatch(option.label, searchQuery) : option.label}
                     </span>
                     {!hideLongTextEllipsis && (
                       <span className={cn(
-                        "ipa-ui-dropdown-single__item-content-ellipsis-indicator ellipsis-indicator",
-                        !hideRowHighlight && focusedIndex === index ? "ipa-ui-dropdown-single__item-content-ellipsis-indicator--focused" : "ipa-ui-dropdown-single__item-content-ellipsis-indicator--unfocused",
-                        !hideRowHighlight && !isKeyboardMode && "ipa-ui-dropdown-single__item-content-ellipsis-indicator--hover",
+                        styles.itemContentEllipsisIndicator,
+                        'ellipsis-indicator',
+                        !hideRowHighlight && focusedIndex === index ? styles.itemContentEllipsisIndicatorFocused : styles.itemContentEllipsisIndicatorUnfocused,
+                        !hideRowHighlight && !isKeyboardMode && styles.itemContentEllipsisIndicatorHover,
                         classNames?.ellipsis
                       )}>
                         ..
@@ -490,22 +488,12 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         )}
         
         {isSearchOpen && filteredOptions.length === 0 && searchQuery && (
-          <DropdownPopup isOpen={true} onClose={() => {
-            setIsSearchOpen(false);
-            setSearchQuery('');
-            setIsInputFocused(false);
-            setFocusedIndex(-1);
-          }} footer={false} popAbove={popAbove} className={classNames?.popup}>
-            <div className={cn("ipa-ui-dropdown-single__no-results", classNames?.noResults)}>
+          <DropdownPopup isOpen={true} onClose={closeSearch} footer={false} popAbove={popAbove} className={classNames?.popup}>
+            <div className={cn(styles.noResults, classNames?.noResults)}>
               No options found
             </div>
             {!popAbove && !hideFooter && (
-              <div className={cn(DROPDOWN_STYLES.footer, classNames?.footer)} onClick={() => {
-                setIsSearchOpen(false);
-                setSearchQuery('');
-                setIsInputFocused(false);
-                setFocusedIndex(-1);
-              }}>
+              <div className={cn(sharedStyles.footer, 'group', classNames?.footer)} onClick={closeSearch}>
                 {icons?.footer ? (
                   <div className={cn(
                     !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
@@ -523,12 +511,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
               </div>
             )}
             {popAbove && !hideFooter && (
-              <div className={cn(DROPDOWN_STYLES.footer, classNames?.footer)} onClick={() => {
-                setIsSearchOpen(false);
-                setSearchQuery('');
-                setIsInputFocused(false);
-                setFocusedIndex(-1);
-              }}>
+              <div className={cn(sharedStyles.footer, 'group', classNames?.footer)} onClick={closeSearch}>
                 {icons?.footer ? (
                   <div className={cn(
                     !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",

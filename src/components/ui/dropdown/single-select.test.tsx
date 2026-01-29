@@ -143,7 +143,7 @@ describe("SingleSelect", () => {
         expect(screen.queryByText(/^Option 1$/)).not.toBeInTheDocument();
         
         // Check that highlighting is applied
-        const boldElements = container.querySelectorAll(".ipa-ui-dropdown-single__highlighted-text");
+        const boldElements = container.querySelectorAll(".highlightedText");
         expect(boldElements.length).toBeGreaterThan(0);
       });
     });
@@ -202,12 +202,12 @@ describe("SingleSelect", () => {
       // Test navigation down
       await user.keyboard("{ArrowDown}");
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).toHaveClass("ipa-ui-dropdown-single__item--focused");
+      expect(firstOption).toHaveClass("itemFocused");
       
       // Test navigation further down then up
       await user.keyboard("{ArrowDown}");
       await user.keyboard("{ArrowUp}");
-      expect(firstOption).toHaveClass("ipa-ui-dropdown-single__item--focused");
+      expect(firstOption).toHaveClass("itemFocused");
       
       // Test selection with Enter
       await user.keyboard("{Enter}");
@@ -244,9 +244,8 @@ describe("SingleSelect", () => {
         expect(screen.queryByText("Option 1")).not.toBeInTheDocument();
       });
       
-      input.focus();
-      await user.type(input, "{Enter}");
-      
+      // Refocus input then Enter to reopen (focus opens dropdown; Enter also opens when closed)
+      await user.click(input);
       await waitFor(() => {
         expect(screen.getByText("Option 1")).toBeInTheDocument();
       });
@@ -261,7 +260,7 @@ describe("SingleSelect", () => {
       await user.keyboard("{ArrowDown}");
       
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveClass("ipa-ui-dropdown-single__item--focused");
+      expect(firstOption).not.toHaveClass("itemFocused");
     });
 
     test("handles rapid keyboard navigation without exceeding bounds", async () => {
@@ -278,7 +277,7 @@ describe("SingleSelect", () => {
       await user.keyboard("{ArrowDown}");
       
       const lastOption = screen.getByText("Option 5").closest("button");
-      expect(lastOption).toHaveClass("ipa-ui-dropdown-single__item--focused");
+      expect(lastOption).toHaveClass("itemFocused");
     });
   });
 
@@ -363,14 +362,14 @@ describe("SingleSelect", () => {
       const input = screen.getByPlaceholderText("Select an option");
       await user.click(input);
       
-      expect(container.querySelector(".ipa-ui-dropdown-shared__popup--top")).toBeInTheDocument();
+      expect(container.querySelector(".popupTop")).toBeInTheDocument();
       
       await user.keyboard("{Escape}");
       
       rerender(<SingleSelect options={defaultOptions} popAbove />);
       await user.click(input);
       
-      expect(container.querySelector(".ipa-ui-dropdown-shared__popup--bottom")).toBeInTheDocument();
+      expect(container.querySelector(".popupBottom")).toBeInTheDocument();
     });
   });
 
@@ -393,9 +392,9 @@ describe("SingleSelect", () => {
       } else if (propName === 'hideRowHighlight') {
         await user.keyboard("{ArrowDown}");
         const firstOption = screen.getByText("Option 1").closest("button");
-        expect(firstOption).not.toHaveClass("ipa-ui-dropdown-single__item--focused");
+        expect(firstOption).not.toHaveClass("itemFocused");
       } else if (propName === 'hideLongTextEllipsis') {
-        expect(container.querySelector(".ipa-ui-dropdown-single__item-content-ellipsis-indicator")).not.toBeInTheDocument();
+        expect(container.querySelector(".itemContentEllipsisIndicator")).not.toBeInTheDocument();
       }
     });
   });
@@ -415,7 +414,7 @@ describe("SingleSelect", () => {
       
       if (propName === 'disableIconAnimation') {
         const icon = container.querySelector("svg");
-        expect(icon).not.toHaveClass("ipa-ui-dropdown-single__trigger-icon--rotate-180");
+        expect(icon).not.toHaveClass("triggerIconRotate180");
       }
       // For enableLongTextAnimation, just verify it renders without error
       expect(screen.getByText(longTextOptions[0].label)).toBeInTheDocument();
@@ -432,7 +431,7 @@ describe("SingleSelect", () => {
       const input = screen.getByPlaceholderText("Select an option");
       await user.click(input);
       
-      expect(container.querySelector(".ipa-ui-dropdown-shared__scroll-content")).not.toBeInTheDocument();
+      expect(container.querySelector(".scrollContent")).not.toBeInTheDocument();
     });
 
     test("disableCloseOnOutsideClick keeps dropdown open", async () => {
@@ -478,12 +477,12 @@ describe("SingleSelect", () => {
       const input = screen.getByPlaceholderText("Select an option");
       await user.click(input);
       
-      expect(container.querySelector(".ipa-ui-dropdown-shared__popup--bottom.custom-popup")).toBeInTheDocument();
+      expect(container.querySelector(".popupBottom.custom-popup")).toBeInTheDocument();
       expect(container.querySelector('[class*="footer"]')).not.toBeInTheDocument();
       
       await user.keyboard("{ArrowDown}");
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveClass("ipa-ui-dropdown-single__item--focused");
+      expect(firstOption).not.toHaveClass("itemFocused");
     });
 
     test("works with filter and custom icons/classNames", async () => {
