@@ -11,7 +11,7 @@
     "build:js": "rollup -c --bundleConfigAsCjs",
     "prepublishOnly": "npm run build",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "npm run build:css && storybook build",
     "test": "jest",
     "testv": "jest --verbose",
     "test-watch": "jest --watch",
