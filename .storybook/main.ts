@@ -17,6 +17,7 @@ const config: StorybookConfig = {
     name: "@storybook/react-webpack5",
     options: {}
   },
+  staticDirs: ['../public'],
   webpackFinal: async (config) => {
     // 1) Exclude .module.css from the default CSS rule so our rule handles it
     const rules = config.module?.rules ?? [];
