@@ -237,7 +237,7 @@ npm run storybook
 npm run build-storybook
 
 # Build the library
-npm run rollup
+npm run build
 ```
 
 ### Testing
@@ -302,6 +302,122 @@ All components follow ARIA best practices and are keyboard navigable. Components
 - Keyboard navigation (Arrow keys, Enter, Escape, Tab)
 - Screen reader support
 - Focus indicators
+
+## Publishing
+
+This package is published to GitHub Packages. Follow these steps to publish a new version:
+
+### TLDR
+
+Quick publishing steps:
+```bash
+# 1. Authenticate with GitHub Packages (one-time setup)
+npm login --registry=https://npm.pkg.github.com --scope=@invicara
+
+# 2. Bump version
+npm version patch  # or minor/major
+
+# 3. Update CHANGELOG.md with your changes
+
+# 4. Publish
+npm publish
+```
+
+**Note**: Make sure you have a GitHub Personal Access Token with `write:packages` permission. See Prerequisites below for details.
+
+### Prerequisites
+
+1. **GitHub Personal Access Token**: You need a GitHub token with `write:packages` permission.
+   - Create one at: https://github.com/settings/tokens
+   - Save it securely (you'll need it for npm authentication)
+
+2. **npm Authentication**: Configure npm to authenticate with GitHub Packages:
+   ```bash
+   npm login --registry=https://npm.pkg.github.com --scope=@invicara
+   ```
+   When prompted:
+   - Username: Your GitHub username
+   - Password: Your GitHub Personal Access Token (not your GitHub password)
+   - Email: Your GitHub email address
+
+   Alternatively, create/update `.npmrc` in your home directory (`~/.npmrc`):
+   ```
+   @invicara:registry=https://npm.pkg.github.com
+   //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+   ```
+
+### Publishing Steps
+
+1. **Update Version**: Use `npm version` to bump the version following [Semantic Versioning](https://semver.org/):
+   ```bash
+   # For a patch release (1.0.1 -> 1.0.2)
+   npm version patch
+   
+   # For a minor release (1.0.1 -> 1.1.0)
+   npm version minor
+   
+   # For a major release (1.0.1 -> 2.0.0)
+   npm version major
+   ```
+   
+   This command will:
+   - Update the version in `package.json`
+   - Create a git commit with the version change
+   - Create a git tag with the version number
+
+2. **Update CHANGELOG.md**: Document your changes in `CHANGELOG.md` following the existing format.
+
+3. **Build the Package**: The `prepublishOnly` script automatically runs before publishing:
+   ```bash
+   npm run build
+   ```
+   This will:
+   - Compile Tailwind CSS (`build:css`)
+   - Build JavaScript bundles with Rollup (`build:js`)
+   - Generate CommonJS, ESM, and TypeScript definition files in the `dist/` directory
+
+4. **Verify Build Output**: Check that the `dist/` directory contains:
+   - `cjs/index.js` - CommonJS bundle
+   - `esm/index.js` - ES Module bundle
+   - `types.d.ts` - TypeScript definitions
+   - CSS files (if any)
+
+5. **Publish to GitHub Packages**:
+   ```bash
+   npm publish
+   ```
+   This will:
+   - Run `prepublishOnly` (which runs `npm run build`)
+   - Publish to `https://npm.pkg.github.com`
+   - Include only files specified in `package.json` `files` field: `dist/`, `README.md`, `LICENSE`
+
+6. **Verify Publication**: Check that the package is available:
+   ```bash
+   npm view @invicara/ipa-ui versions
+   ```
+   Or visit: `https://github.com/Invicara/Twinit-IPA-UI/packages`
+
+### Installing the Published Package
+
+Consumers of the package need to configure npm to access GitHub Packages. They should:
+
+1. Create/update `.npmrc` in their project root:
+   ```
+   @invicara:registry=https://npm.pkg.github.com
+   //npm.pkg.github.com/:_authToken=THEIR_GITHUB_TOKEN
+   ```
+
+2. Install the package:
+   ```bash
+   npm install @invicara/ipa-ui
+   ```
+
+### Troubleshooting
+
+- **Authentication Errors**: Ensure your GitHub token has `write:packages` permission and is correctly configured in `.npmrc`
+- **Build Failures**: Run `npm run build` manually to see detailed error messages
+- **Version Conflicts**: If a version already exists, increment the version number
+- **Scope Issues**: Ensure the package name in `package.json` matches `@invicara/ipa-ui` exactly
 
 ## Contributing
 
