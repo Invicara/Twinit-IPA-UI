@@ -35,10 +35,16 @@ export const Default: Story = {
 }
 
 export const Inline: Story = {
-  render: () => (
+  args: {
+    href: '#',
+    children: 'Click This Link',
+    variant: 'inline',
+    disabled: false,
+  },
+  render: (args) => (
     <div className="max-w-md">
       <p className="font-sans text-[14px] font-normal leading-[18px] text-neutral-9">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea <Link href="#" variant="inline">Click This Link</Link> commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. consectetur adipiscing elit.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea <Link href={args.href} variant={args.variant} disabled={args.disabled}>{args.children}</Link> commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. consectetur adipiscing elit.
       </p>
     </div>
   ),

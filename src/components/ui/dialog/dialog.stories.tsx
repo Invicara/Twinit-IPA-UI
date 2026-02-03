@@ -68,7 +68,16 @@ export const Default: Story = {
       <div>
         <Button onClick={() => setOpen(true)}>Open Dialog</Button>
         <Dialog
-          {...args as any}
+          title={args.title}
+          size={args.size}
+          className={args.className}
+          hideOverlay={args.hideOverlay}
+          acknowledgment={args.acknowledgment}
+          passive={args.passive}
+          disableClickOutside={args.disableClickOutside}
+          disableCloseButton={args.disableCloseButton}
+          disableEscapeKey={args.disableEscapeKey}
+          classNames={args.classNames}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -109,7 +118,20 @@ export const Acknowledgment: Story = {
     return (
       <div>
         <Button onClick={() => handleOpenChange(true)}>Open Acknowledgment</Button>
-        <Dialog {...args as any} open={open} onOpenChange={handleOpenChange}>
+        <Dialog
+          title={args.title}
+          size={args.size}
+          className={args.className}
+          hideOverlay={args.hideOverlay}
+          acknowledgment={args.acknowledgment}
+          passive={args.passive}
+          disableClickOutside={args.disableClickOutside}
+          disableCloseButton={args.disableCloseButton}
+          disableEscapeKey={args.disableEscapeKey}
+          classNames={args.classNames}
+          open={open}
+          onOpenChange={handleOpenChange}
+        >
           <p>This dialog has only an OK button.</p>
           <p>The acknowledgment prop automatically generates it.</p>
         </Dialog>
@@ -129,7 +151,20 @@ export const Passive: Story = {
     return (
       <div>
         <Button onClick={() => setOpen(true)}>Open Passive</Button>
-        <Dialog {...args as any} open={open} onOpenChange={setOpen}>
+        <Dialog
+          title={args.title}
+          size={args.size}
+          className={args.className}
+          hideOverlay={args.hideOverlay}
+          acknowledgment={args.acknowledgment}
+          passive={args.passive}
+          disableClickOutside={args.disableClickOutside}
+          disableCloseButton={args.disableCloseButton}
+          disableEscapeKey={args.disableEscapeKey}
+          classNames={args.classNames}
+          open={open}
+          onOpenChange={setOpen}
+        >
           <p>This is a passive dialog with no footer.</p>
           <p>Use the X button or click outside to close.</p>
         </Dialog>
@@ -150,7 +185,16 @@ export const NonModal: Story = {
       <div>
         <Button onClick={() => setOpen(true)}>Open Non-Modal</Button>
         <Dialog
-          {...args as any}
+          title={args.title}
+          size={args.size}
+          className={args.className}
+          hideOverlay={args.hideOverlay}
+          acknowledgment={args.acknowledgment}
+          passive={args.passive}
+          disableClickOutside={args.disableClickOutside}
+          disableCloseButton={args.disableCloseButton}
+          disableEscapeKey={args.disableEscapeKey}
+          classNames={args.classNames}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -184,7 +228,16 @@ export const CustomStyles: Story = {
       <div>
         <Button onClick={() => setOpen(true)}>Open Custom Styled</Button>
         <Dialog
-          {...args as any}
+          title={args.title}
+          size={args.size}
+          className={args.className}
+          hideOverlay={args.hideOverlay}
+          acknowledgment={args.acknowledgment}
+          passive={args.passive}
+          disableClickOutside={args.disableClickOutside}
+          disableCloseButton={args.disableCloseButton}
+          disableEscapeKey={args.disableEscapeKey}
+          classNames={args.classNames}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -212,7 +265,16 @@ export const Large: Story = {
       <div>
         <Button onClick={() => setOpen(true)}>Open Large</Button>
         <Dialog
-          {...args as any}
+          title={args.title}
+          size={args.size}
+          className={args.className}
+          hideOverlay={args.hideOverlay}
+          acknowledgment={args.acknowledgment}
+          passive={args.passive}
+          disableClickOutside={args.disableClickOutside}
+          disableCloseButton={args.disableCloseButton}
+          disableEscapeKey={args.disableEscapeKey}
+          classNames={args.classNames}
           open={open}
           onOpenChange={setOpen}
           footer={
