@@ -58,10 +58,13 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
           {/* Conditional overlay for modal/non-modal */}
           {!hideOverlay && (
             <DialogPrimitive.Overlay 
-              className={cn(styles.overlay, classNames?.overlay)}
+              className={cn(
+                styles.overlay,
+                classNames?.overlay 
+              )}
             />
           )}
-          
+
           <DialogPrimitive.Content
             ref={ref}
             className={cn(

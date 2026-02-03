@@ -46,6 +46,10 @@ Simple components use **Class Variance Authority (CVA)** for variant-based styli
 - Use `size` prop for size variants (e.g., `default`, `sm`, `icon`)
 - Use `className` prop to add additional Tailwind classes that merge with the base styles
 
+For details on how dialog animations are implemented (and why they differ slightly from other components), see:
+
+- `docs/dialog-animations.md`
+
 ### 2. Complex Components (Interface Pattern with classNames)
 
 **Components:** `Dialog`, `Dropdown` (SingleSelect/MultiSelect), `Accordion`, `Breadcrumb`

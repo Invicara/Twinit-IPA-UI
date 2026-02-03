@@ -1,12 +1,62 @@
 @reference "../../../styles/globals.css";
 
 @layer components {
+  /* Dialog overlay animations */
+  @keyframes ipa-dialog-overlay-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes ipa-dialog-overlay-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  /* Dialog content animations */
+  @keyframes ipa-dialog-content-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -48%) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes ipa-dialog-content-out {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -48%) scale(0.95);
+    }
+  }
+
   .overlay {
-    @apply fixed inset-0 z-50 bg-neutral-10/75 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
+    @apply fixed inset-0 z-50 bg-neutral-10/75;
+  }
+
+  .overlay[data-state="open"] {
+    animation: ipa-dialog-overlay-in 150ms ease-out forwards;
+  }
+
+  .overlay[data-state="closed"] {
+    animation: ipa-dialog-overlay-out 150ms ease-in forwards;
   }
 
   .content {
-    @apply fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-0 border-0 bg-neutral-0 shadow-[0_4px_24px_rgba(0,0,0,0.15)] transition-all duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-[8px];
+    @apply fixed left-[50%] top-[50%] z-50 grid w-full translate-y-[-50%] gap-0 border-0 bg-neutral-0 shadow-[0_4px_24px_rgba(0,0,0,0.15)] transition-all duration-200 rounded-[8px];
+  }
+
+  .content[data-state="open"] {
+    animation: ipa-dialog-content-in 150ms ease-out forwards;
+  }
+
+  .content[data-state="closed"] {
+    animation: ipa-dialog-content-out 150ms ease-in forwards;
   }
 
   .contentPointerEventsAuto {

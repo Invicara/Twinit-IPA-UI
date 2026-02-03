@@ -319,4 +319,4 @@
 }
 
 /* Import component styles */
-@import "../components/ui/index.css";
+/* Note: Component styles are now in individual .module.css files */
