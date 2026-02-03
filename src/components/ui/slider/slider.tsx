@@ -5,9 +5,10 @@ import { cva } from "class-variance-authority"
 import { cn } from "../../../lib/utils"
 import '../../../output.css'
 import { SliderProps } from "./slider.types"
+import styles from "./slider.module.css"
 
 const sliderVariants = cva(
-  "flex flex-col gap-[8px] w-[336px]",
+  styles.container,
   {
     variants: {
       variant: {
@@ -22,7 +23,7 @@ const sliderVariants = cva(
 )
 
 const labelVariants = cva(
-  "font-sans text-[14px] font-medium leading-[18px] text-neutral-9"
+  styles.label
 )
 
 const Slider = React.forwardRef<
@@ -87,17 +88,17 @@ const Slider = React.forwardRef<
           </label>
         )}
         
-        <div className="flex items-center gap-[8px]">
-          <span className="font-sans text-[14px] font-normal text-neutral-7 min-w-[32px] text-center">
+        <div className={styles.controls}>
+          <span className={styles.minLabel}>
             {minLabel}
           </span>
           
-          <div className="flex-1 relative flex items-center">
+          <div className={styles.sliderContainer}>
             <SliderPrimitive.Root
               ref={ref}
               className={cn(
-                "relative flex items-center select-none touch-none w-full h-[20px]",
-                disabled && "cursor-not-allowed"
+                styles.root,
+                disabled && styles.rootDisabled
               )}
               value={currentValue}
               onValueChange={handleValueChange}
@@ -111,14 +112,14 @@ const Slider = React.forwardRef<
             >
               <SliderPrimitive.Track
                 className={cn(
-                  "relative grow rounded-full h-[4px]",
-                  disabled ? "bg-neutral-3" : "bg-neutral-4"
+                  styles.track,
+                  disabled ? styles.trackDisabled : styles.trackEnabled
                 )}
               >
                 <SliderPrimitive.Range
                   className={cn(
-                    "absolute h-full rounded-full",
-                    disabled ? "bg-neutral-5" : "bg-brand-8"
+                    styles.range,
+                    disabled ? styles.rangeDisabled : styles.rangeEnabled
                   )}
                 />
               </SliderPrimitive.Track>
@@ -127,22 +128,20 @@ const Slider = React.forwardRef<
                 <SliderPrimitive.Thumb
                   key={index}
                   className={cn(
-                    "block w-[20px] h-[20px] rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-8 focus-visible:ring-offset-0",
-                    disabled 
-                      ? "bg-neutral-5 cursor-not-allowed"
-                      : "bg-brand-8 hover:bg-brand-7 cursor-grab active:cursor-grabbing"
+                    styles.thumb,
+                    disabled ? styles.thumbDisabled : styles.thumbEnabled
                   )}
                 />
               ))}
             </SliderPrimitive.Root>
           </div>
           
-          <span className="font-sans text-[14px] font-normal text-neutral-7 min-w-[32px] text-center">
+          <span className={styles.maxLabel}>
             {maxLabel}
           </span>
         </div>
         
-        <div className="flex justify-between">
+        <div className={styles.inputs}>
           {isRange ? (
             <>
               <input
@@ -154,10 +153,8 @@ const Slider = React.forwardRef<
                 max={max}
                 step={step}
                 className={cn(
-                  "w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none",
-                  disabled
-                    ? "border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed"
-                    : "border-neutral-5 hover:border-neutral-7 focus:border-brand-6"
+                  styles.input,
+                  disabled ? styles.inputDisabled : styles.inputEnabled
                 )}
               />
               <input
@@ -169,15 +166,13 @@ const Slider = React.forwardRef<
                 max={max}
                 step={step}
                 className={cn(
-                  "w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none",
-                  disabled
-                    ? "border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed"
-                    : "border-neutral-5 hover:border-neutral-7 focus:border-brand-6"
+                  styles.input,
+                  disabled ? styles.inputDisabled : styles.inputEnabled
                 )}
               />
             </>
           ) : (
-            <div className="flex justify-end w-full">
+            <div className={styles.inputContainer}>
               <input
                 type="number"
                 value={currentValue[0]}
@@ -187,10 +182,8 @@ const Slider = React.forwardRef<
                 max={max}
                 step={step}
                 className={cn(
-                  "w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none",
-                  disabled
-                    ? "border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed"
-                    : "border-neutral-5 hover:border-neutral-7 focus:border-brand-6"
+                  styles.input,
+                  disabled ? styles.inputDisabled : styles.inputEnabled
                 )}
               />
             </div>

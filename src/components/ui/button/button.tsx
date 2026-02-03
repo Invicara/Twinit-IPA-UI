@@ -6,37 +6,34 @@ import { cn } from "../../../lib/utils"
 
 import '../../../output.css'
 import { ButtonProps } from "./button.types"
+import styles from "./button.module.css"
  
 const buttonVariants = cva(
-  "ipa-ui-btn-base",
+  styles.base,
   {
     variants: {
       variant: {
-        default:
-          "ipa-ui-btn-variant-default",
-        danger:
-          "ipa-ui-btn-variant-danger",
-        secondary:
-          "ipa-ui-btn-variant-secondary",
-        tertiary: 
-          "ipa-ui-btn-variant-tertiary",
+        default: styles.variantDefault,
+        danger: styles.variantDanger,
+        secondary: styles.variantSecondary,
+        tertiary: styles.variantTertiary,
       },
       size: {
-        default: "ipa-ui-btn-size-default",
-        sm: "ipa-ui-btn-size-sm",
-        icon: "ipa-ui-btn-size-icon",
+        default: styles.sizeDefault,
+        sm: styles.sizeSm,
+        icon: styles.sizeIcon,
       },
     },
     compoundVariants: [
       {
         variant: "tertiary",
         size: "default",
-        class: "px-4",
+        class: styles.variantTertiarySizeDefault,
       },
       {
         variant: "tertiary",
         size: "sm",
-        class: "px-2",
+        class: styles.variantTertiarySizeSm,
       },
     ],
     defaultVariants: {

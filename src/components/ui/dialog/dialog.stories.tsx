@@ -100,10 +100,16 @@ export const Acknowledgment: Story = {
   },
   render: (args) => {
     const [open, setOpen] = useState(false);
+
+    const handleOpenChange = (open: boolean) => {
+      console.log('Acknowledgment handleOpenChange open', open);
+      setOpen(open);
+    };
+    
     return (
       <div>
-        <Button onClick={() => setOpen(true)}>Open Acknowledgment</Button>
-        <Dialog {...args as any} open={open} onOpenChange={setOpen}>
+        <Button onClick={() => handleOpenChange(true)}>Open Acknowledgment</Button>
+        <Dialog {...args as any} open={open} onOpenChange={handleOpenChange}>
           <p>This dialog has only an OK button.</p>
           <p>The acknowledgment prop automatically generates it.</p>
         </Dialog>

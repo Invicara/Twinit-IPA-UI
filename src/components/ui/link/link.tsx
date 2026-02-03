@@ -5,17 +5,18 @@ import { cva } from "class-variance-authority"
 import { cn } from "../../../lib/utils"
 import '../../../output.css'
 import { LinkProps } from "./link.types"
+import styles from "./link.module.css"
 
 const linkVariants = cva(
-  "font-sans text-[14px] font-normal leading-[18px] transition-colors focus-visible:outline-none",
+  styles.base,
   {
     variants: {
       variant: {
-        default: "text-brand-8 hover:text-brand-6 active:text-brand-9 focus:text-brand-6 flex items-center gap-[4px]",
-        inline: "text-brand-8 hover:text-brand-6 active:text-brand-9 focus:text-brand-6 underline hover:no-underline underline-offset-2",
+        default: styles.variantDefault,
+        inline: styles.variantInline,
       },
       disabled: {
-        true: "text-neutral-5 cursor-not-allowed pointer-events-none",
+        true: styles.disabled,
         false: "",
       },
     },
@@ -60,7 +61,7 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         }}
         {...props}
       >
-        {variant === "default" && <Pencil1Icon className="h-[14px] w-[14px]" />}
+        {variant === "default" && <Pencil1Icon className={styles.icon} />}
         {children}
       </a>
     )

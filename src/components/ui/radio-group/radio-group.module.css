@@ -1,0 +1,67 @@
+@reference "../../../styles/globals.css";
+
+@layer components {
+  .container {
+    @apply w-full flex flex-col gap-[8px];
+  }
+
+  .group {
+    @apply flex gap-[8px];
+  }
+
+  .groupOrientationVertical {
+    @apply flex-col;
+  }
+
+  .groupOrientationHorizontal {
+    @apply flex-row flex-wrap;
+  }
+
+  .label {
+    @apply font-sans text-[14px] font-medium leading-[18px] text-neutral-9;
+  }
+
+  .item {
+    @apply flex items-start gap-[8px];
+  }
+
+  .radio {
+    @apply relative h-[16px] w-[16px] rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand-3;
+  }
+
+  .radioDisabled {
+    @apply border-neutral-4 bg-neutral-1 cursor-not-allowed;
+  }
+
+  .radioEnabled {
+    @apply border-neutral-5 hover:border-brand-8 data-[state=checked]:border-brand-8 data-[state=checked]:bg-white;
+  }
+
+  .indicator {
+    @apply flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-[8px] after:h-[8px] after:rounded-full;
+  }
+
+  .indicatorDisabled {
+    @apply after:bg-neutral-5;
+  }
+
+  .indicatorEnabled {
+    @apply after:bg-brand-8;
+  }
+
+  .itemContent {
+    @apply flex flex-col gap-[2px] flex-1;
+  }
+
+  .itemLabel {
+    @apply font-sans text-[14px] font-normal leading-[18px] cursor-pointer select-none;
+  }
+
+  .itemLabelDisabled {
+    @apply text-neutral-5 cursor-not-allowed;
+  }
+
+  .itemLabelEnabled {
+    @apply text-neutral-9;
+  }
+}

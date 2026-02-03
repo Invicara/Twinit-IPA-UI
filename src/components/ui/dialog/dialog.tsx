@@ -5,24 +5,14 @@ import { cn } from "../../../lib/utils";
 import Button from "../button/button";
 import '../../../output.css';
 import { DialogProps } from "./dialog.types";
+import styles from "./dialog.module.css";
 
-// Style constants
-const DIALOG_STYLES = {
-  overlay: "fixed inset-0 z-50 bg-neutral-10/75 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-  content: "fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-0 border-0 bg-neutral-0 shadow-[0_4px_24px_rgba(0,0,0,0.15)] transition-all duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-[8px]",
-  header: "flex items-center justify-between bg-neutral-1 px-6 py-5 text-neutral-10 rounded-t-[8px]",
-  title: "text-[20px] font-bold font-sans leading-tight",
-  closeButton: "rounded-full p-1 transition-colors hover:bg-neutral-2 focus:outline-none focus-visible:ring-0 disabled:pointer-events-none cursor-pointer",
-  body: "px-6 py-6 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar",
-  footer: "flex justify-end gap-3 px-6 py-5 bg-neutral-0 rounded-b-[8px]",
-  
-  sizes: {
-    sm: "max-w-md",
-    default: "max-w-xl",
-    lg: "max-w-3xl",
-    xl: "max-w-5xl",
-    full: "max-w-[90vw]"
-  }
+const sizeClasses = {
+  sm: styles.sizeSm,
+  default: styles.sizeDefault,
+  lg: styles.sizeLg,
+  xl: styles.sizeXl,
+  full: styles.sizeFull
 } as const;
 
 export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
@@ -61,22 +51,23 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
       return footer;
     }, [passive, acknowledgment, footer]);
 
+    console.log('Dialog render open', open);
     return (
       <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
         <DialogPrimitive.Portal>
           {/* Conditional overlay for modal/non-modal */}
           {!hideOverlay && (
             <DialogPrimitive.Overlay 
-              className={cn(DIALOG_STYLES.overlay, classNames?.overlay)} 
+              className={cn(styles.overlay, classNames?.overlay)}
             />
           )}
           
           <DialogPrimitive.Content
             ref={ref}
             className={cn(
-              DIALOG_STYLES.content,
-              DIALOG_STYLES.sizes[size],
-              hideOverlay && "pointer-events-auto",
+              styles.content,
+              sizeClasses[size],
+              hideOverlay && styles.contentPointerEventsAuto,
               classNames?.content,
               className
             )}
@@ -89,32 +80,33 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
             {...props}
           >
             {/* Header */}
-            <div className={cn(DIALOG_STYLES.header, classNames?.header)}>
+            <div className={cn(styles.header, classNames?.header)}>
               <DialogPrimitive.Title asChild>
-                <h2 className={cn(DIALOG_STYLES.title, classNames?.title)}>
+                <h2 className={cn(styles.title, classNames?.title)}>
                   {title}
                 </h2>
               </DialogPrimitive.Title>
               {!disableCloseButton && (
                 <DialogPrimitive.Close asChild>
                   <button
-                    className={cn(DIALOG_STYLES.closeButton, classNames?.closeButton)}
+                    type="button"
+                    className={cn(styles.closeButton, classNames?.closeButton)}
                     aria-label="Close"
                   >
-                    <X className="h-5 w-5 text-neutral-10" strokeWidth={2} />
+                    <X className={styles.closeButtonIcon} strokeWidth={2} />
                   </button>
                 </DialogPrimitive.Close>
               )}
             </div>
 
             {/* Body (Scrollable) */}
-            <div className={cn(DIALOG_STYLES.body, classNames?.body)}>
+            <div className={cn(styles.body, "custom-scrollbar", classNames?.body)}>
               {children}
             </div>
 
             {/* Footer (Conditional) */}
             {footerContent && (
-              <div className={cn(DIALOG_STYLES.footer, classNames?.footer)}>
+              <div className={cn(styles.footer, classNames?.footer)}>
                 {footerContent}
               </div>
             )}

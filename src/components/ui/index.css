@@ -1,3 +1,2 @@
 /* Component styles index - import all component CSS files here */
-@import "./button/button.css";
-
+/* Note: CSS modules are now imported directly in component files, so no imports needed here */

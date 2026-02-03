@@ -5,14 +5,15 @@ import { cva } from "class-variance-authority"
 import { cn } from "../../../lib/utils"
 import '../../../output.css'
 import { RadioGroupProps } from "./radio-group.types"
+import styles from "./radio-group.module.css"
 
 const radioGroupVariants = cva(
-  "flex gap-[8px]",
+  styles.group,
   {
     variants: {
       orientation: {
-        vertical: "flex-col",
-        horizontal: "flex-row flex-wrap",
+        vertical: styles.groupOrientationVertical,
+        horizontal: styles.groupOrientationHorizontal,
       },
     },
     defaultVariants: {
@@ -22,7 +23,7 @@ const radioGroupVariants = cva(
 )
 
 const labelVariants = cva(
-  "font-sans text-[14px] font-medium leading-[18px] text-neutral-9"
+  styles.label
 )
 
 const RadioGroup = React.forwardRef<
@@ -44,7 +45,7 @@ const RadioGroup = React.forwardRef<
     const groupId = React.useId()
 
     return (
-      <div className="w-full flex flex-col gap-[8px]">
+      <div className={styles.container}>
         {label && (
           <div
             className={cn(labelVariants())}
@@ -65,31 +66,30 @@ const RadioGroup = React.forwardRef<
           {options.map((option) => {
             const isDisabled = disabled || option.disabled
             return (
-              <div key={option.value} className="flex items-start gap-[8px]">
+              <div key={option.value} className={styles.item}>
                 <RadioGroupPrimitive.Item
                   value={option.value}
                   id={`${groupId}-${option.value}`}
                   disabled={isDisabled}
                   className={cn(
-                    "group relative h-[16px] w-[16px] rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand-3",
-                    isDisabled 
-                      ? "border-neutral-4 bg-neutral-1 cursor-not-allowed"
-                      : "border-neutral-5 hover:border-brand-8 data-[state=checked]:border-brand-8 data-[state=checked]:bg-white"
+                    "group",
+                    styles.radio,
+                    isDisabled ? styles.radioDisabled : styles.radioEnabled
                   )}
                 >
                   <RadioGroupPrimitive.Indicator 
                     className={cn(
-                      "flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-[8px] after:h-[8px] after:rounded-full",
-                      isDisabled ? "after:bg-neutral-5" : "after:bg-brand-8"
+                      styles.indicator,
+                      isDisabled ? styles.indicatorDisabled : styles.indicatorEnabled
                     )}
                   />
                 </RadioGroupPrimitive.Item>
-                <div className="flex flex-col gap-[2px] flex-1">
+                <div className={styles.itemContent}>
                   <label
                     htmlFor={`${groupId}-${option.value}`}
                     className={cn(
-                      "font-sans text-[14px] font-normal leading-[18px] cursor-pointer select-none",
-                      isDisabled ? "text-neutral-5 cursor-not-allowed" : "text-neutral-9"
+                      styles.itemLabel,
+                      isDisabled ? styles.itemLabelDisabled : styles.itemLabelEnabled
                     )}
                   >
                     {option.label}

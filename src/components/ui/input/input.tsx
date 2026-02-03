@@ -6,22 +6,22 @@ import { cn } from "../../../lib/utils"
 
 import '../../../output.css'
 import { InputProps } from "./input.types"
+import styles from "./input.module.css"
 
 const inputVariants = cva(
-  // Base styles matching Figma Section 1: 36px height (or min-height for textarea), 4px border radius, Inter Regular 14px
-  "flex w-full rounded-[4px] border bg-neutral-0 px-[12px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 placeholder:text-neutral-4 transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+  styles.base,
   {
     variants: {
       state: {
-        default: "border-neutral-5 hover:border-neutral-7 focus:border-brand-6",
-        error: "border-alert-7 focus:border-alert-5",
-        success: "border-positive-7 focus:border-positive-5",
-        warning: "border-warning-9 focus:border-warning-7",
-        readonly: "border-neutral-3 bg-neutral-1 text-neutral-5 placeholder:text-neutral-3 select-text cursor-text",
+        default: styles.stateDefault,
+        error: styles.stateError,
+        success: styles.stateSuccess,
+        warning: styles.stateWarning,
+        readonly: styles.stateReadonly,
       },
       variant: {
-        input: "h-[36px]",
-        textarea: "min-h-[80px] resize-y",
+        input: styles.variantInput,
+        textarea: styles.variantTextarea,
       },
     },
     defaultVariants: {
@@ -32,15 +32,15 @@ const inputVariants = cva(
 )
 
 const labelVariants = cva(
-  "font-sans text-[14px] font-medium leading-[18px] flex items-center gap-[8px]",
+  styles.label,
   {
     variants: {
       state: {
-        default: "text-neutral-9",
-        error: "text-alert-7",
-        success: "text-positive-7",
-        warning: "text-warning-9",
-        readonly: "text-neutral-9",
+        default: styles.labelStateDefault,
+        error: styles.labelStateError,
+        success: styles.labelStateSuccess,
+        warning: styles.labelStateWarning,
+        readonly: styles.labelStateReadonly,
       },
     },
     defaultVariants: {
@@ -50,15 +50,15 @@ const labelVariants = cva(
 )
 
 const helperTextVariants = cva(
-  "font-sans text-[13px] font-normal leading-[17.5px]",
+  styles.helperText,
   {
     variants: {
       state: {
-        default: "text-neutral-7",
-        error: "text-alert-7",
-        success: "text-positive-7",
-        warning: "text-warning-9",
-        readonly: "text-neutral-7",
+        default: styles.helperTextStateDefault,
+        error: styles.helperTextStateError,
+        success: styles.helperTextStateSuccess,
+        warning: styles.helperTextStateWarning,
+        readonly: styles.helperTextStateReadonly,
       },
     },
     defaultVariants: {
@@ -78,7 +78,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
     const Component = textarea ? "textarea" : "input"
 
     return (
-      <div className="w-full flex flex-col gap-[4px]">
+      <div className={styles.container}>
         {label && (
           <label
             htmlFor={inputId}
@@ -87,10 +87,10 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
             {label}
           </label>
         )}
-        <div className="relative w-full">
+        <div className={styles.wrapper}>
           {Icon && (
-            <div className="absolute left-[12px] top-1/2 -translate-y-1/2 text-neutral-5 pointer-events-none">
-              <Icon className="h-[16px] w-[16px]" />
+            <div className={styles.iconContainer}>
+              <Icon className={styles.icon} />
             </div>
           )}
           <Component
@@ -98,8 +98,8 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
             data-testid={testIdPrefix}
             className={cn(
               inputVariants({ state, variant, className }),
-              Icon && "pl-[36px]",
-              password && "pr-[36px]"
+              Icon && styles.withIcon,
+              password && styles.withPassword
             )}
             ref={ref as any}
             aria-describedby={helperText ? helperId : undefined}
@@ -111,14 +111,14 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-[12px] top-1/2 -translate-y-1/2 text-neutral-5 hover:text-neutral-7 transition-colors cursor-pointer"
+              className={styles.passwordToggle}
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <Eye className="h-[16px] w-[16px]" />
+                <Eye className={styles.passwordToggleIcon} />
               ) : (
-                <EyeOff className="h-[16px] w-[16px]" />
+                <EyeOff className={styles.passwordToggleIcon} />
               )}
             </button>
           )}
