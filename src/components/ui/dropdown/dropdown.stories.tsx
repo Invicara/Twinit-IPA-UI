@@ -26,6 +26,26 @@ const meta: Meta<typeof SingleSelect> = {
       control: { type: 'boolean' },
       description: 'Disable looping when navigating with arrow keys (stops at first/last item instead of cycling)',
     },
+    hideFooter: {
+      control: { type: 'boolean' },
+      description: 'Hide the footer (e.g. "No results" / selection count)',
+    },
+    hideRowHighlight: {
+      control: { type: 'boolean' },
+      description: 'Hide row highlight on hover/focus',
+    },
+    hideLongTextEllipsis: {
+      control: { type: 'boolean' },
+      description: 'Hide ellipsis for long option text',
+    },
+    hideLongTextTooltip: {
+      control: { type: 'boolean' },
+      description: 'Hide tooltip for truncated long text',
+    },
+    popAbove: {
+      control: { type: 'boolean' },
+      description: 'Open dropdown above the trigger instead of below',
+    },
     className: {
       control: { type: 'text' },
       description: 'Additional CSS classes',
@@ -61,6 +81,13 @@ export const Default: Story = {
   args: {
     options: defaultOptions,
     placeholder: 'Select an option',
+    hideFooter: true,
+    filter: true,
+    disabled: false,
+    hideRowHighlight: false,
+    hideLongTextEllipsis: true,
+    popAbove: false,
+      hideLongTextTooltip: false
   },
   render: (args) => {
     const [value, setValue] = useState<string>('');
@@ -70,8 +97,14 @@ export const Default: Story = {
           options={args.options}
           placeholder={args.placeholder}
           disabled={args.disabled}
+          filter={args.filter}
           className={args.className}
           disableSelectionLooping={args.disableSelectionLooping}
+          hideFooter={args.hideFooter}
+          hideRowHighlight={args.hideRowHighlight}
+          hideLongTextEllipsis={args.hideLongTextEllipsis}
+          hideLongTextTooltip={args.hideLongTextTooltip}
+          popAbove={args.popAbove}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -98,6 +131,14 @@ export const Filter: Story = {
     options: filterOptions,
     placeholder: 'Type to search...',
     filter: true,
+    hideFooter: false,
+    hideRowHighlight: false,
+    hideLongTextEllipsis: false,
+    hideLongTextTooltip: false,
+    disableKeyboardNavigation: true,
+    disableIconAnimation: true,
+    disableScrolling: true,
+    enableLongTextAnimation: true
   },
   render: (args) => {
     const [value, setValue] = useState<string>('');
@@ -110,6 +151,11 @@ export const Filter: Story = {
           filter={args.filter}
           className={args.className}
           disableSelectionLooping={args.disableSelectionLooping}
+          hideFooter={args.hideFooter}
+          hideRowHighlight={args.hideRowHighlight}
+          hideLongTextEllipsis={args.hideLongTextEllipsis}
+          hideLongTextTooltip={args.hideLongTextTooltip}
+          popAbove={args.popAbove}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -122,6 +168,17 @@ export const Multiselect: Story = {
   args: {
     options: defaultOptions,
     placeholder: 'Select multiple options',
+    disabled: false,
+    hideFooter: false,
+    hideRowHighlight: false,
+    hideLongTextEllipsis: false,
+    hideLongTextTooltip: false,
+    popAbove: false,
+    maxDisplayBadges: 2,
+    hideSelectionCount: false,
+    hideRemainingBadge: false,
+    rightAlignCheckboxes: false,
+    wrapBadges: false,
   },
   render: (args) => {
     const [value, setValue] = useState<string[]>([]);
@@ -130,7 +187,19 @@ export const Multiselect: Story = {
         <MultiSelect
           options={args.options}
           placeholder={args.placeholder}
+          disabled={args.disabled}
+          className={args.className}
           disableSelectionLooping={args.disableSelectionLooping}
+          hideFooter={args.hideFooter}
+          hideRowHighlight={args.hideRowHighlight}
+          hideLongTextEllipsis={args.hideLongTextEllipsis}
+          hideLongTextTooltip={args.hideLongTextTooltip}
+          popAbove={args.popAbove}
+          maxDisplayBadges={args.maxDisplayBadges}
+          hideSelectionCount={args.hideSelectionCount}
+          hideRemainingBadge={args.hideRemainingBadge}
+          rightAlignCheckboxes={args.rightAlignCheckboxes}
+          wrapBadges={args.wrapBadges}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -172,6 +241,17 @@ export const CustomMultiselect: Story = {
   args: {
     options: defaultOptions,
     placeholder: 'Custom styled multiselect',
+    maxDisplayBadges: 3,
+    hideFooter: true,
+    hideRowHighlight: true,
+    rightAlignCheckboxes: true,
+    popAbove: true,
+    disabled: false,
+    hideLongTextEllipsis: false,
+    hideLongTextTooltip: false,
+    hideSelectionCount: false,
+    hideRemainingBadge: false,
+    wrapBadges: false,
   },
   render: (args) => {
     const [value, setValue] = useState<string[]>(['option2', 'option5']);
@@ -181,14 +261,21 @@ export const CustomMultiselect: Story = {
         <MultiSelect
           options={args.options}
           placeholder={args.placeholder}
+          disabled={args.disabled}
+          className={args.className}
+          disableSelectionLooping={args.disableSelectionLooping}
+          hideFooter={args.hideFooter}
+          hideRowHighlight={args.hideRowHighlight}
+          hideLongTextEllipsis={args.hideLongTextEllipsis}
+          hideLongTextTooltip={args.hideLongTextTooltip}
+          popAbove={args.popAbove}
+          maxDisplayBadges={args.maxDisplayBadges}
+          hideSelectionCount={args.hideSelectionCount}
+          hideRemainingBadge={args.hideRemainingBadge}
+          rightAlignCheckboxes={args.rightAlignCheckboxes}
+          wrapBadges={args.wrapBadges}
           value={value}
           onChange={(val) => setValue(val)}
-          maxDisplayBadges={3}
-          hideFooter
-          hideRowHighlight
-          rightAlignCheckboxes
-          popAbove
-          disableSelectionLooping={args.disableSelectionLooping}
           icons={customMultiselectIcons}
           classNames={customMultiselectClassNames}
         />
