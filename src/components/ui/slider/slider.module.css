@@ -1,91 +1,89 @@
 @reference "../../../styles/globals.css";
 
-@layer components {
-  .container {
-    @apply flex flex-col gap-[8px] w-[336px];
-  }
+.container {
+  @apply flex flex-col gap-[8px] w-[336px];
+}
 
-  .label {
-    @apply font-sans text-[14px] font-medium leading-[18px] text-neutral-9;
-  }
+.label {
+  @apply font-sans text-[14px] font-medium leading-[18px] text-neutral-9;
+}
 
-  .controls {
-    @apply flex items-center gap-[8px];
-  }
+.controls {
+  @apply flex items-center gap-[8px];
+}
 
-  .minLabel {
-    @apply font-sans text-[14px] font-normal text-neutral-7 min-w-[32px] text-center;
-  }
+.minLabel {
+  @apply font-sans text-[14px] font-normal text-neutral-7 min-w-[32px] text-center;
+}
 
-  .maxLabel {
-    @apply font-sans text-[14px] font-normal text-neutral-7 min-w-[32px] text-center;
-  }
+.maxLabel {
+  @apply font-sans text-[14px] font-normal text-neutral-7 min-w-[32px] text-center;
+}
 
-  .sliderContainer {
-    @apply flex-1 relative flex items-center;
-  }
+.sliderContainer {
+  @apply flex-1 relative flex items-center;
+}
 
-  .root {
-    @apply relative flex items-center select-none touch-none w-full h-[20px];
-  }
+.root {
+  @apply relative flex items-center select-none touch-none w-full h-[20px];
+}
 
-  .rootDisabled {
-    @apply cursor-not-allowed;
-  }
+.rootDisabled {
+  @apply cursor-not-allowed;
+}
 
-  .track {
-    @apply relative grow rounded-full h-[4px];
-  }
+.track {
+  @apply relative grow rounded-full h-[4px];
+}
 
-  .trackDisabled {
-    @apply bg-neutral-3;
-  }
+.trackDisabled {
+  @apply bg-neutral-3;
+}
 
-  .trackEnabled {
-    @apply bg-neutral-4;
-  }
+.trackEnabled {
+  @apply bg-neutral-4;
+}
 
-  .range {
-    @apply absolute h-full rounded-full;
-  }
+.range {
+  @apply absolute h-full rounded-full;
+}
 
-  .rangeDisabled {
-    @apply bg-neutral-5;
-  }
+.rangeDisabled {
+  @apply bg-neutral-5;
+}
 
-  .rangeEnabled {
-    @apply bg-brand-8;
-  }
+.rangeEnabled {
+  @apply bg-brand-8;
+}
 
-  .thumb {
-    @apply block w-[20px] h-[20px] rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-8 focus-visible:ring-offset-0;
-  }
+.thumb {
+  @apply block w-[20px] h-[20px] rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-8 focus-visible:ring-offset-0;
+}
 
-  .thumbDisabled {
-    @apply bg-neutral-5 cursor-not-allowed;
-  }
+.thumbDisabled {
+  @apply bg-neutral-5 cursor-not-allowed;
+}
 
-  .thumbEnabled {
-    @apply bg-brand-8 hover:bg-brand-7 cursor-grab active:cursor-grabbing;
-  }
+.thumbEnabled {
+  @apply bg-brand-8 hover:bg-brand-7 cursor-grab active:cursor-grabbing;
+}
 
-  .inputs {
-    @apply flex justify-between;
-  }
+.inputs {
+  @apply flex justify-between;
+}
 
-  .input {
-    @apply w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none;
-  }
+.input {
+  @apply w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none;
+}
 
-  .inputDisabled {
-    @apply border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed;
-  }
+.inputDisabled {
+  @apply border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed;
+}
 
-  .inputEnabled {
-    @apply border-neutral-5 hover:border-neutral-7 focus:border-brand-6;
-  }
+.inputEnabled {
+  @apply border-neutral-5 hover:border-neutral-7 focus:border-brand-6;
+}
 
-  .inputContainer {
-    @apply flex justify-end w-full;
-  }
+.inputContainer {
+  @apply flex justify-end w-full;
 }

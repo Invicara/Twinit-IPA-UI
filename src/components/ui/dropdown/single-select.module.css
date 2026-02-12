@@ -1,74 +1,72 @@
 @reference "../../../styles/globals.css";
 
-@layer components {
-  .highlightedText {
-    @apply font-bold;
-  }
-
-  .trigger {
-    @apply h-[36px] w-[284px];
-    @apply placeholder:text-neutral-4;
-    @apply text-ellipsis overflow-hidden pr-[36px];
-  }
-
-  .triggerCursorText {
-    @apply cursor-text;
-  }
-
-  .triggerCursorPointer {
-    @apply cursor-pointer;
-  }
-
-  .triggerIconContainer {
-    @apply absolute right-[12px] top-1/2 -translate-y-1/2 pointer-events-none;
-  }
-
-  .triggerIcon {
-    @apply h-5 w-5 text-neutral-5 stroke-[1.5];
-  }
-
-  .triggerIconTransition {
-    @apply transition-transform duration-200;
-  }
-
-  .triggerIconRotate180 {
-    @apply rotate-180;
-  }
-
-  .itemFocused {
-    @apply bg-brand-1;
-  }
-
-  .itemHover {
-    @apply hover:bg-brand-1;
-  }
-
-  .itemContent {
-    @apply flex-1 overflow-hidden relative;
-  }
-
-  .itemContentText {
-    @apply whitespace-nowrap block text-left pointer-events-none;
-  }
-
-  .itemContentEllipsisIndicator {
-    @apply absolute right-0 top-0 px-1 text-neutral-6;
-  }
-
-  .itemContentEllipsisIndicatorFocused {
-    @apply bg-brand-1;
-  }
-
-  .itemContentEllipsisIndicatorUnfocused {
-    @apply bg-neutral-0;
-  }
-
-  .itemContentEllipsisIndicatorHover {
-    @apply group-hover:bg-brand-1;
-  }
-
-  .noResults {
-    @apply px-[12px] py-[8px] text-[14px] text-neutral-5 text-center;
-  }
-
+.highlightedText {
+  @apply font-bold;
 }
+
+.trigger {
+  @apply h-[36px] w-[284px];
+  @apply placeholder:text-neutral-4;
+  @apply text-ellipsis overflow-hidden pr-[36px];
+}
+
+.triggerCursorText {
+  @apply cursor-text;
+}
+
+.triggerCursorPointer {
+  @apply cursor-pointer;
+}
+
+.triggerIconContainer {
+  @apply absolute right-[12px] top-1/2 -translate-y-1/2 pointer-events-none;
+}
+
+.triggerIcon {
+  @apply h-5 w-5 text-neutral-5 stroke-[1.5];
+}
+
+.triggerIconTransition {
+  @apply transition-transform duration-200;
+}
+
+.triggerIconRotate180 {
+  @apply rotate-180;
+}
+
+.itemFocused {
+  @apply bg-brand-1;
+}
+
+.itemHover {
+  @apply hover:bg-brand-1;
+}
+
+.itemContent {
+  @apply flex-1 overflow-hidden relative;
+}
+
+.itemContentText {
+  @apply whitespace-nowrap block text-left pointer-events-none;
+}
+
+.itemContentEllipsisIndicator {
+  @apply absolute right-0 top-0 px-1 text-neutral-6;
+}
+
+.itemContentEllipsisIndicatorFocused {
+  @apply bg-brand-1;
+}
+
+.itemContentEllipsisIndicatorUnfocused {
+  @apply bg-neutral-0;
+}
+
+.itemContentEllipsisIndicatorHover {
+  @apply group-hover:bg-brand-1;
+}
+
+.noResults {
+  @apply px-[12px] py-[8px] text-[14px] text-neutral-5 text-center;
+}
+

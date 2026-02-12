@@ -1,115 +1,113 @@
 @reference "../../../styles/globals.css";
 
-@layer components {
-  .base {
-    @apply flex w-full rounded-[4px] border bg-neutral-0 px-[12px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 placeholder:text-neutral-4 transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50;
-  }
+.base {
+  @apply flex w-full rounded-[4px] border bg-neutral-0 px-[12px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 placeholder:text-neutral-4 transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50;
+}
 
-  .stateDefault {
-    @apply border-neutral-5 hover:border-neutral-7 focus:border-brand-6;
-  }
+.stateDefault {
+  @apply border-neutral-5 hover:border-neutral-7 focus:border-brand-6;
+}
 
-  .stateError {
-    @apply border-alert-7 focus:border-alert-5;
-  }
+.stateError {
+  @apply border-alert-7 focus:border-alert-5;
+}
 
-  .stateSuccess {
-    @apply border-positive-7 focus:border-positive-5;
-  }
+.stateSuccess {
+  @apply border-positive-7 focus:border-positive-5;
+}
 
-  .stateWarning {
-    @apply border-warning-9 focus:border-warning-7;
-  }
+.stateWarning {
+  @apply border-warning-9 focus:border-warning-7;
+}
 
-  .stateReadonly {
-    @apply border-neutral-3 bg-neutral-1 text-neutral-5 placeholder:text-neutral-3 select-text cursor-text;
-  }
+.stateReadonly {
+  @apply border-neutral-3 bg-neutral-1 text-neutral-5 placeholder:text-neutral-3 select-text cursor-text;
+}
 
-  .variantInput {
-    @apply h-[36px];
-  }
+.variantInput {
+  @apply h-[36px];
+}
 
-  .variantTextarea {
-    @apply min-h-[80px] resize-y;
-  }
+.variantTextarea {
+  @apply min-h-[80px] resize-y;
+}
 
-  .withIcon {
-    @apply pl-[36px];
-  }
+.withIcon {
+  @apply pl-[36px];
+}
 
-  .withPassword {
-    @apply pr-[36px];
-  }
+.withPassword {
+  @apply pr-[36px];
+}
 
-  .container {
-    @apply w-full flex flex-col gap-[4px];
-  }
+.container {
+  @apply w-full flex flex-col gap-[4px];
+}
 
-  .wrapper {
-    @apply relative w-full;
-  }
+.wrapper {
+  @apply relative w-full;
+}
 
-  .iconContainer {
-    @apply absolute left-[12px] top-1/2 -translate-y-1/2 text-neutral-5 pointer-events-none;
-  }
+.iconContainer {
+  @apply absolute left-[12px] top-1/2 -translate-y-1/2 text-neutral-5 pointer-events-none;
+}
 
-  .icon {
-    @apply h-[16px] w-[16px];
-  }
+.icon {
+  @apply h-[16px] w-[16px];
+}
 
-  .passwordToggle {
-    @apply absolute right-[12px] top-1/2 -translate-y-1/2 text-neutral-5 hover:text-neutral-7 transition-colors cursor-pointer;
-  }
+.passwordToggle {
+  @apply absolute right-[12px] top-1/2 -translate-y-1/2 text-neutral-5 hover:text-neutral-7 transition-colors cursor-pointer;
+}
 
-  .passwordToggleIcon {
-    @apply h-[16px] w-[16px];
-  }
+.passwordToggleIcon {
+  @apply h-[16px] w-[16px];
+}
 
-  .label {
-    @apply font-sans text-[14px] font-medium leading-[18px] flex items-center gap-[8px];
-  }
+.label {
+  @apply font-sans text-[14px] font-medium leading-[18px] flex items-center gap-[8px];
+}
 
-  .labelStateDefault {
-    @apply text-neutral-9;
-  }
+.labelStateDefault {
+  @apply text-neutral-9;
+}
 
-  .labelStateError {
-    @apply text-alert-7;
-  }
+.labelStateError {
+  @apply text-alert-7;
+}
 
-  .labelStateSuccess {
-    @apply text-positive-7;
-  }
+.labelStateSuccess {
+  @apply text-positive-7;
+}
 
-  .labelStateWarning {
-    @apply text-warning-9;
-  }
+.labelStateWarning {
+  @apply text-warning-9;
+}
 
-  .labelStateReadonly {
-    @apply text-neutral-9;
-  }
+.labelStateReadonly {
+  @apply text-neutral-9;
+}
 
-  .helperText {
-    @apply font-sans text-[13px] font-normal leading-[17.5px];
-  }
+.helperText {
+  @apply font-sans text-[13px] font-normal leading-[17.5px];
+}
 
-  .helperTextStateDefault {
-    @apply text-neutral-7;
-  }
+.helperTextStateDefault {
+  @apply text-neutral-7;
+}
 
-  .helperTextStateError {
-    @apply text-alert-7;
-  }
+.helperTextStateError {
+  @apply text-alert-7;
+}
 
-  .helperTextStateSuccess {
-    @apply text-positive-7;
-  }
+.helperTextStateSuccess {
+  @apply text-positive-7;
+}
 
-  .helperTextStateWarning {
-    @apply text-warning-9;
-  }
+.helperTextStateWarning {
+  @apply text-warning-9;
+}
 
-  .helperTextStateReadonly {
-    @apply text-neutral-7;
-  }
+.helperTextStateReadonly {
+  @apply text-neutral-7;
 }
