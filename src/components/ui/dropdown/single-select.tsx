@@ -41,6 +41,7 @@ export interface SingleSelectProps {
   // Styling
   classNames?: {
     container?: string;
+    inputContainer?: string;
     trigger?: string;
     triggerIconContainer?: string;
     triggerIcon?: string;
@@ -315,7 +316,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         }} 
         {...props}
       >
-        <div className={sharedStyles.container}>
+        <div className={cn(sharedStyles.container, classNames?.inputContainer)}>
           <input
             ref={searchInputRef}
             type="text"
