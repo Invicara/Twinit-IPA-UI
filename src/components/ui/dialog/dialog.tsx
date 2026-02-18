@@ -32,10 +32,17 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
       disableCloseButton = false,
       disableEscapeKey = false,
       classNames,
+      container,
       ...props
     },
     ref
   ) => {
+    const portalContainer =
+      container ??
+      (typeof document !== 'undefined'
+        ? document.getElementById('ipa-ui-modal-root') ?? undefined
+        : undefined);
+
     // Determine footer content based on props
     const footerContent = React.useMemo(() => {
       if (passive) return null;
@@ -51,10 +58,9 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
       return footer;
     }, [passive, acknowledgment, footer]);
 
-    console.log('Dialog render open', open);
     return (
       <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
-        <DialogPrimitive.Portal>
+        <DialogPrimitive.Portal container={portalContainer}>
           {/* Conditional overlay for modal/non-modal */}
           {!hideOverlay && (
             <DialogPrimitive.Overlay 
