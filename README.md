@@ -226,6 +226,89 @@ All components use Tailwind CSS for styling. You can customize components in sev
    </Button>
    ```
 
+## Theming and Dialog Portals
+
+### Theme wrapper (`data-theme="invicara"`)
+
+ipa-ui ships with an `invicara` design theme based on CSS variables.  
+To ensure all components (especially those using `var(--primary)` and other tokens) are themed correctly and isolated from host CSS (e.g. Bootstrap):
+
+- Wrap the part of your app that uses ipa-ui in a theme container:
+
+```tsx
+const root = createRoot(document.getElementById('root')!);
+
+root.render(
+  <div data-theme="invicara">
+    <App />
+  </div>
+);
+```
+
+All ipa-ui components rendered under this wrapper will resolve their theme variables (colors, radii, etc.) from the `invicara` theme.
+
+### Dialog portal container (`#ipa-ui-modal-root`)
+
+ipa-ui’s `Dialog` component uses a React portal. By default, portals render into `document.body`, which can cause themed content (e.g. buttons) to inherit the wrong CSS variables when global styles override `:root`.
+
+To keep all dialogs inside your theme wrapper:
+
+- Add a dedicated modal root **inside** the theme container:
+
+```tsx
+root.render(
+  <div data-theme="invicara">
+    <div id="ipa-ui-modal-root" />
+    <App />
+  </div>
+);
+```
+
+- `Dialog` will:
+  - Use the `container` prop if you pass one:
+
+    ```tsx
+    <Dialog
+      title="My Dialog"
+      open={open}
+      onOpenChange={setOpen}
+      container={document.getElementById('ipa-ui-modal-root')}
+    >
+      …
+    </Dialog>
+    ```
+
+  - Otherwise, automatically portal into `document.getElementById('ipa-ui-modal-root')` when that element exists.
+
+This keeps dialog overlays, content, and buttons inside the `data-theme="invicara"` subtree so they use ipa-ui’s tokens (e.g. pink primary) rather than host globals.
+
+### CSS loading (component imports vs global import)
+
+ipa-ui components import the library CSS internally (e.g. `import './output.css'`), so **in most setups you do not need an explicit global CSS import** – using any ipa-ui component will load the CSS.
+
+However, if you want deterministic load order relative to your app styles (for example, “always after Bootstrap”), you can optionally add a global import once in your app’s main stylesheet:
+
+```scss
+/* Example: in your main app.scss */
+@import '~@invicara/ipa-ui/dist/output.css';
+```
+
+This is recommended when you:
+
+- Rely heavily on global frameworks like Bootstrap, and
+- Want ipa-ui’s utility/component layers to consistently win in the cascade.
+
+### Using ipa-ui via `@invicara/ipa-core`
+
+If you consume ipa-ui indirectly through `@invicara/ipa-core` and use `IpaMainLayout`:
+
+- `IpaMainLayout` already:
+  - wraps the application in `<div data-theme="invicara">…</div>`
+  - includes `<div id="ipa-ui-modal-root" />` inside that wrapper
+- You generally **don’t need to add your own theme or modal wrappers** for core-driven screens; they’re provided by the layout.
+
+You can still optionally add a global CSS import (as above) if you need strict control over load order relative to your app’s existing styles.
+
 ## Development
 
 ### Running the Project
