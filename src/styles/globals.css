@@ -9,7 +9,8 @@
  
 @custom-variant dark (&:is(.dark *));
  
-:root {
+:root,
+[data-theme="invicara"] {
   /* Brand Colors (can replace with custom colors) */
   --brand-1: #FDF3F9;
   --brand-2: #FCE8F4;

@@ -5,9 +5,11 @@
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
+  "style": "dist/output.css",
   "scripts": {
-    "build": "npm run build:css && npm run build:js",
+    "build": "npm run build:css && npm run build:js && npm run copy:css",
     "build:css": "npx @tailwindcss/cli -i ./src/styles/globals.css -o ./src/output.css",
+    "copy:css": "node -e \"require('fs').copyFileSync('src/output.css','dist/output.css')\"",
     "build:js": "rollup -c --bundleConfigAsCjs",
     "prepublishOnly": "npm run build",
     "storybook": "storybook dev -p 6006",
