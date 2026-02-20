@@ -47,7 +47,7 @@ git checkout -b feature/your-change
 
 ### 4. Commit
 
-Use **conventional commits** as much as possible it helps us integrate your code (e.g. `feat: add tooltip`, `fix: dialog focus trap`, `docs: update button examples`). Keep the first line short and clear.
+We enforce **Conventional Commits** (commitlint runs on each commit). Use a type and short description (e.g. `feat: add tooltip`, `fix: dialog focus trap`, `docs: update button examples`). For breaking changes, use `feat!:` or `fix(scope)!:` in the subject, or add a `BREAKING CHANGE:` footer. Keep the first line short and clear.
 
 ### 5. Push and open a PR
 

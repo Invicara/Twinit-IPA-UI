@@ -7,6 +7,7 @@
   "types": "dist/index.d.ts",
   "style": "dist/output.css",
   "scripts": {
+    "prepare": "husky || true",
     "build": "npm run build:css && npm run build:js && npm run copy:css",
     "build:css": "npx @tailwindcss/cli -i ./src/styles/globals.css -o ./src/output.css",
     "copy:css": "node -e \"require('fs').copyFileSync('src/output.css','dist/output.css')\"",
@@ -17,7 +18,8 @@
     "test": "jest",
     "testv": "jest --verbose",
     "test-watch": "jest --watch",
-    "tailwind-dev": "npx @tailwindcss/cli -i ./src/styles/globals.css -o ./src/output.css --watch"
+    "tailwind-dev": "npx @tailwindcss/cli -i ./src/styles/globals.css -o ./src/output.css --watch",
+    "release:breaking": "node scripts/breaking-changes.js"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +28,8 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.26.0",
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
     "@chromatic-com/storybook": "^3.2.5",
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
@@ -46,6 +50,7 @@
     "@types/react": "^19.0.10",
     "autoprefixer": "^10.4.20",
     "babel-jest": "^29.7.0",
+    "husky": "^9.1.7",
     "daisyui": "^5.0.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
