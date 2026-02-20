@@ -42,7 +42,7 @@ Implementation guides for each component are in the [`docs/`](docs/) folder:
 | [Slider](docs/slider.md) | `docs/slider.md` |
 | [Icons (XIcon)](docs/icons.md) | `docs/icons.md` |
 
-**For library developers:** implementation details, build, and release are in [docs/internal/](docs/internal/).
+**For contributors:** see [docs/external/](docs/external/). **For internal team:** release flow, publishing, and implementation details are in [docs/internal/](docs/internal/).
 
 ## Component Architecture
 

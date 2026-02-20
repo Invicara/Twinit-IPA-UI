@@ -115,7 +115,7 @@ Ensure modals inherit your app’s theme by rendering them inside a wrapper that
 
 ## Styling
 
-The dialog uses internal CSS modules for layout, overlay, and animations. Override specific areas with `classNames` or the root `className`. For implementation details (e.g. animation strategy), see [dialog-animations.md](internal/dialog-animations.md) (library developers).
+The dialog uses internal CSS modules for layout, overlay, and animations. Override specific areas with `classNames` or the root `className`. For implementation details (e.g. animation strategy), see [dialog-animations.md](external/dialog-animations.md) (contributors).
 
 ## Accessibility
 
