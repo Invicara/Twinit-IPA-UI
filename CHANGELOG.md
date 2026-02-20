@@ -6,16 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [1.0.3] - 2026-02-20
-
-### Added
-- split docs into external and internal, add git-flow and publishing
-- add component user docs and internal/ for library developers
-### Changed
-- add commitlint, husky, and release:breaking script
-
-
-
 ## [1.0.1-1] - 2025-12-10
 
 ### Added

@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 /**
  * Updates CHANGELOG.md with changes since the last version.
- * - If an entry for the current package version (or "Unreleased") exists, replaces it with generated content.
- * - Otherwise, adds a new entry at the top with the current version and today's date.
+ * - If an entry for the target version (or "Unreleased") exists, replaces it with generated content.
+ * - Otherwise, adds a new entry at the top with the target version and today's date.
+ *
+ * Usage: node scripts/update-changelog.js [version]
+ * - version: optional. Next release version (e.g. 1.0.4). If omitted, uses version from package.json.
  *
  * Uses conventional commit types: feat -> Added, fix -> Fixed, docs -> Added,
  * feat!/fix! or BREAKING CHANGE -> Breaking, others -> Changed.
@@ -156,7 +159,8 @@ function getPreamble(changelog) {
 }
 
 function main() {
-  const version = getPackageVersion();
+  const versionArg = process.argv[2];
+  const version = versionArg && versionArg.trim() ? versionArg.trim() : getPackageVersion();
   const tag = getLatestTag();
   const raw = getCommitsSince(tag);
 
