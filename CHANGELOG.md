@@ -5,39 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.1-0] - 2025-10-31
+
+## [1.0.3] - 2026-02-20
 
 ### Added
-- Initial project setup and configuration
-- Package structure with TypeScript support
-- Storybook integration for component documentation and development
-- Testing setup with Jest and React Testing Library
-- Rollup build configuration for package publishing
-- Tailwind CSS integration with DaisyUI
-- Radix UI components integration as primitives
-- Initial set of UI components:
-  - Accordion component with Storybook stories
-  - Breadcrumb component with Storybook stories
-  - Button component with tests and Storybook stories
-  - Checkbox component with Storybook stories
-  - Dialog component with Storybook stories
-  - Dropdown component (70% complete) with custom icon import functionality
-  - Input component with tests and Storybook stories
-  - Link component with tests and Storybook stories
-  - Radio Group component with tests and Storybook stories
-  - Slider component with tests and Storybook stories
-- Custom X Icon component
-- Icon library support (Lucide React, Radix UI Icons)
-- Dropdown component features:
-  - Custom icon import functionality
-  - Parameterised theme/behaviour options
-  - Basic dropdown functionality
-
+- split docs into external and internal, add git-flow and publishing
+- add component user docs and internal/ for library developers
 ### Changed
-- Component scaffolding and code structure (initially unfinished, later refined)
+- add commitlint, husky, and release:breaking script
 
-### Fixed
-- Fixed rollup configuration to allow publishing the package
+
 
 ## [1.0.1-1] - 2025-12-10
 

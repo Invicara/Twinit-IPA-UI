@@ -19,7 +19,8 @@
     "testv": "jest --verbose",
     "test-watch": "jest --watch",
     "tailwind-dev": "npx @tailwindcss/cli -i ./src/styles/globals.css -o ./src/output.css --watch",
-    "release:breaking": "node scripts/breaking-changes.js"
+    "release:breaking": "node scripts/breaking-changes.js",
+    "changelog:update": "node scripts/update-changelog.js"
   },
   "author": "",
   "license": "ISC",
