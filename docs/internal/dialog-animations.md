@@ -206,4 +206,3 @@ If you modify or extend dialog animations:
 5. Avoid reintroducing Tailwind animation utilities such as `animate-in` / `animate-out` into the public `className` props of this component.
 
 If you need a different animation preset (e.g. more pronounced zoom/slide), add new `@keyframes` in this module and update the `[data-state]` rules accordingly, rather than switching back to raw Tailwind animation utilities.
-
