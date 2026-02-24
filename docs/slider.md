@@ -5,7 +5,7 @@ Single-thumb or range (dual-thumb) slider with optional labels and numeric input
 ## Import
 
 ```tsx
-import { Slider, sliderVariants } from '@invicara/ipa-ui';
+import { Slider, sliderVariants } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
@@ -95,7 +95,7 @@ The component also renders optional number inputs below the track (one for singl
 For custom wrappers that match the design system:
 
 ```tsx
-import { sliderVariants } from '@invicara/ipa-ui';
+import { sliderVariants } from '@dtplatform/ipa-ui';
 <div className={sliderVariants({ variant: 'range' })}>...</div>
 ```
 

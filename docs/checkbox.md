@@ -5,7 +5,7 @@ Single checkbox control built on [Radix UI Checkbox](https://www.radix-ui.com/pr
 ## Import
 
 ```tsx
-import { Checkbox } from '@invicara/ipa-ui';
+import { Checkbox } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage

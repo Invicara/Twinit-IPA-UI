@@ -13,7 +13,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
-} from '@invicara/ipa-ui';
+} from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage

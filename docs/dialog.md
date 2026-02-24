@@ -5,7 +5,7 @@ Modal (or non-modal) dialog with optional overlay, header with title and close b
 ## Import
 
 ```tsx
-import { Dialog } from '@invicara/ipa-ui';
+import { Dialog } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage

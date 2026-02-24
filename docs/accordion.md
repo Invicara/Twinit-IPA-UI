@@ -5,7 +5,7 @@ Collapsible sections that expand and collapse. Built on [Radix UI Accordion](htt
 ## Import
 
 ```tsx
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@invicara/ipa-ui';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
