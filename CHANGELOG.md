@@ -6,17 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-
-## [1.1.0] - 2026-02-20
+## [1.1.0] - 2026-02-24
 
 ### Added
 - add optional version arg to changelog:update
+- run changelog update before npm version
 - split docs into external and internal, add git-flow and publishing
 - add component user docs and internal/ for library developers
 ### Changed
+- updated package registry to dtplatform
+- replace release:breaking with version:suggest
 - add changelog:update script and document in publishing
 - add commitlint, husky, and release:breaking script
-- Reverted: docs(release): run changelog update before npm version
 
 
 
