@@ -1,0 +1,21 @@
+@reference "../../../styles/globals.css";
+
+.base {
+  @apply font-sans text-[14px] font-normal leading-[18px] transition-colors focus-visible:outline-none;
+}
+
+.variantDefault {
+  @apply text-brand-8 hover:text-brand-6 active:text-brand-9 focus:text-brand-6 flex items-center gap-[4px];
+}
+
+.variantInline {
+  @apply text-brand-8 hover:text-brand-6 active:text-brand-9 focus:text-brand-6 underline hover:no-underline underline-offset-2;
+}
+
+.disabled {
+  @apply text-neutral-5 cursor-not-allowed pointer-events-none;
+}
+
+.icon {
+  @apply h-[14px] w-[14px];
+}

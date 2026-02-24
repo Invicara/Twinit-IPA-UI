@@ -1,0 +1,106 @@
+@reference "../../../styles/globals.css";
+
+.trigger {
+  @apply min-h-[36px];
+}
+
+.triggerContent {
+  @apply flex gap-1 flex-1 min-w-0;
+}
+
+.triggerContentWrap {
+  @apply flex-wrap;
+}
+
+.triggerContentNoWrap {
+  @apply overflow-x-hidden;
+}
+
+.badge {
+  @apply inline-flex items-center gap-1 bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium whitespace-nowrap;
+}
+
+.badgeText {
+  @apply whitespace-nowrap;
+}
+
+.badgeRemove {
+  @apply hover:bg-brand-8/20 rounded-[4px] p-0.5 cursor-pointer;
+}
+
+.remainingBadge {
+  @apply inline-flex items-center bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium whitespace-nowrap;
+}
+
+.placeholder {
+  @apply text-neutral-4;
+}
+
+.header {
+  @apply px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0;
+}
+
+.headerText {
+  @apply px-[6px] text-[13px] text-neutral-4;
+}
+
+.itemFocused {
+  @apply bg-brand-1;
+}
+
+.itemHover {
+  @apply hover:bg-brand-1;
+}
+
+.itemRightAlign {
+  @apply flex-row-reverse;
+}
+
+.checkbox {
+  @apply mr-3 flex items-center justify-center;
+}
+
+.checkboxRightAlign {
+  @apply mr-0 ml-3;
+}
+
+.checkboxIconWrapper {
+  @apply w-4 h-4 rounded-[4px] flex items-center justify-center border;
+}
+
+.checkboxIconWrapperChecked {
+  @apply bg-brand-8 border-brand-8;
+}
+
+.checkboxIconWrapperUnchecked {
+  @apply bg-white border-neutral-5;
+}
+
+.checkboxIcon {
+  @apply text-white;
+}
+
+.itemContent {
+  @apply flex-1 overflow-hidden relative;
+}
+
+.itemContentText {
+  @apply whitespace-nowrap block text-left pointer-events-none;
+}
+
+.itemContentEllipsisIndicator {
+  @apply absolute right-0 top-0 px-1 text-neutral-6;
+}
+
+.itemContentEllipsisIndicatorFocused {
+  @apply bg-brand-1;
+}
+
+.itemContentEllipsisIndicatorUnfocused {
+  @apply bg-neutral-0;
+}
+
+.itemContentEllipsisIndicatorHover {
+  @apply group-hover:bg-brand-1;
+}
+

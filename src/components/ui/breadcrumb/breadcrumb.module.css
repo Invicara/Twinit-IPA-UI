@@ -1,0 +1,29 @@
+@reference "../../../styles/globals.css";
+
+.list {
+  @apply text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5;
+}
+
+.item {
+  @apply inline-flex items-center gap-1.5;
+}
+
+.link {
+  @apply hover:text-foreground transition-colors;
+}
+
+.page {
+  @apply text-foreground font-normal;
+}
+
+.separator {
+  @apply [&>svg]:size-3.5;
+}
+
+.ellipsis {
+  @apply flex size-9 items-center justify-center;
+}
+
+.ellipsisIcon {
+  @apply size-4;
+}

@@ -1,0 +1,95 @@
+@reference "../../../styles/globals.css";
+
+/* Dialog overlay animations */
+@keyframes ipa-dialog-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ipa-dialog-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Dialog content animations */
+@keyframes ipa-dialog-content-in {
+  from { opacity: 0; scale: 0.95; }
+  to { opacity: 1; scale: 1; }
+}
+
+@keyframes ipa-dialog-content-out {
+  from { opacity: 1; scale: 1; }
+  to { opacity: 0; scale: 0.95; }
+}
+
+.overlay {
+  @apply fixed inset-0 z-50 bg-neutral-10/75;
+}
+
+.overlay[data-state="open"] {
+  animation: ipa-dialog-overlay-in 150ms ease-out forwards;
+}
+
+.overlay[data-state="closed"] {
+  animation: ipa-dialog-overlay-out 150ms ease-in forwards;
+}
+
+.content {
+  @apply fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-0 border-0 bg-neutral-0 shadow-[0_4px_24px_rgba(0,0,0,0.15)] transition-all duration-200 rounded-[8px];
+}
+
+.content[data-state="open"] {
+  animation: ipa-dialog-content-in 150ms ease-out forwards;
+}
+
+.content[data-state="closed"] {
+  animation: ipa-dialog-content-out 150ms ease-in forwards;
+}
+
+.contentPointerEventsAuto {
+  @apply pointer-events-auto;
+}
+
+.sizeSm {
+  @apply max-w-md;
+}
+
+.sizeDefault {
+  @apply max-w-xl;
+}
+
+.sizeLg {
+  @apply max-w-3xl;
+}
+
+.sizeXl {
+  @apply max-w-5xl;
+}
+
+.sizeFull {
+  @apply max-w-[90vw];
+}
+
+.header {
+  @apply flex items-center justify-between bg-neutral-1 px-6 py-5 text-neutral-10 rounded-t-[8px];
+}
+
+.title {
+  @apply text-[20px] font-bold font-sans leading-tight;
+}
+
+.closeButton {
+  @apply rounded-full p-1 transition-colors hover:bg-neutral-2 focus:outline-none focus-visible:ring-0 disabled:pointer-events-none cursor-pointer;
+}
+
+.closeButtonIcon {
+  @apply h-5 w-5 text-neutral-10;
+}
+
+.body {
+  @apply px-6 py-6 space-y-6 overflow-y-auto max-h-[70vh];
+}
+
+.footer {
+  @apply flex justify-end gap-3 px-6 py-5 bg-neutral-0 rounded-b-[8px];
+}
