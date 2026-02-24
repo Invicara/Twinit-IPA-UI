@@ -40,7 +40,7 @@ function getCommitsSince(tag) {
   const range = tag ? `${tag}..HEAD` : 'HEAD';
   try {
     const out = execSync(
-      `git log ${range} --pretty=format:"%h%x01%s%x01%b%x02"`,
+      `git log ${range} --pretty=format:"%H%x01%s%x01%b%x02"`,
       { encoding: 'utf-8', maxBuffer: 2 * 1024 * 1024, cwd: ROOT }
     );
     return out;
@@ -66,6 +66,27 @@ function extractBreakingFromBody(body) {
   const lower = body.toLowerCase();
   const match = body.match(/\bbreaking\s+change[s]?:\s*([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i);
   return match ? match[1].trim() : null;
+}
+
+function isRevertCommit(subject) {
+  return /^Revert "/.test(subject || '');
+}
+
+/** Returns Set of full SHAs that are reverted by a later commit in the list (git log order = newest first). */
+function getRevertedShas(commits) {
+  const reverted = new Set();
+  for (const c of commits) {
+    if (!isRevertCommit(c.subject)) continue;
+    const m = (c.body || '').match(/This reverts commit ([0-9a-f]{40})/i);
+    if (m) reverted.add(m[1]);
+  }
+  return reverted;
+}
+
+/** Extract original subject from a revert commit for changelog line. */
+function getRevertedSubject(subject) {
+  const m = (subject || '').match(/^Revert "(.+)"$/);
+  return m ? m[1].trim() : null;
 }
 
 function categorizeCommits(commits) {
@@ -177,7 +198,18 @@ function main() {
     })
     .filter((c) => c.hash && c.subject);
 
-  const sections = categorizeCommits(commits);
+  const revertedShas = getRevertedShas(commits);
+  const commitsToShow = commits.filter(
+    (c) => !revertedShas.has(c.hash) && !isRevertCommit(c.subject)
+  );
+  const sections = categorizeCommits(commitsToShow);
+
+  // Add one line per revert under Changed: "Reverted: <original subject>"
+  for (const c of commits) {
+    if (!isRevertCommit(c.subject)) continue;
+    const original = getRevertedSubject(c.subject);
+    if (original) sections.changed.push(`Reverted: ${original}`);
+  }
 
   const today = new Date().toISOString().slice(0, 10);
   const changelogContent = fs.readFileSync(CHANGELOG_PATH, 'utf-8');

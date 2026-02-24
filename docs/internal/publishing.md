@@ -6,8 +6,8 @@ This package is published to **GitHub Packages**. Follow these steps to publish 
 
 ```bash
 npm login --registry=https://npm.pkg.github.com --scope=@invicara
-npm run changelog:update   # update CHANGELOG.md before bumping
-npm version patch         # or minor / major
+npm version patch   # or minor / major
+# Update CHANGELOG.md with your changes
 npm publish
 ```
 
@@ -28,7 +28,7 @@ You need a GitHub Personal Access Token with `write:packages` (create at https:/
 
 ## Publishing steps
 
-1. **Breaking changes:** Run `npm run release:breaking` to list commits since the last tag that contain breaking changes (`feat!:` / `fix!:` or `BREAKING CHANGE:` footer). Use the output to decide version bump: **major** if there are breaking changes, otherwise minor/patch per semver.
+1. **Suggested version:** Run `npm run version:suggest` (dry-run). It analyzes conventional commits since the last tag and suggests the next stable version: **major** if any breaking changes, **minor** if any `feat` (and no breaking), **patch** otherwise. With no commits since last tag it suggests "No release". Use the output to run `npm version major|minor|patch` in the next step.
 2. **CHANGELOG:** Run `npm run changelog:update` to add or refresh the entry from commits since the last tag (conventional commits → Added / Changed / Fixed / Breaking). Optionally pass the next version so the entry uses it: `npm run changelog:update -- 1.0.4`. Otherwise the script uses the version in `package.json`. Edit `CHANGELOG.md` by hand if you need to adjust wording or add items.
 3. **Version:** `npm version patch|minor|major` (updates `package.json`, creates commit and tag).
 4. **Build:** `npm run build` (runs automatically via `prepublishOnly`). Produces `dist/cjs/`, `dist/esm/`, types, CSS.

@@ -4,7 +4,7 @@ This document describes the branching and release process for **internal** devel
 
 ## Commit message format
 
-We use **Conventional Commits**; [commitlint](https://commitlint.js.org/) runs on every commit (via husky). Use types such as `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`. For breaking changes, use `feat!:` or `fix(scope)!:` in the subject, or a footer line `BREAKING CHANGE: description`. Merge commits are ignored. At release time, run `npm run release:breaking` to list breaking commits and update CHANGELOG (see [publishing.md](publishing.md)).
+We use **Conventional Commits**; [commitlint](https://commitlint.js.org/) runs on every commit (via husky). Use types such as `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`. For breaking changes, use `feat!:` or `fix(scope)!:` in the subject, or a footer line `BREAKING CHANGE: description`. Merge commits are ignored. At release time, run `npm run version:suggest` to get the suggested next version (see [publishing.md](publishing.md)).
 
 ## Branch roles
 
@@ -25,7 +25,7 @@ We use **Conventional Commits**; [commitlint](https://commitlint.js.org/) runs o
    - `docs/short-description`
 
 2. **Develop and commit**  
-   Work on your branch. Use **Conventional Commits**; commitlint enforces the format on every commit. For breaking changes, use `feat!:` or `fix(scope)!:` in the subject, or add a `BREAKING CHANGE:` footer. Merge commits are ignored by commitlint. At release time, run `npm run release:breaking` (see [publishing.md](publishing.md)) to list breaking changes for CHANGELOG and version bump.
+   Work on your branch. Use **Conventional Commits**; commitlint enforces the format on every commit. For breaking changes, use `feat!:` or `fix(scope)!:` in the subject, or add a `BREAKING CHANGE:` footer. Merge commits are ignored by commitlint. At release time, run `npm run version:suggest` (see [publishing.md](publishing.md)) to get the suggested version bump.
 
 3. **Merge into NEXT-RELEASE**  
    Open a PR (or merge) into **NEXT-RELEASE**. Do not merge feature branches directly into STAGING or PRODUCTION.
