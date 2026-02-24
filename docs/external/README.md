@@ -1,6 +1,6 @@
 # Contributor documentation (external developers)
 
-This folder is for **external contributors** who want to work on `@dtplatform/ipa-ui`. It covers how to run the project, understand the codebase, and submit contributions. **Consumers** of the package should use the [component docs](../) in the parent `docs/` folder.
+This folder is for **external contributors** who want to work on `@dtplatform/ipa-ui`. This is the **public** repo ([Twinit-IPA-UI](https://github.com/Invicara/Twinit-IPA-UI)); released code lives on the **releases** branch. Day-to-day development happens in the private repo [Internal-IPA-UI](https://github.com/Invicara/Internal-IPA-UI). It covers how to run the project, understand the codebase, and submit contributions. **Consumers** of the package should use the [component docs](../) in the parent `docs/` folder.
 
 ## Contents
 

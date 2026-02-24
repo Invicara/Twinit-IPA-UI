@@ -1,6 +1,6 @@
 # Publishing (internal developers)
 
-This package is published to **GitHub Packages**. Follow these steps to publish a new version. Ensure the release has gone through the [git flow](git-flow.md) (STAGING → master) before publishing.
+This package is published to **GitHub Packages**. Development happens in the **private** repo [Internal-IPA-UI](https://github.com/Invicara/Internal-IPA-UI); releases are synced to the **public** repo [Twinit-IPA-UI](https://github.com/Invicara/Twinit-IPA-UI) on the **releases** branch. Follow these steps to publish a new version. Ensure the release has gone through the [git flow](git-flow.md) (STAGING → master) before publishing.
 
 ## Quick steps
 
@@ -11,20 +11,16 @@ npm version patch   # or minor / major
 npm publish
 ```
 
-You need a GitHub Personal Access Token with `write:packages` (create at https://github.com/settings/tokens).
+You need a GitHub Personal Access Token with `write:packages` (create at [https://github.com/settings/tokens](https://github.com/settings/tokens)).
 
 ## Prerequisites
 
 1. **GitHub token** with `write:packages`.
 2. **npm auth:**
-   ```bash
+  ```bash
    npm login --registry=https://npm.pkg.github.com --scope=@dtplatform
-   ```
+  ```
    Use your GitHub username and the token as password. Or set `~/.npmrc`:
-   ```
-   @dtplatform:registry=https://npm.pkg.github.com
-   //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
-   ```
 
 ## Publishing steps
 
@@ -33,7 +29,8 @@ You need a GitHub Personal Access Token with `write:packages` (create at https:/
 3. **Version:** `npm version patch|minor|major` (updates `package.json`, creates commit and tag).
 4. **Build:** `npm run build` (runs automatically via `prepublishOnly`). Produces `dist/cjs/`, `dist/esm/`, types, CSS.
 5. **Publish:** `npm publish`. Publishes to GitHub Packages; only `dist/`, `README.md`, `LICENSE` are included (see `package.json` `files`).
-6. **Verify:** `npm view @dtplatform/ipa-ui versions` or https://github.com/Invicara/Twinit-IPA-UI/packages.
+6. **Sync to public repo:** Merge the commit with the newly created tag from the **master** branch of [Internal-IPA-UI](https://github.com/Invicara/Internal-IPA-UI) into the **releases** branch of [Twinit-IPA-UI](https://github.com/Invicara/Twinit-IPA-UI). The merge commit message must follow this pattern: `chore(release): v<version>` where the version matches the tag (e.g. `chore(release): v1.0.4`).
+7. **Verify:** `npm view @dtplatform/ipa-ui versions` or the [package page](https://github.com/Invicara/Twinit-IPA-UI/packages) on GitHub Packages.
 
 ## Installing the published package (consumers)
 
@@ -45,3 +42,4 @@ Consumers need `.npmrc` with `@dtplatform:registry` and `//npm.pkg.github.com/:_
 - **Build failures:** Run `npm run build` manually for full errors.
 - **Version exists:** Bump again (patch/minor/major).
 - **Scope:** Package name must be exactly `@dtplatform/ipa-ui`.
+

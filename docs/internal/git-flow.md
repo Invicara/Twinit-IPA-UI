@@ -1,6 +1,6 @@
 # Git flow (internal developers)
 
-This document describes the branching and release process for **internal** development of `@dtplatform/ipa-ui`. The long-lived branches are **NEXT-RELEASE** (develop), **STAGING** (pre-production testing), and **master** (releases). Feature work and hotfixes follow the patterns below.
+This document describes the branching and release process for **internal** development of `@dtplatform/ipa-ui`. Development happens in the **private** repo [Internal-IPA-UI](https://github.com/Invicara/Internal-IPA-UI); the **public** repo [Twinit-IPA-UI](https://github.com/Invicara/Twinit-IPA-UI) receives releases on its **releases** branch. The long-lived branches in the private repo are **NEXT-RELEASE** (develop), **STAGING** (pre-production testing), and **master** (releases). Feature work and hotfixes follow the patterns below.
 
 ## Commit message format
 
@@ -73,7 +73,7 @@ When QA signs off on a release candidate (e.g. `v1.0.4-2`):
    git push origin v1.0.4
    ```
 
-3. **Publish** the package (see [publishing.md](publishing.md)). Then sync the release to the **public** repo if you use a dual-repo release process.
+3. **Publish** the package (see [publishing.md](publishing.md)), then **sync the release to the [public repo](https://github.com/Invicara/Twinit-IPA-UI)** on the **releases** branch.
 
 ```
 NEXT-RELEASE  ──►  STAGING (v1.0.4-0, v1.0.4-1, …)  ──►  master (v1.0.4)
