@@ -5,7 +5,7 @@ Styled link (anchor) with optional default icon, inline variant, and disabled st
 ## Import
 
 ```tsx
-import { Link, linkVariants } from '@invicara/ipa-ui';
+import { Link, linkVariants } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
@@ -59,7 +59,7 @@ If `href` is missing or falsy, the link is treated as disabled (no navigation, `
 Use `linkVariants` to style a different element (e.g. React Router `Link`) like the design-system link:
 
 ```tsx
-import { linkVariants } from '@invicara/ipa-ui';
+import { linkVariants } from '@dtplatform/ipa-ui';
 import { Link as RouterLink } from 'react-router-dom';
 
 <RouterLink to="/docs" className={linkVariants({ variant: 'default' })}>

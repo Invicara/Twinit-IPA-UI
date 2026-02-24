@@ -5,9 +5,9 @@ Dropdowns for choosing one option (**SingleSelect**) or multiple options (**Mult
 ## Import
 
 ```tsx
-import { SingleSelect, MultiSelect, Dropdown } from '@invicara/ipa-ui';
+import { SingleSelect, MultiSelect, Dropdown } from '@dtplatform/ipa-ui';
 // Types
-import type { SingleSelectProps, MultiSelectProps } from '@invicara/ipa-ui';
+import type { SingleSelectProps, MultiSelectProps } from '@dtplatform/ipa-ui';
 ```
 
 ## SingleSelect

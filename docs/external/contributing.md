@@ -1,6 +1,6 @@
 # Contributing to ipa-ui
 
-Thank you for considering contributing to `@invicara/ipa-ui`. This guide explains how to submit changes and what to expect from the maintainers.
+Thank you for considering contributing to `@dtplatform/ipa-ui`. This guide explains how to submit changes and what to expect from the maintainers.
 
 ## Overview
 

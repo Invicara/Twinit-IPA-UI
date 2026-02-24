@@ -1,6 +1,6 @@
 # Contributor documentation (external developers)
 
-This folder is for **external contributors** who want to work on `@invicara/ipa-ui`. It covers how to run the project, understand the codebase, and submit contributions. **Consumers** of the package should use the [component docs](../) in the parent `docs/` folder.
+This folder is for **external contributors** who want to work on `@dtplatform/ipa-ui`. It covers how to run the project, understand the codebase, and submit contributions. **Consumers** of the package should use the [component docs](../) in the parent `docs/` folder.
 
 ## Contents
 

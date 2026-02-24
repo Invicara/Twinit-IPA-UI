@@ -1,6 +1,6 @@
 # Icons
 
-`@invicara/ipa-ui` provides a small set of custom icons and documents how to use external icon libraries that are already dependencies of the package.
+`@dtplatform/ipa-ui` provides a small set of custom icons and documents how to use external icon libraries that are already dependencies of the package.
 
 ## XIcon (custom)
 
@@ -9,7 +9,7 @@ A simple “X” (close) icon, e.g. for dialog close buttons or dismiss controls
 ### Import
 
 ```tsx
-import { XIcon } from '@invicara/ipa-ui';
+import { XIcon } from '@dtplatform/ipa-ui';
 ```
 
 ### Usage

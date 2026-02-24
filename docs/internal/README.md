@@ -6,5 +6,5 @@ This folder is for **internal team** only. It covers release flow, publishing, a
 
 | Doc | Description |
 |-----|-------------|
-| [git-flow.md](git-flow.md) | Branching and release process: NEXT-RELEASE, STAGING, PRODUCTION, feature branches, release candidates, hotfixes. |
+| [git-flow.md](git-flow.md) | Branching and release process: NEXT-RELEASE, STAGING, master, feature branches, release candidates, hotfixes. |
 | [publishing.md](publishing.md) | How to publish the package to GitHub Packages (version, CHANGELOG, npm publish). |

@@ -5,7 +5,7 @@ Primary action component with multiple variants and sizes. Supports `asChild` so
 ## Import
 
 ```tsx
-import { Button, buttonVariants } from '@invicara/ipa-ui';
+import { Button, buttonVariants } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
@@ -30,7 +30,7 @@ import { Button, buttonVariants } from '@invicara/ipa-ui';
 **buttonVariants** – CVA helper if you need to apply button styles to another element:
 
 ```tsx
-import { buttonVariants } from '@invicara/ipa-ui';
+import { buttonVariants } from '@dtplatform/ipa-ui';
 <a className={buttonVariants({ variant: 'secondary', size: 'sm' })} href="/">Back</a>
 ```
 

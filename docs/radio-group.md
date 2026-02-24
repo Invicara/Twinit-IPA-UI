@@ -5,8 +5,8 @@ A group of radio options with a single selection. Built on [Radix UI Radio Group
 ## Import
 
 ```tsx
-import { RadioGroup, radioGroupVariants } from '@invicara/ipa-ui';
-import type { RadioGroupOption } from '@invicara/ipa-ui';
+import { RadioGroup, radioGroupVariants } from '@dtplatform/ipa-ui';
+import type { RadioGroupOption } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
@@ -90,7 +90,7 @@ const [value, setValue] = useState('a');
 For custom layouts that match the design system:
 
 ```tsx
-import { radioGroupVariants } from '@invicara/ipa-ui';
+import { radioGroupVariants } from '@dtplatform/ipa-ui';
 <div className={radioGroupVariants({ orientation: 'horizontal' })}>
   {/* custom radio markup */}
 </div>

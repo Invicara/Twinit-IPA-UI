@@ -5,7 +5,7 @@ Text input or textarea with optional label, helper text, password visibility tog
 ## Import
 
 ```tsx
-import { Input, inputVariants } from '@invicara/ipa-ui';
+import { Input, inputVariants } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
@@ -88,7 +88,7 @@ import { Search } from 'lucide-react';
 For building custom inputs that match the design system:
 
 ```tsx
-import { inputVariants } from '@invicara/ipa-ui';
+import { inputVariants } from '@dtplatform/ipa-ui';
 <input className={inputVariants({ state: 'error', variant: 'input' })} />
 ```
 

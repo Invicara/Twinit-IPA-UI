@@ -2,7 +2,7 @@
 
 This document explains why the `Dialog` component uses a **custom animation strategy** instead of the standard Tailwind + `data-[state=...]` pattern used elsewhere in the library.
 
-It is intended for **library developers** working on `@invicara/ipa-ui`, not for consumers of the package.
+It is intended for **library developers** working on `@dtplatform/ipa-ui`, not for consumers of the package.
 
 ---
 

@@ -2,18 +2,20 @@
 
 A React component library implementing Invicara's design system with TypeScript support.
 
+> **BETA disclaimer:** This library is currently in **BETA**. Integrators should expect **breaking changes** to the component API as the library evolves. Use at your own risk.
+
 ## Quick Start
 
 ### Installation
 
 ```bash
-npm install @invicara/ipa-ui
+npm install @dtplatform/ipa-ui
 ```
 
 ### Basic Usage
 
 ```tsx
-import { Button, Dialog, SingleSelect, Input } from '@invicara/ipa-ui';
+import { Button, Dialog, SingleSelect, Input } from '@dtplatform/ipa-ui';
 
 function App() {
   return (
@@ -146,7 +148,7 @@ The dropdown functionality is split into two variants:
 
 **Usage:**
 ```tsx
-import { SingleSelect, MultiSelect } from '@invicara/ipa-ui';
+import { SingleSelect, MultiSelect } from '@dtplatform/ipa-ui';
 
 // Single select
 <SingleSelect
@@ -294,7 +296,7 @@ However, if you want deterministic load order relative to your app styles (for e
 
 ```scss
 /* Example: in your main app.scss */
-@import '~@invicara/ipa-ui/dist/output.css';
+@import '~@dtplatform/ipa-ui/dist/output.css';
 ```
 
 This is recommended when you:
@@ -302,9 +304,9 @@ This is recommended when you:
 - Rely heavily on global frameworks like Bootstrap, and
 - Want ipa-ui’s utility/component layers to consistently win in the cascade.
 
-### Using ipa-ui via `@invicara/ipa-core`
+### Using ipa-ui via `@dtplatform/ipa-core`
 
-If you consume ipa-ui indirectly through `@invicara/ipa-core` and use `IpaMainLayout`:
+If you consume ipa-ui indirectly through `@dtplatform/ipa-core` and use `IpaMainLayout`:
 
 - `IpaMainLayout` already:
   - wraps the application in `<div data-theme="invicara">…</div>`
