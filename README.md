@@ -2,18 +2,20 @@
 
 A React component library implementing Invicara's design system with TypeScript support.
 
+> **BETA disclaimer:** This library is currently in **BETA**. Integrators should expect **breaking changes** to the component API as the library evolves. Use at your own risk.
+
 ## Quick Start
 
 ### Installation
 
 ```bash
-npm install @invicara/ipa-ui
+npm install @dtplatform/ipa-ui
 ```
 
 ### Basic Usage
 
 ```tsx
-import { Button, Dialog, SingleSelect, Input } from '@invicara/ipa-ui';
+import { Button, Dialog, SingleSelect, Input } from '@dtplatform/ipa-ui';
 
 function App() {
   return (
@@ -23,6 +25,26 @@ function App() {
   );
 }
 ```
+
+## Component documentation
+
+Implementation guides for each component are in the [`docs/`](docs/) folder:
+
+| Component | Doc |
+|-----------|-----|
+| [Accordion](docs/accordion.md) | `docs/accordion.md` |
+| [Breadcrumb](docs/breadcrumb.md) | `docs/breadcrumb.md` |
+| [Button](docs/button.md) | `docs/button.md` |
+| [Checkbox](docs/checkbox.md) | `docs/checkbox.md` |
+| [Dialog](docs/dialog.md) | `docs/dialog.md` |
+| [Dropdown (SingleSelect / MultiSelect)](docs/dropdown.md) | `docs/dropdown.md` |
+| [Input](docs/input.md) | `docs/input.md` |
+| [Link](docs/link.md) | `docs/link.md` |
+| [RadioGroup](docs/radio-group.md) | `docs/radio-group.md` |
+| [Slider](docs/slider.md) | `docs/slider.md` |
+| [Icons (XIcon)](docs/icons.md) | `docs/icons.md` |
+
+**For contributors:** see [docs/external/](docs/external/). **For internal team:** release flow, publishing, and implementation details are in [docs/internal/](docs/internal/).
 
 ## Component Architecture
 
@@ -45,10 +67,6 @@ Simple components use **Class Variance Authority (CVA)** for variant-based styli
 - Use `variant` prop for style variants (e.g., `default`, `danger`, `secondary`, `tertiary`)
 - Use `size` prop for size variants (e.g., `default`, `sm`, `icon`)
 - Use `className` prop to add additional Tailwind classes that merge with the base styles
-
-For details on how dialog animations are implemented (and why they differ slightly from other components), see:
-
-- `docs/dialog-animations.md`
 
 ### 2. Complex Components (Interface Pattern with classNames)
 
@@ -175,18 +193,12 @@ Some components are broken down into multiple variants that share a common base:
 
 The dropdown functionality is split into two variants:
 
-- **`SingleSelect`** - Single selection dropdown with optional search/filter
-- **`MultiSelect`** - Multiple selection dropdown with checkboxes and badges
-
-Both variants share:
-- Common base components (`DropdownPopup`, `DropdownTrigger`, `DropdownScrollableContent`)
-- Shared styles (`DROPDOWN_STYLES`)
-- Shared keyboard navigation logic (`useDropdownKeyboard`)
-- Shared text utilities (`dropdown-text-utils`)
+- **`SingleSelect`** – Single selection with optional search/filter
+- **`MultiSelect`** – Multiple selection with checkboxes and badges
 
 **Usage:**
 ```tsx
-import { SingleSelect, MultiSelect } from '@invicara/ipa-ui';
+import { SingleSelect, MultiSelect } from '@dtplatform/ipa-ui';
 
 // Single select
 <SingleSelect
@@ -270,52 +282,88 @@ All components use Tailwind CSS for styling. You can customize components in sev
    </Button>
    ```
 
-## Development
+## Theming and Dialog Portals
 
-### Running the Project
+### Theme wrapper (`data-theme="invicara"`)
 
-```bash
-# Install dependencies
-npm install
+ipa-ui ships with an `invicara` design theme based on CSS variables.  
+To ensure all components (especially those using `var(--primary)` and other tokens) are themed correctly and isolated from host CSS (e.g. Bootstrap):
 
-# Run Storybook (component documentation and testing)
-npm run storybook
+- Wrap the part of your app that uses ipa-ui in a theme container:
 
-# Build Storybook for production
-npm run build-storybook
+```tsx
+const root = createRoot(document.getElementById('root')!);
 
-# Build the library
-npm run build
+root.render(
+  <div data-theme="invicara">
+    <App />
+  </div>
+);
 ```
 
-### Testing
+All ipa-ui components rendered under this wrapper will resolve their theme variables (colors, radii, etc.) from the `invicara` theme.
 
-```bash
-# Run tests
-npm test
+### Dialog portal container (`#ipa-ui-modal-root`)
 
-# Run tests in verbose mode (shows detailed output)
-npm run testv
+ipa-ui’s `Dialog` component uses a React portal. By default, portals render into `document.body`, which can cause themed content (e.g. buttons) to inherit the wrong CSS variables when global styles override `:root`.
 
-# Run tests in watch mode (re-runs on file changes)
-npm run test-watch
+To keep all dialogs inside your theme wrapper:
+
+- Add a dedicated modal root **inside** the theme container:
+
+```tsx
+root.render(
+  <div data-theme="invicara">
+    <div id="ipa-ui-modal-root" />
+    <App />
+  </div>
+);
 ```
 
-### Tailwind Development
+- `Dialog` will:
+  - Use the `container` prop if you pass one:
 
-```bash
-# Watch and compile Tailwind CSS during development
-npm run tailwind-dev
+    ```tsx
+    <Dialog
+      title="My Dialog"
+      open={open}
+      onOpenChange={setOpen}
+      container={document.getElementById('ipa-ui-modal-root')}
+    >
+      …
+    </Dialog>
+    ```
+
+  - Otherwise, automatically portal into `document.getElementById('ipa-ui-modal-root')` when that element exists.
+
+This keeps dialog overlays, content, and buttons inside the `data-theme="invicara"` subtree so they use ipa-ui’s tokens (e.g. pink primary) rather than host globals.
+
+### CSS loading (component imports vs global import)
+
+ipa-ui components import the library CSS internally (e.g. `import './output.css'`), so **in most setups you do not need an explicit global CSS import** – using any ipa-ui component will load the CSS.
+
+However, if you want deterministic load order relative to your app styles (for example, “always after Bootstrap”), you can optionally add a global import once in your app’s main stylesheet:
+
+```scss
+/* Example: in your main app.scss */
+@import '~@dtplatform/ipa-ui/dist/output.css';
 ```
 
-This command watches `src/styles/globals.css` and outputs to `src/output.css` for use in components.
+This is recommended when you:
 
-## Component Props
+- Rely heavily on global frameworks like Bootstrap, and
+- Want ipa-ui’s utility/component layers to consistently win in the cascade.
 
-Each component exports TypeScript types for full IDE support. Check individual component files for:
-- `*.types.ts` - Type definitions
-- `*.stories.tsx` - Storybook examples and prop documentation
-- `*.test.tsx` - Test examples showing usage patterns
+### Using ipa-ui via `@dtplatform/ipa-core`
+
+If you consume ipa-ui indirectly through `@dtplatform/ipa-core` and use `IpaMainLayout`:
+
+- `IpaMainLayout` already:
+  - wraps the application in `<div data-theme="invicara">…</div>`
+  - includes `<div id="ipa-ui-modal-root" />` inside that wrapper
+- You generally **don’t need to add your own theme or modal wrappers** for core-driven screens; they’re provided by the layout.
+
+You can still optionally add a global CSS import (as above) if you need strict control over load order relative to your app’s existing styles.
 
 ## Common Patterns
 
@@ -351,129 +399,3 @@ All components follow ARIA best practices and are keyboard navigable. Components
 - Screen reader support
 - Focus indicators
 
-## Publishing
-
-This package is published to GitHub Packages. Follow these steps to publish a new version:
-
-### TLDR
-
-Quick publishing steps:
-```bash
-# 1. Authenticate with GitHub Packages (one-time setup)
-npm login --registry=https://npm.pkg.github.com --scope=@invicara
-
-# 2. Bump version
-npm version patch  # or minor/major
-
-# 3. Update CHANGELOG.md with your changes
-
-# 4. Publish
-npm publish
-```
-
-**Note**: Make sure you have a GitHub Personal Access Token with `write:packages` permission. See Prerequisites below for details.
-
-### Prerequisites
-
-1. **GitHub Personal Access Token**: You need a GitHub token with `write:packages` permission.
-   - Create one at: https://github.com/settings/tokens
-   - Save it securely (you'll need it for npm authentication)
-
-2. **npm Authentication**: Configure npm to authenticate with GitHub Packages:
-   ```bash
-   npm login --registry=https://npm.pkg.github.com --scope=@invicara
-   ```
-   When prompted:
-   - Username: Your GitHub username
-   - Password: Your GitHub Personal Access Token (not your GitHub password)
-   - Email: Your GitHub email address
-
-   Alternatively, create/update `.npmrc` in your home directory (`~/.npmrc`):
-   ```
-   @invicara:registry=https://npm.pkg.github.com
-   //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
-   ```
-
-### Publishing Steps
-
-1. **Update Version**: Use `npm version` to bump the version following [Semantic Versioning](https://semver.org/):
-   ```bash
-   # For a patch release (1.0.1 -> 1.0.2)
-   npm version patch
-   
-   # For a minor release (1.0.1 -> 1.1.0)
-   npm version minor
-   
-   # For a major release (1.0.1 -> 2.0.0)
-   npm version major
-   ```
-   
-   This command will:
-   - Update the version in `package.json`
-   - Create a git commit with the version change
-   - Create a git tag with the version number
-
-2. **Update CHANGELOG.md**: Document your changes in `CHANGELOG.md` following the existing format.
-
-3. **Build the Package**: The `prepublishOnly` script automatically runs before publishing:
-   ```bash
-   npm run build
-   ```
-   This will:
-   - Compile Tailwind CSS (`build:css`)
-   - Build JavaScript bundles with Rollup (`build:js`)
-   - Generate CommonJS, ESM, and TypeScript definition files in the `dist/` directory
-
-4. **Verify Build Output**: Check that the `dist/` directory contains:
-   - `cjs/index.js` - CommonJS bundle
-   - `esm/index.js` - ES Module bundle
-   - `types.d.ts` - TypeScript definitions
-   - CSS files (if any)
-
-5. **Publish to GitHub Packages**:
-   ```bash
-   npm publish
-   ```
-   This will:
-   - Run `prepublishOnly` (which runs `npm run build`)
-   - Publish to `https://npm.pkg.github.com`
-   - Include only files specified in `package.json` `files` field: `dist/`, `README.md`, `LICENSE`
-
-6. **Verify Publication**: Check that the package is available:
-   ```bash
-   npm view @invicara/ipa-ui versions
-   ```
-   Or visit: `https://github.com/Invicara/Twinit-IPA-UI/packages`
-
-### Installing the Published Package
-
-Consumers of the package need to configure npm to access GitHub Packages. They should:
-
-1. Create/update `.npmrc` in their project root:
-   ```
-   @invicara:registry=https://npm.pkg.github.com
-   //npm.pkg.github.com/:_authToken=THEIR_GITHUB_TOKEN
-   ```
-
-2. Install the package:
-   ```bash
-   npm install @invicara/ipa-ui
-   ```
-
-### Troubleshooting
-
-- **Authentication Errors**: Ensure your GitHub token has `write:packages` permission and is correctly configured in `.npmrc`
-- **Build Failures**: Run `npm run build` manually to see detailed error messages
-- **Version Conflicts**: If a version already exists, increment the version number
-- **Scope Issues**: Ensure the package name in `package.json` matches `@invicara/ipa-ui` exactly
-
-## Contributing
-
-When adding new components:
-
-1. **Simple components** → Use CVA pattern with variants
-2. **Complex components** → Use interface pattern with `classNames` prop
-3. **Component variants** → Share base components and utilities
-4. **Composed components** → Accept ReactNode for flexible composition
-
-Follow the existing patterns in the codebase for consistency.

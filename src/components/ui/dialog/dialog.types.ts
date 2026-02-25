@@ -16,6 +16,9 @@ export interface DialogProps {
   disableCloseButton?: boolean;    // Hide the X close button in header
   disableEscapeKey?: boolean;      // Prevent closing with Escape key
   
+  /** Portal container (e.g. element with id "ipa-ui-modal-root" inside theme wrapper so modals inherit theme variables) */
+  container?: HTMLElement | null;
+
   // Custom Classnames for Sub-components
   classNames?: {
     overlay?: string;
