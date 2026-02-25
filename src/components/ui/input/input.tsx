@@ -1,130 +1,123 @@
 import * as React from "react"
-import { cva } from "class-variance-authority"
 import { Eye, EyeOff } from "lucide-react"
 
 import { cn } from "../../../lib/utils"
 
 import '../../../output.css'
-import { InputProps } from "./input.types"
 import styles from "./input.module.css"
 
-const inputVariants = cva(
-  styles.base,
-  {
-    variants: {
-      state: {
-        default: styles.stateDefault,
-        error: styles.stateError,
-        success: styles.stateSuccess,
-        warning: styles.stateWarning,
-        readonly: styles.stateReadonly,
-      },
-      variant: {
-        input: styles.variantInput,
-        textarea: styles.variantTextarea,
-      },
-    },
-    defaultVariants: {
-      state: "default",
-      variant: "input",
-    },
-  }
-)
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement>, "size"> {
+  // Core Props
+  label?: string
+  helperText?: string
+  state?: "default" | "error" | "success" | "warning" | "readonly"
 
-const labelVariants = cva(
-  styles.label,
-  {
-    variants: {
-      state: {
-        default: styles.labelStateDefault,
-        error: styles.labelStateError,
-        success: styles.labelStateSuccess,
-        warning: styles.labelStateWarning,
-        readonly: styles.labelStateReadonly,
-      },
-    },
-    defaultVariants: {
-      state: "default",
-    },
+  // Feature Toggles
+  password?: boolean
+  textarea?: boolean
+  icon?: React.ReactNode
+  
+  classNames?: {
+    container?: string
+    label?: string
+    wrapper?: string
+    iconContainer?: string
+    icon?: string
+    input?: string
+    passwordToggle?: string
+    passwordToggleIcon?: string
+    helperText?: string
   }
-)
+}
 
-const helperTextVariants = cva(
-  styles.helperText,
-  {
-    variants: {
-      state: {
-        default: styles.helperTextStateDefault,
-        error: styles.helperTextStateError,
-        success: styles.helperTextStateSuccess,
-        warning: styles.helperTextStateWarning,
-        readonly: styles.helperTextStateReadonly,
-      },
-    },
-    defaultVariants: {
-      state: "default",
-    },
-  }
-)
 
 const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
-  ({ className, state = "default", testIdPrefix, label, helperText, password = false, textarea = false, icon: Icon, ...props }, ref) => {
+  (
+    {
+      className,
+      state = "default",
+      label,
+      helperText,
+      password = false,
+      textarea = false,
+      icon,
+      classNames,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     const inputId = React.useId()
     const helperId = React.useId()
     const [showPassword, setShowPassword] = React.useState(false)
 
     const inputType = password && !showPassword ? "password" : props.type || "text"
-    const variant = textarea ? "textarea" : "input"
     const Component = textarea ? "textarea" : "input"
 
     return (
-      <div className={styles.container}>
+      <div
+        className={cn(styles.container, classNames?.container)}
+        data-state={state}
+      >
         {label && (
           <label
+            className={cn(styles.label, classNames?.label)}
+            data-state={state}
             htmlFor={inputId}
-            className={cn(labelVariants({ state }))}
           >
             {label}
           </label>
         )}
-        <div className={styles.wrapper}>
-          {Icon && (
-            <div className={styles.iconContainer}>
-              <Icon className={styles.icon} />
+        <div className={cn(styles.wrapper, classNames?.wrapper)}>
+          {icon != null && (
+            <div className={cn(styles.iconContainer, classNames?.iconContainer)}>
+              <span className={cn(styles.icon, classNames?.icon)}>{icon}</span>
             </div>
           )}
           <Component
-            id={inputId}
-            data-testid={testIdPrefix}
             className={cn(
-              inputVariants({ state, variant, className }),
-              Icon && styles.withIcon,
-              password && styles.withPassword
+              styles.input,
+              textarea ? styles.variantTextarea : styles.variantInput,
+              icon != null && styles.withIcon,
+              password && styles.withPassword,
+              className,
+              classNames?.input
             )}
+            data-state={state}
+            {...(textarea ? {} : { type: inputType })}
+            id={inputId}
+            data-testid={"ipa_input"}
             ref={ref as any}
             aria-describedby={helperText ? helperId : undefined}
+            aria-invalid={state === "error"}
             readOnly={state === "readonly"}
-            {...(textarea ? {} : { type: inputType })}
+            disabled={disabled}
             {...props}
           />
           {password && (
             <button
+              className={cn(styles.passwordToggle, classNames?.passwordToggle)}
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className={styles.passwordToggle}
+              onClick={() => !disabled && setShowPassword(!showPassword)}
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}
+              disabled={disabled}
             >
               {showPassword ? (
-                <Eye className={styles.passwordToggleIcon} />
+                <Eye className={cn(styles.passwordToggleIcon, classNames?.passwordToggleIcon)} />
               ) : (
-                <EyeOff className={styles.passwordToggleIcon} />
+                <EyeOff className={cn(styles.passwordToggleIcon, classNames?.passwordToggleIcon)} />
               )}
-            </button>
+            </button>     
           )}
         </div>
         {helperText && (
-          <p id={helperId} className={cn(helperTextVariants({ state }))}>
+          <p
+            className={cn(styles.helperText, classNames?.helperText)}
+            data-state={state}
+            id={helperId}
+          >
             {helperText}
           </p>
         )}
@@ -134,5 +127,5 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
 )
 Input.displayName = "Input"
 
-export { Input, inputVariants }
+export { Input }
 export default Input

@@ -1,6 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { RadioGroup } from './radio-group'
+import styles from './radio-group.module.css'
 
 const defaultOptions = [
   { value: 'option1', label: 'Option 1' },
@@ -81,16 +82,15 @@ describe('RadioGroup', () => {
     expect(option3).not.toBeDisabled()
   })
 
-  it('renders in horizontal orientation', () => {
+  it('renders in horizontal layout', () => {
     render(
       <RadioGroup
         options={defaultOptions}
-        orientation="horizontal"
+        horizontal
       />
     )
-    
     const radioGroup = screen.getByRole('radiogroup')
-    expect(radioGroup).toHaveClass('flex-row', 'flex-wrap')
+    expect(radioGroup).toHaveClass(styles.groupOrientationHorizontal)
   })
 
   it('applies custom className', () => {
@@ -105,14 +105,19 @@ describe('RadioGroup', () => {
     expect(radioGroup).toHaveClass('custom-class')
   })
 
-  it('renders with testIdPrefix', () => {
+  it('renders with default testId', () => {
+    render(<RadioGroup options={defaultOptions} />)
+    const radioGroup = screen.getByTestId('ipa_radio_group')
+    expect(radioGroup).toBeInTheDocument()
+  })
+
+  it('renders with custom testId', () => {
     render(
       <RadioGroup
         options={defaultOptions}
-        testIdPrefix="test-radio"
+        testId="test-radio"
       />
     )
-    
     const radioGroup = screen.getByTestId('test-radio')
     expect(radioGroup).toBeInTheDocument()
   })

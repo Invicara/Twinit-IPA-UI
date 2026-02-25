@@ -1,65 +1,118 @@
-@reference "../../../styles/globals.css";
-
+/* Layout */
 .container {
-  @apply w-full flex flex-col gap-[8px];
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .group {
-  @apply flex gap-[8px];
-}
-
-.groupOrientationVertical {
-  @apply flex-col;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .groupOrientationHorizontal {
-  @apply flex-row flex-wrap;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
+/* Label */
 .label {
-  @apply font-sans text-[14px] font-medium leading-[18px] text-neutral-9;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--neutral-9);
 }
 
+/* Item row */
 .item {
-  @apply flex items-start gap-[8px];
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+/* Radio circle */
 .radio {
-  @apply relative h-[16px] w-[16px] rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-brand-3;
+  position: relative;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.radioDisabled {
-  @apply border-neutral-4 bg-neutral-1 cursor-not-allowed;
+.radio:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-3);
 }
 
-.radioEnabled {
-  @apply border-neutral-5 hover:border-brand-8 data-[state=checked]:border-brand-8 data-[state=checked]:bg-white;
+.radio:disabled {
+  border-color: var(--neutral-4);
+  background-color: var(--neutral-1);
+  cursor: not-allowed;
 }
 
+.radio:not(:disabled) {
+  border-color: var(--neutral-5);
+  cursor: pointer;
+}
+
+.radio:not(:disabled):hover {
+  border-color: var(--brand-8);
+}
+
+.radio:not(:disabled)[data-state="checked"] {
+  border-color: var(--brand-8);
+  background-color: var(--neutral-0);
+}
+
+/* Indicator dot */
 .indicator {
-  @apply flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-[8px] after:h-[8px] after:rounded-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
-.indicatorDisabled {
-  @apply after:bg-neutral-5;
+.indicator::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
 }
 
-.indicatorEnabled {
-  @apply after:bg-brand-8;
+.radio:disabled .indicator::after {
+  background-color: var(--neutral-5);
 }
 
+.radio:not(:disabled) .indicator::after {
+  background-color: var(--brand-8);
+}
+
+/* Item label */
 .itemContent {
-  @apply flex flex-col gap-[2px] flex-1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
 }
 
 .itemLabel {
-  @apply font-sans text-[14px] font-normal leading-[18px] cursor-pointer select-none;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--neutral-9);
 }
 
-.itemLabelDisabled {
-  @apply text-neutral-5 cursor-not-allowed;
-}
-
-.itemLabelEnabled {
-  @apply text-neutral-9;
+.item[data-disabled="true"] .itemLabel {
+  color: var(--neutral-5);
+  cursor: not-allowed;
 }

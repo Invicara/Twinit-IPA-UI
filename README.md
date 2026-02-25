@@ -123,6 +123,50 @@ classNames={{
 - You can override any default styling by providing your own classes
 - Classes are applied using the `className={cn(defaultStyles, classNames?.key)}` pattern
 
+### Input: Styling subparts (no Tailwind)
+
+The `Input` component supports the same pattern via **`classNames`**. Pass custom classes (e.g. from your CSS module) to target each subpart without rewriting the component's CSS.
+
+**Available keys:** `container`, `label`, `wrapper`, `iconContainer`, `icon`, `input`, `passwordToggle`, `passwordToggleIcon`, `helperText`
+
+**Example – Custom classes (e.g. from your CSS module):**
+
+```tsx
+import { Input } from '@invicara/ipa-ui'
+import formStyles from './MyForm.module.css'
+
+<Input
+  label="Email"
+  helperText="We'll never share your email"
+  placeholder="you@example.com"
+  classNames={{
+    container: formStyles.inputGroup,
+    label: formStyles.inputLabel,
+    input: formStyles.inputField,
+    helperText: formStyles.inputHelper,
+  }}
+/>
+```
+
+```css
+/* MyForm.module.css */
+.inputGroup {
+  margin-bottom: 1rem;
+}
+.inputLabel {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.inputField {
+  max-width: 20rem;
+}
+.inputHelper {
+  font-size: 0.75rem;
+  color: var(--neutral-6);
+  margin-top: 0.25rem;
+}
+```
+
 ## Component Variants
 
 Some components are broken down into multiple variants that share a common base:
