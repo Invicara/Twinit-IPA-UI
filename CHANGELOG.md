@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.1.2] - 2026-02-26
+
+### Changed
+- updated change:update script to avoid rewriting old entries
+- lockfile updated to use @dtplatform
+- adding missing 1.1.1 in changelog
+
+
+## [1.1.1] - 2026-02-26
+
+### Changed
+- use @dtplatform registry, master branch, and add beta disclaimer
+- document release sync (master→releases) and add repo links
+
+
+
 ## [1.1.0] - 2026-02-24
 
 ### Added
@@ -21,34 +37,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
-## [1.0.1-1] - 2025-12-10
+## [1.0.3] - 2026-02-18
 
 ### Added
-- Remix Icons support and integration
-- Detailed tests for components
-- Comprehensive documentation
-- Dropdown component progress to 90% completion
-- New structure for swappable styles
-- Customized dropdown theme example
-- Atomic behavioural props fully customizable via simple booleans
-- Dropdown component enhancements:
-  - Refactored base & variants structure
-  - Filter mode functionality
-  - Keyboard navigation support
-  - Ellipsis handling for long text
-  - Enhanced theme customization capabilities
-  - PopAbove functionality
+- Added missing cutomClassName slot for single-select
+
+
+
+## [1.0.2] - 2026-02-18
+
+### Added
+- Added portal container for dialog
+- Documented new styling customization process
 
 ### Changed
-- All components now use generic 'brand' colours, customizable by developers
-- Defaults to digitaltwin brand colours
-- Refactored dialog component with new code structure
-- Improved dialog component with tweaks and enhancements
+- Using data attribute to scope invicara theme + putting output.css in final build
+- Removing layers everywhere
+- Removed button styling from layer to try if it stops getting overridden by external ui libs
+- chore(dialog): remove redundant comment, already documented in dialog-animations.md
 
 ### Fixed
-- Fixed double chevron bug after popAbove feature was added
-- Removed storybook-static from Git tracking
-- Removed tailwind output file from Git tracking
+- resolve double vertical offset caused by translate + transform composition
+- Fixed button's export
+
+
+## [1.0.1] - 2026-02-03
+
+### Added
+- update all stories with explicit props
+
+### Changed
+- Moved styling to CSS modules
+- Changed className strategy to wrap utility classes in a single semantic class per element
+- Updated rollup to include css in packaged lib
+- css modules: dropdown only. also some updates to filter keyboard actions.
+- Updated publishing documentation
+- Removed extract from rollup to attempt fixing missing css
+
+### Fixed
+- fix storybook props connection
+- Fixed the dialog's animation
+- Removed empty index.css
+- Fixed tests
+- Fixed issue with dropdown container not being the same size as trigger
+- Fixed a couple of issues with missing utility classes due to the change from in-js utilities to in-css
 
 ---
 
