@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * Updates CHANGELOG.md with changes since the last version.
- * - If an entry for the target version (or "Unreleased") exists, replaces it with generated content.
- * - Otherwise, adds a new entry at the top with the target version and today's date.
+ * - Never edits existing entries for versions that have a git tag (full releases only).
+ * - Creates missing entries for (non-prerelease) tags between the first changelog version and latest tag.
+ * - Creates or updates only the "next" (unreleased) entry with commits since the last tag.
  *
  * Usage: node scripts/update-changelog.js [version]
  * - version: optional. Next release version (e.g. 1.0.4). If omitted, uses version from package.json.
@@ -24,16 +25,62 @@ function getPackageVersion() {
   return pkg.version;
 }
 
-function getLatestTag() {
+/** True if version is prerelease (contains hyphen), e.g. 1.0.1-1 */
+function isPrerelease(version) {
+  return typeof version === 'string' && version.includes('-');
+}
+
+/** Get all non-prerelease tags in version order (newest first). Returns { tags, taggedSet, latestTag }. */
+function getAllTags() {
   try {
-    const out = execSync('git describe --tags --abbrev=0 2>/dev/null', {
+    const out = execSync('git tag -l --sort=-version:refname 2>/dev/null', {
       encoding: 'utf-8',
       cwd: ROOT,
     });
-    return out.trim();
+    const allTagNames = out.trim() ? out.trim().split(/\s+/) : [];
+    const tags = [];
+    const taggedSet = new Set();
+    for (const tagName of allTagNames) {
+      const version = tagName.replace(/^v/, '');
+      if (isPrerelease(version)) continue;
+      tags.push({ tagName, version });
+      taggedSet.add(version);
+    }
+    const latestTag = tags.length > 0 ? tags[0].tagName : null;
+    return { tags, taggedSet, latestTag };
   } catch {
-    return null;
+    return { tags: [], taggedSet: new Set(), latestTag: null };
   }
+}
+
+/** Parse all ## [version] entries from changelog. Returns array of { version, fullMatch, index }. fullMatch is the entire block (header + body). */
+function parseAllChangelogEntries(changelog) {
+  const entries = [];
+  const re = /\n(## \[([^\]]+)\]( - (\d{4}-\d{2}-\d{2}))?\s*\n)([\s\S]*?)(?=\n## |\n---\s*\n|\z)/g;
+  let match;
+  while ((match = re.exec(changelog)) !== null) {
+    entries.push({
+      version: match[2],
+      fullMatch: match[0],
+      index: match.index,
+    });
+  }
+  return entries;
+}
+
+/** Compare two full-release versions. Returns -1 if a < b, 0 if a === b, 1 if a > b. */
+function compareVersions(a, b) {
+  const parse = (v) => {
+    const s = (v || '').replace(/^v/, '').split('.');
+    return [parseInt(s[0], 10) || 0, parseInt(s[1], 10) || 0, parseInt(s[2], 10) || 0];
+  };
+  const pa = parse(a);
+  const pb = parse(b);
+  for (let i = 0; i < 3; i++) {
+    if (pa[i] < pb[i]) return -1;
+    if (pa[i] > pb[i]) return 1;
+  }
+  return 0;
 }
 
 function getCommitsSince(tag) {
@@ -41,6 +88,20 @@ function getCommitsSince(tag) {
   try {
     const out = execSync(
       `git log ${range} --pretty=format:"%H%x01%s%x01%b%x02"`,
+      { encoding: 'utf-8', maxBuffer: 2 * 1024 * 1024, cwd: ROOT }
+    );
+    return out;
+  } catch {
+    return '';
+  }
+}
+
+/** Get commits between two tags (fromTag..toTag). */
+function getCommitsBetween(fromTag, toTag) {
+  if (!fromTag || !toTag) return '';
+  try {
+    const out = execSync(
+      `git log ${fromTag}..${toTag} --pretty=format:"%H%x01%s%x01%b%x02"`,
       { encoding: 'utf-8', maxBuffer: 2 * 1024 * 1024, cwd: ROOT }
     );
     return out;
@@ -152,26 +213,6 @@ function buildEntry(version, date, sections) {
   return `## [${version}]${dateStr}\n\n${body.trim()}\n\n`;
 }
 
-// Find first entry (top-most ## [version]) to support "Unreleased" or current version
-function findFirstEntry(changelog, version) {
-  const first = changelog.match(/\n(## \[([^\]]+)\]( - (\d{4}-\d{2}-\d{2}))?\s*\n)([\s\S]*?)(?=\n## |\n---\s*\n|\z)/);
-  if (!first) return null;
-  const [fullMatch, , entryVersion, , dateValue] = first;
-  const index = changelog.indexOf(fullMatch);
-  if (index === -1) return null;
-  const isTarget =
-    entryVersion === version ||
-    entryVersion === 'Unreleased';
-  return isTarget
-    ? {
-        fullMatch,
-        version: entryVersion,
-        datePart: dateValue ? dateValue.trim() : null,
-        index,
-      }
-    : null;
-}
-
 // Preamble: from start until (and including) the Semantic Versioning line
 function getPreamble(changelog) {
   const end = changelog.search(/\n## \[/);
@@ -179,13 +220,8 @@ function getPreamble(changelog) {
   return changelog.slice(0, end);
 }
 
-function main() {
-  const versionArg = process.argv[2];
-  const version = versionArg && versionArg.trim() ? versionArg.trim() : getPackageVersion();
-  const tag = getLatestTag();
-  const raw = getCommitsSince(tag);
-
-  const commits = raw
+function parseRawCommits(raw) {
+  return raw
     .split('\u0002')
     .filter(Boolean)
     .map((block) => {
@@ -197,47 +233,119 @@ function main() {
       };
     })
     .filter((c) => c.hash && c.subject);
+}
 
+function buildSectionsFromCommits(commits) {
   const revertedShas = getRevertedShas(commits);
   const commitsToShow = commits.filter(
     (c) => !revertedShas.has(c.hash) && !isRevertCommit(c.subject)
   );
   const sections = categorizeCommits(commitsToShow);
-
-  // Add one line per revert under Changed: "Reverted: <original subject>"
   for (const c of commits) {
     if (!isRevertCommit(c.subject)) continue;
     const original = getRevertedSubject(c.subject);
     if (original) sections.changed.push(`Reverted: ${original}`);
   }
+  return sections;
+}
 
-  const today = new Date().toISOString().slice(0, 10);
+/** Get date of a tag (YYYY-MM-DD) or today if not available. */
+function getTagDate(tagName) {
+  try {
+    const out = execSync(`git log -1 --format=%ad --date=short ${tagName} 2>/dev/null`, {
+      encoding: 'utf-8',
+      cwd: ROOT,
+    });
+    return out.trim() || new Date().toISOString().slice(0, 10);
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+
+function main() {
+  const versionArg = process.argv[2];
+  const nextVersion = versionArg && versionArg.trim() ? versionArg.trim() : getPackageVersion();
+  const { tags, taggedSet, latestTag } = getAllTags();
+  const latestTagVersion = latestTag ? tags[0].version : null;
+
   const changelogContent = fs.readFileSync(CHANGELOG_PATH, 'utf-8');
-  const existing = findFirstEntry(changelogContent, version);
+  const entries = parseAllChangelogEntries(changelogContent);
+  const changelogVersionsSet = new Set(entries.map((e) => e.version));
+  // First "release" version in changelog (skip "Unreleased" for range of missing tags)
+  const firstChangelogVersion =
+    entries.find((e) => e.version !== 'Unreleased')?.version ?? null;
+  const preamble = getPreamble(changelogContent);
+  const today = new Date().toISOString().slice(0, 10);
+  let newChangelog = changelogContent;
+  const actions = [];
 
-  const dateForEntry = existing && existing.datePart ? existing.datePart : today;
-  const newEntry = buildEntry(version, dateForEntry, sections);
-
-  let newChangelog;
-  if (existing) {
-    const prefix = changelogContent.slice(0, existing.index);
-    const separator = prefix.endsWith('\n\n') ? '' : prefix.endsWith('\n') ? '\n' : '\n\n';
-    newChangelog =
-      prefix +
-      separator +
-      newEntry +
-      changelogContent.slice(existing.index + existing.fullMatch.length);
-  } else {
-    const preamble = getPreamble(changelogContent);
-    const fromFirstEntry = changelogContent.search(/\n## \[/);
-    const rest = fromFirstEntry === -1 ? '' : changelogContent.slice(fromFirstEntry);
-    newChangelog = preamble + '\n\n' + newEntry + (rest ? '\n' + rest : '');
+  // Step A: Create missing entries only for tags *newer* than the first changelog release (e.g. 1.1.2+ when 1.1.1 is at top). Never add older versions (e.g. 1.0.2, 1.0.3).
+  if (tags.length > 0 && firstChangelogVersion !== null && latestTagVersion !== null) {
+    const missingTagInfos = [];
+    for (let i = 0; i < tags.length; i++) {
+      const t = tags[i];
+      if (changelogVersionsSet.has(t.version)) continue;
+      // Only add if tag is strictly newer than first changelog version (so 1.1.2 and above when 1.1.1 is at top)
+      if (compareVersions(t.version, firstChangelogVersion) <= 0) continue;
+      if (compareVersions(t.version, latestTagVersion) > 0) continue;
+      const previousTag = i + 1 < tags.length ? tags[i + 1].tagName : null;
+      missingTagInfos.push({ ...t, previousTag });
+    }
+    if (missingTagInfos.length > 0) {
+      const newEntries = [];
+      for (const { tagName, version, previousTag } of missingTagInfos) {
+        const raw = previousTag ? getCommitsBetween(previousTag, tagName) : getCommitsSince(null);
+        const commits = parseRawCommits(raw);
+        const sections = buildSectionsFromCommits(commits);
+        const date = getTagDate(tagName);
+        newEntries.push(buildEntry(version, date, sections));
+        actions.push(`added ${version}`);
+      }
+      const fromFirstEntry = newChangelog.search(/\n## \[/);
+      const rest = fromFirstEntry === -1 ? '' : newChangelog.slice(fromFirstEntry);
+      newChangelog = preamble + '\n\n' + newEntries.join('') + (rest ? '\n' + rest : '');
+    }
   }
 
-  fs.writeFileSync(CHANGELOG_PATH, newChangelog, 'utf-8');
-  console.log(
-    `CHANGELOG.md updated: ${existing ? 'refreshed' : 'added'} entry for v${version} (${commits.length} commit(s)).`
-  );
+  // Step B: Create or update the "next" version entry (only if there are commits since latest tag)
+  const rawNext = getCommitsSince(latestTag);
+  const commitsNext = parseRawCommits(rawNext);
+  if (commitsNext.length > 0) {
+    // If nextVersion equals the latest tag, use "Unreleased" so we don't create a duplicate tagged entry
+    const effectiveNextVersion =
+      latestTagVersion && nextVersion === latestTagVersion ? 'Unreleased' : nextVersion;
+    const entriesAfterA = parseAllChangelogEntries(newChangelog);
+    const firstEditable = entriesAfterA.find(
+      (e) =>
+        (e.version === effectiveNextVersion || e.version === 'Unreleased') &&
+        !taggedSet.has(e.version)
+    );
+    const sections = buildSectionsFromCommits(commitsNext);
+    const newEntry = buildEntry(effectiveNextVersion, today, sections);
+
+    if (firstEditable) {
+      const prefix = newChangelog.slice(0, firstEditable.index);
+      const separator = prefix.endsWith('\n\n') ? '' : prefix.endsWith('\n') ? '\n' : '\n\n';
+      newChangelog =
+        prefix +
+        separator +
+        newEntry +
+        newChangelog.slice(firstEditable.index + firstEditable.fullMatch.length);
+      actions.push(`refreshed ${effectiveNextVersion}`);
+    } else {
+      const fromFirstEntry = newChangelog.search(/\n## \[/);
+      const rest = fromFirstEntry === -1 ? '' : newChangelog.slice(fromFirstEntry);
+      newChangelog = preamble + '\n\n' + newEntry + (rest ? '\n' + rest : '');
+      actions.push(`added ${effectiveNextVersion}`);
+    }
+  }
+
+  if (actions.length > 0) {
+    fs.writeFileSync(CHANGELOG_PATH, newChangelog, 'utf-8');
+    console.log(`CHANGELOG.md updated: ${actions.join(', ')}.`);
+  } else {
+    console.log('CHANGELOG.md unchanged (no missing tagged entries and no commits since latest tag).');
+  }
 }
 
 main();
