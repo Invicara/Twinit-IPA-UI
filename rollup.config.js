@@ -24,19 +24,23 @@ export default [
       }
     ],
     plugins: [
+      peerDepsExternal(),
+      resolve(),
+      typescript({
+        tsconfig: './tsconfig.json',
+        include: ['**/*.ts', '**/*.tsx'],
+        exclude: ['**/*.stories.tsx', '**/*.test.tsx', '**/*.spec.tsx'],
+        compilerOptions: {
+          outDir: 'dist',
+        },
+      }),
+      commonjs(),
       postcss({
         modules: {
           generateScopedName: '[local]_[hash:base64:5]',
         },
         minimize: true,
       }),
-      peerDepsExternal(),
-      resolve(),
-      commonjs(),
-      typescript({ 
-        tsconfig: './tsconfig.json',
-        exclude: ['**/*.stories.tsx', '**/*.test.tsx', '**/*.spec.tsx']
-      })
       // terser() // Temporarily disabled to debug build issues
     ],
     external: ['react', 'react-dom']
