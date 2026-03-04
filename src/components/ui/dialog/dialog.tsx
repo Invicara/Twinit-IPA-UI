@@ -1,19 +1,42 @@
-import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
-import { cn } from "../../../lib/utils";
-import Button from "../button/button";
-import '../../../output.css';
-import { DialogProps } from "./dialog.types";
-import styles from "./dialog.module.css";
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { X } from "lucide-react"
+import { cn } from "../../../lib/utils"
+import { Button } from "../button"
+import styles from "./dialog.module.css"
 
-const sizeClasses = {
-  sm: styles.sizeSm,
-  default: styles.sizeDefault,
-  lg: styles.sizeLg,
-  xl: styles.sizeXl,
-  full: styles.sizeFull
-} as const;
+export interface DialogProps {
+  // Core Props
+  className?: string
+  size?: "sm" | "default" | "lg" | "xl" | "full"
+  title: string
+  children: React.ReactNode
+  footer?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+
+  // Feature Toggles
+  hideOverlay?: boolean;           // Non-modal mode - no dark background overlay
+  acknowledgment?: boolean;        // Auto-generate "OK" button footer
+  passive?: boolean;               // Hide footer entirely
+  disableClickOutside?: boolean;   // Prevent closing by clicking outside dialog
+  disableCloseButton?: boolean;    // Hide the X close button in header
+  disableEscapeKey?: boolean;      // Prevent closing with Escape key
+
+  /** Portal container (e.g. element with id "ipa-ui-modal-root" inside theme wrapper so modals inherit theme variables) */
+  container?: HTMLElement | null
+
+  // Custom Classnames for Sub-components
+  classNames?: {
+    dialog?: string
+    content?: string
+    header?: string
+    title?: string
+    closeButton?: string
+    body?: string
+    footer?: string
+  }
+}
 
 export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
   (
@@ -63,19 +86,17 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
         <DialogPrimitive.Portal container={portalContainer}>
           {/* Conditional overlay for modal/non-modal */}
           {!hideOverlay && (
-            <DialogPrimitive.Overlay 
-              className={cn(
-                styles.overlay,
-                classNames?.overlay 
-              )}
+            <DialogPrimitive.Overlay
+              data-testid="ipa_dialog_overlay"
+              className={cn(styles.dialog, classNames?.dialog)}
             />
           )}
 
           <DialogPrimitive.Content
             ref={ref}
+            data-size={size}
             className={cn(
               styles.content,
-              sizeClasses[size],
               hideOverlay && styles.contentPointerEventsAuto,
               classNames?.content,
               className

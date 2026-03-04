@@ -54,7 +54,7 @@ All properties are optional. Pass only the keys you need to override.
 
 | Property       | Applies to |
 |----------------|------------|
-| `overlay`      | Backdrop behind the dialog. |
+| `dialog`       | Backdrop overlay (outermost). |
 | `content`      | Main dialog panel (wrapper around header, body, footer). |
 | `header`       | Header bar (title + close button). |
 | `title`        | Title heading (`h2`). |

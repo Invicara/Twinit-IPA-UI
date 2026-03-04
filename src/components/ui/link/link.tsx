@@ -1,40 +1,32 @@
 import * as React from "react"
-import { Pencil1Icon } from "@radix-ui/react-icons"
-import { cva } from "class-variance-authority"
 
 import { cn } from "../../../lib/utils"
-import '../../../output.css'
-import { LinkProps } from "./link.types"
 import styles from "./link.module.css"
 
-const linkVariants = cva(
-  styles.base,
-  {
-    variants: {
-      variant: {
-        default: styles.variantDefault,
-        inline: styles.variantInline,
-      },
-      disabled: {
-        true: styles.disabled,
-        false: "",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      disabled: false,
-    },
+export interface LinkProps
+  extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
+  href?: string
+  disabled?: boolean
+  inline?: boolean // When true, underline style for inline text; default is button-like
+  icon?: React.ReactNode
+
+  classNames?: {
+    link?: string
+    icon?: string
   }
-)
+
+  children: React.ReactNode
+}
 
 const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
   (
     {
       className,
-      variant = "default",
+      inline = false,
       disabled = false,
       href,
-      testIdPrefix,
+      icon,
+      classNames,
       children,
       onClick,
       ...props
@@ -47,8 +39,15 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
       <a
         ref={ref}
         href={isDisabled ? undefined : href}
-        className={cn(linkVariants({ variant, disabled: isDisabled }), className)}
-        data-testid={testIdPrefix}
+        className={cn(
+          styles.link,
+          inline && icon != null && styles.withIcon,
+          className,
+          classNames?.link
+        )}
+        data-testid="ipa_link"
+        data-variant={inline ? "inline" : "default"}
+        data-disabled={isDisabled}
         aria-disabled={isDisabled}
         onClick={(event) => {
           if (isDisabled) {
@@ -56,12 +55,13 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
             event.stopPropagation()
             return
           }
-
           onClick?.(event)
         }}
         {...props}
       >
-        {variant === "default" && <Pencil1Icon className={styles.icon} />}
+        {icon != null && (
+          <span className={cn(styles.icon, classNames?.icon)}>{icon}</span>
+        )}
         {children}
       </a>
     )
@@ -70,5 +70,4 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
 
 Link.displayName = "Link"
 
-export { Link, linkVariants }
-export default Link
+export { Link }

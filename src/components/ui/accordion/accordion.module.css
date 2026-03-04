@@ -1,25 +1,108 @@
-@reference "../../../styles/globals.css";
+@keyframes accordionDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordionUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.accordion {
+  width: 100%;
+  min-width: 0;
+}
 
 .item {
-  @apply border-b last:border-b-0;
+  width: 100%;
+  border-bottom: 1px solid var(--neutral-3);
+}
+
+.item:last-child {
+  border-bottom-width: 0;
 }
 
 .header {
-  @apply flex;
+  display: flex;
+  width: 100%;
 }
 
 .trigger {
-  @apply focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180;
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--neutral-9);
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.trigger:hover {
+  text-decoration: underline;
+}
+
+.trigger:focus-visible {
+  outline: none;
+  text-decoration: underline;
+}
+
+.trigger:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.trigger[data-state="open"] .icon {
+  transform: rotate(180deg);
 }
 
 .icon {
-  @apply text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200;
+  color: var(--neutral-6);
+  pointer-events: none;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transform: translateY(2px);
+  transition: transform 0.2s ease;
 }
 
 .content {
-  @apply data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--neutral-8);
+}
+
+.content[data-state="open"] {
+  animation: accordionDown 0.2s ease-out;
+}
+
+.content[data-state="closed"] {
+  animation: accordionUp 0.2s ease-out;
 }
 
 .contentInner {
-  @apply pt-0 pb-4;
+  width: 100%;
+  padding-top: 0;
+  padding-bottom: 16px;
+  box-sizing: border-box;
 }

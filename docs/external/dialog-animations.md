@@ -47,13 +47,13 @@ For the `Dialog` component we specifically want:
 
 The dialog's styling is split into:
 
-- **Base layout & appearance** – defined in the CSS module using `@apply` (for BEM-style classes such as `overlay`, `content`, `header`, `footer`, etc.).
+- **Base layout & appearance** – defined in the CSS module using `@apply` (for BEM-style classes such as `dialog`, `content`, `header`, `footer`, etc.).
 - **Open/close animations** – implemented as custom keyframes (`ipa-dialog-*`) wired to Radix's `data-state` attribute using standard CSS attribute selectors.
 
 #### 1. Base styles (CSS module)
 
 ```css
-.overlay {
+.dialog {
   @apply fixed inset-0 z-50 bg-neutral-10/75;
 }
 
@@ -105,11 +105,11 @@ Key points:
 #### 3. Attribute selectors wired to Radix `data-state`
 
 ```css
-.overlay[data-state="open"] {
+.dialog[data-state="open"] {
   animation: ipa-dialog-overlay-in 150ms ease-out forwards;
 }
 
-.overlay[data-state="closed"] {
+.dialog[data-state="closed"] {
   animation: ipa-dialog-overlay-out 150ms ease-in forwards;
 }
 
@@ -136,8 +136,8 @@ In `dialog.tsx`, we only apply **CSS module classes** and optional overrides via
 ```tsx
 <DialogPrimitive.Overlay
   className={cn(
-    styles.overlay,
-    classNames?.overlay
+    styles.dialog,
+    classNames?.dialog
   )}
 />;
 

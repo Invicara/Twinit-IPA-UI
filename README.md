@@ -114,8 +114,8 @@ The `classNames` prop is an object that maps to specific sub-components within a
 ```tsx
 // Dialog example
 classNames={{
-  overlay: "custom-overlay-styles",      // Styles the backdrop overlay
-  content: "custom-content-styles",      // Styles the main dialog container
+  dialog: "custom-dialog-styles",        // Styles the backdrop overlay (outermost)
+  content: "custom-content-styles",      // Styles the main dialog panel
   header: "custom-header-styles",        // Styles the header section
   title: "custom-title-styles",          // Styles the title text
   closeButton: "custom-close-styles",    // Styles the X close button
@@ -145,7 +145,7 @@ classNames={{
 
 The `Input` component supports the same pattern via **`classNames`**. Pass custom classes (e.g. from your CSS module) to target each subpart without rewriting the component's CSS.
 
-**Available keys:** `container`, `label`, `wrapper`, `iconContainer`, `icon`, `input`, `passwordToggle`, `passwordToggleIcon`, `helperText`
+**Available keys:** `input`, `label`, `wrapper`, `iconContainer`, `icon`, `inputBox`, `passwordToggle`, `passwordToggleIcon`, `helperText`
 
 **Example – Custom classes (e.g. from your CSS module):**
 
@@ -158,9 +158,9 @@ import formStyles from './MyForm.module.css'
   helperText="We'll never share your email"
   placeholder="you@example.com"
   classNames={{
-    container: formStyles.inputGroup,
+    input: formStyles.inputGroup,
     label: formStyles.inputLabel,
-    input: formStyles.inputField,
+    inputBox: formStyles.inputField,
     helperText: formStyles.inputHelper,
   }}
 />

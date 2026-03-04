@@ -54,7 +54,7 @@ describe("Input", () => {
   test("applies correct dimensions (base and variant classes)", () => {
     render(<Input />);
     const input = screen.getByTestId("ipa_input");
-    expect(input).toHaveClass(styles.input, styles.variantInput);
+    expect(input).toHaveClass(styles.inputBox, styles.variantInput);
   });
 
   test("applies data-state for default state", () => {
@@ -92,6 +92,7 @@ describe("Input", () => {
     render(<Input disabled />);
     const input = screen.getByTestId("ipa_input");
     expect(input).toBeDisabled();
+    expect(input).toHaveAttribute("data-disabled", "true");
   });
 
   test("error state sets data-state on label and helper text", () => {

@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 import { Dialog } from './dialog';
-import Button from '../button/button';
+import { Button } from "../button";
+import customStyles from './dialog.custom-styles.module.css';
 
 const meta: Meta<typeof Dialog> = {
   title: 'UI/Dialog',
@@ -177,7 +178,7 @@ export const NonModal: Story = {
   args: {
     title: 'Non-Modal Dialog',
     size: 'default',
-    hideOverlay: false,
+    hideOverlay: true,
   },
   render: (args) => {
     const [open, setOpen] = useState(false);
@@ -215,12 +216,6 @@ export const CustomStyles: Story = {
   args: {
     title: 'Custom Styled Dialog',
     size: 'lg',
-    classNames: {
-      header: 'bg-brand-1 text-brand-8',
-      title: 'text-xl font-bold',
-      body: 'bg-neutral-05',
-      footer: 'bg-brand-1',
-    },
   },
   render: (args) => {
     const [open, setOpen] = useState(false);
@@ -237,7 +232,14 @@ export const CustomStyles: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          classNames={{
+            content: customStyles.content,
+            header: customStyles.header,
+            title: customStyles.title,
+            body: customStyles.body,
+            footer: customStyles.footer,
+            closeButton: customStyles.closeButton,
+          }}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -246,8 +248,8 @@ export const CustomStyles: Story = {
             </Button>
           }
         >
-          <p>This dialog demonstrates custom classNames prop.</p>
-          <p>Each section can be styled independently using the classNames object.</p>
+          <p>This dialog uses a CSS module for customisation.</p>
+          <p>Header: dark cyan; body: light cyan, monospace; footer: medium cyan. Close button uses cyan shades for hover, focus ring and pressed state.</p>
         </Dialog>
       </div>
     );

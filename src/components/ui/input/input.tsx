@@ -2,8 +2,6 @@ import * as React from "react"
 import { Eye, EyeOff } from "lucide-react"
 
 import { cn } from "../../../lib/utils"
-
-import '../../../output.css'
 import styles from "./input.module.css"
 
 export interface InputProps
@@ -19,12 +17,12 @@ export interface InputProps
   icon?: React.ReactNode
   
   classNames?: {
-    container?: string
+    input?: string
     label?: string
     wrapper?: string
     iconContainer?: string
     icon?: string
-    input?: string
+    inputBox?: string
     passwordToggle?: string
     passwordToggleIcon?: string
     helperText?: string
@@ -57,7 +55,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
 
     return (
       <div
-        className={cn(styles.container, classNames?.container)}
+        className={cn(styles.input, classNames?.input)}
         data-state={state}
       >
         {label && (
@@ -77,17 +75,18 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
           )}
           <Component
             className={cn(
-              styles.input,
+              styles.inputBox,
               textarea ? styles.variantTextarea : styles.variantInput,
               icon != null && styles.withIcon,
               password && styles.withPassword,
               className,
-              classNames?.input
+              classNames?.inputBox
             )}
             data-state={state}
+            data-disabled={!!disabled}
             {...(textarea ? {} : { type: inputType })}
             id={inputId}
-            data-testid={"ipa_input"}
+            data-testid="ipa_input"
             ref={ref as any}
             aria-describedby={helperText ? helperId : undefined}
             aria-invalid={state === "error"}

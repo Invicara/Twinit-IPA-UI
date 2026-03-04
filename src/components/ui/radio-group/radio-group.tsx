@@ -2,7 +2,6 @@ import * as React from "react"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 
 import { cn } from "../../../lib/utils"
-import "../../../output.css"
 import styles from "./radio-group.module.css"
 
 export interface RadioGroupProps
@@ -21,7 +20,7 @@ export interface RadioGroupProps
   }>
 
   classNames?: {
-    container?: string
+    radioGroup?: string
     label?: string
     group?: string
     item?: string
@@ -80,7 +79,7 @@ const RadioGroup = React.forwardRef<
 
     return (
       <div
-        className={cn(styles.container, classNames?.container)}
+        className={cn(styles.radioGroup, classNames?.radioGroup)}
         data-disabled={disabled}
       >
         {label && (
@@ -93,15 +92,11 @@ const RadioGroup = React.forwardRef<
         )}
         <RadioGroupPrimitive.Root
           ref={ref}
-          className={cn(
-            styles.group,
-            horizontal && styles.groupOrientationHorizontal,
-            className,
-            classNames?.group
-          )}
+          className={cn(styles.group, className, classNames?.group)}
+          data-orientation={horizontal ? "horizontal" : "vertical"}
           orientation={horizontal ? "horizontal" : "vertical"}
           aria-labelledby={label ? groupId : undefined}
-          data-testid={"ipa_radio_group"}
+          data-testid="ipa_radio_group"
           disabled={disabled}
           {...props}
         >

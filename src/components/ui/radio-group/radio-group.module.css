@@ -1,5 +1,5 @@
-/* Layout */
-.container {
+/* RadioGroup – outermost wrapper (component scope) */
+.radioGroup {
   width: fit-content;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@
   gap: 8px;
 }
 
-.groupOrientationHorizontal {
+.group[data-orientation="horizontal"] {
   flex-direction: row;
   flex-wrap: wrap;
 }

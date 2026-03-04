@@ -1,30 +1,36 @@
 import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
-import { cva } from "class-variance-authority"
 
 import { cn } from "../../../lib/utils"
-import '../../../output.css'
-import { SliderProps } from "./slider.types"
 import styles from "./slider.module.css"
 
-const sliderVariants = cva(
-  styles.container,
-  {
-    variants: {
-      variant: {
-        default: "",
-        range: "",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
+export interface SliderProps
+  extends Omit<
+    React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>,
+    "disabled"
+  > {
+  label?: string
+  minLabel?: string
+  maxLabel?: string
+  disabled?: boolean
+  range?: boolean // When true, use two thumbs for range selection
 
-const labelVariants = cva(
-  styles.label
-)
+  classNames?: {
+    slider?: string
+    label?: string
+    controls?: string
+    minLabel?: string
+    maxLabel?: string
+    sliderContainer?: string
+    root?: string
+    track?: string
+    range?: string
+    thumb?: string
+    inputs?: string
+    inputBox?: string
+    inputContainer?: string
+  }
+}
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -36,9 +42,9 @@ const Slider = React.forwardRef<
       label = "Select Amount",
       minLabel = "0",
       maxLabel = "100",
-      variant = "default",
+      range = false,
       disabled = false,
-      testIdPrefix,
+      classNames,
       value,
       defaultValue,
       onValueChange,
@@ -49,18 +55,16 @@ const Slider = React.forwardRef<
     },
     ref
   ) => {
-    const isRange = variant === "range"
     const sliderId = React.useId()
-    
-    // Internal state for uncontrolled component
+
     const [internalValue, setInternalValue] = React.useState<number[]>(
-      defaultValue || (isRange ? [25, 75] : [50])
+      defaultValue ?? (range ? [25, 75] : [50])
     )
-    
-    const currentValue = value || internalValue
-    
+
+    const currentValue = value ?? internalValue
+
     const handleValueChange = (newValue: number[]) => {
-      if (!value) {
+      if (value == null) {
         setInternalValue(newValue)
       }
       onValueChange?.(newValue)
@@ -69,80 +73,74 @@ const Slider = React.forwardRef<
     const handleInputChange = (index: number, inputValue: string) => {
       const numValue = parseFloat(inputValue)
       if (isNaN(numValue) || disabled) return
-      
+
       const clampedValue = Math.min(Math.max(numValue, min), max)
       const newValue = [...currentValue]
       newValue[index] = clampedValue
-      
+
       handleValueChange(newValue)
     }
 
     return (
-      <div className={cn(sliderVariants({ variant }), className)}>
+      <div
+        className={cn(styles.slider, classNames?.slider)}
+        data-disabled={disabled}
+      >
         {label && (
           <label
-            className={cn(labelVariants())}
+            className={cn(styles.label, classNames?.label)}
             id={sliderId}
           >
             {label}
           </label>
         )}
-        
-        <div className={styles.controls}>
-          <span className={styles.minLabel}>
+
+        <div className={cn(styles.controls, classNames?.controls)}>
+          <span className={cn(styles.minLabel, classNames?.minLabel)}>
             {minLabel}
           </span>
-          
-          <div className={styles.sliderContainer}>
+
+          <div
+            className={cn(styles.sliderContainer, classNames?.sliderContainer)}
+          >
             <SliderPrimitive.Root
               ref={ref}
-              className={cn(
-                styles.root,
-                disabled && styles.rootDisabled
-              )}
+              className={cn(styles.root, className, classNames?.root)}
               value={currentValue}
               onValueChange={handleValueChange}
               min={min}
               max={max}
               step={step}
               disabled={disabled}
+              data-disabled={disabled}
               aria-labelledby={label ? sliderId : undefined}
-              data-testid={testIdPrefix}
+              data-testid="ipa_slider"
               {...props}
             >
               <SliderPrimitive.Track
-                className={cn(
-                  styles.track,
-                  disabled ? styles.trackDisabled : styles.trackEnabled
-                )}
+                className={cn(styles.track, classNames?.track)}
               >
                 <SliderPrimitive.Range
-                  className={cn(
-                    styles.range,
-                    disabled ? styles.rangeDisabled : styles.rangeEnabled
-                  )}
+                  className={cn(styles.range, classNames?.range)}
                 />
               </SliderPrimitive.Track>
-              
+
               {currentValue.map((_: number, index: number) => (
                 <SliderPrimitive.Thumb
                   key={index}
-                  className={cn(
-                    styles.thumb,
-                    disabled ? styles.thumbDisabled : styles.thumbEnabled
-                  )}
+                  className={cn(styles.thumb, classNames?.thumb)}
                 />
               ))}
             </SliderPrimitive.Root>
           </div>
-          
-          <span className={styles.maxLabel}>
+
+          <span className={cn(styles.maxLabel, classNames?.maxLabel)}>
             {maxLabel}
           </span>
         </div>
-        
-        <div className={styles.inputs}>
-          {isRange ? (
+
+        <div className={cn(styles.inputs, classNames?.inputs)}>
+          {range ? (
             <>
               <input
                 type="number"
@@ -152,10 +150,7 @@ const Slider = React.forwardRef<
                 min={min}
                 max={max}
                 step={step}
-                className={cn(
-                  styles.input,
-                  disabled ? styles.inputDisabled : styles.inputEnabled
-                )}
+                className={cn(styles.inputBox, classNames?.inputBox)}
               />
               <input
                 type="number"
@@ -165,14 +160,11 @@ const Slider = React.forwardRef<
                 min={min}
                 max={max}
                 step={step}
-                className={cn(
-                  styles.input,
-                  disabled ? styles.inputDisabled : styles.inputEnabled
-                )}
+                className={cn(styles.inputBox, classNames?.inputBox)}
               />
             </>
           ) : (
-            <div className={styles.inputContainer}>
+            <div className={cn(styles.inputContainer, classNames?.inputContainer)}>
               <input
                 type="number"
                 value={currentValue[0]}
@@ -181,10 +173,7 @@ const Slider = React.forwardRef<
                 min={min}
                 max={max}
                 step={step}
-                className={cn(
-                  styles.input,
-                  disabled ? styles.inputDisabled : styles.inputEnabled
-                )}
+                className={cn(styles.inputBox, classNames?.inputBox)}
               />
             </div>
           )}
@@ -196,6 +185,4 @@ const Slider = React.forwardRef<
 
 Slider.displayName = "Slider"
 
-export { Slider, sliderVariants }
-export default Slider
-
+export { Slider }

@@ -1,5 +1,13 @@
-/* Input – layout, typography, and shared states */
+/* Input – outermost wrapper (component scope) */
 .input {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Input box – the actual input/textarea element, typography and states */
+.inputBox {
   display: flex;
   width: 100%;
   border-radius: 4px;
@@ -14,61 +22,62 @@
   transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
-.input::placeholder {
+.inputBox::placeholder {
   color: var(--neutral-4);
 }
 
-.input:focus-visible {
+.inputBox:focus-visible {
   outline: none;
 }
 
-.input:disabled {
+.inputBox:disabled,
+.inputBox[data-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-/* Input state – via data-state for inspectability */
-.input[data-state="default"] {
+/* Input box state – via data-state for inspectability */
+.inputBox[data-state="default"] {
   border-color: var(--neutral-5);
 }
 
-.input[data-state="default"]:hover {
+.inputBox[data-state="default"]:hover {
   border-color: var(--neutral-7);
 }
 
-.input[data-state="default"]:focus,
-.input[data-state="default"]:focus-visible {
+.inputBox[data-state="default"]:focus,
+.inputBox[data-state="default"]:focus-visible {
   border-color: var(--brand-6);
 }
 
-.input[data-state="error"] {
+.inputBox[data-state="error"] {
   border-color: var(--alert-7);
 }
 
-.input[data-state="error"]:focus,
-.input[data-state="error"]:focus-visible {
+.inputBox[data-state="error"]:focus,
+.inputBox[data-state="error"]:focus-visible {
   border-color: var(--alert-5);
 }
 
-.input[data-state="success"] {
+.inputBox[data-state="success"] {
   border-color: var(--positive-7);
 }
 
-.input[data-state="success"]:focus,
-.input[data-state="success"]:focus-visible {
+.inputBox[data-state="success"]:focus,
+.inputBox[data-state="success"]:focus-visible {
   border-color: var(--positive-5);
 }
 
-.input[data-state="warning"] {
+.inputBox[data-state="warning"] {
   border-color: var(--warning-9);
 }
 
-.input[data-state="warning"]:focus,
-.input[data-state="warning"]:focus-visible {
+.inputBox[data-state="warning"]:focus,
+.inputBox[data-state="warning"]:focus-visible {
   border-color: var(--warning-7);
 }
 
-.input[data-state="readonly"] {
+.inputBox[data-state="readonly"] {
   border-color: var(--neutral-3);
   background-color: var(--neutral-1);
   color: var(--neutral-5);
@@ -76,7 +85,7 @@
   cursor: text;
 }
 
-.input[data-state="readonly"]::placeholder {
+.inputBox[data-state="readonly"]::placeholder {
   color: var(--neutral-3);
 }
 
@@ -99,14 +108,6 @@
 /* With password toggle – extra padding for the button */
 .withPassword {
   padding-right: 36px;
-}
-
-/* Layout */
-.container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .wrapper {

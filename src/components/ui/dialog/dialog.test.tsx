@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import util from "util";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Dialog } from "./dialog";
-import type { DialogProps } from "./dialog.types";
+import type { DialogProps } from "./dialog"
 
 const defaultTitle = "Sample Dialog";
 const customFooter = <button data-testid="custom-footer">Custom Action</button>;
@@ -88,7 +88,7 @@ const renderDialog = (props: Partial<DialogProps> = {}) => {
   return { ...result, onOpenChange };
 };
 
-const findOverlay = () => document.body.querySelector('[class*="bg-neutral-10/75"]');
+const findOverlay = () => document.body.querySelector('[data-testid="ipa_dialog_overlay"]');
 
 describe("Dialog", () => {
   describe("Core Rendering", () => {
@@ -102,15 +102,15 @@ describe("Dialog", () => {
     });
 
     test.each([
-      ["sm", "max-w-md"],
-      ["default", "max-w-xl"],
-      ["lg", "max-w-3xl"],
-      ["xl", "max-w-5xl"],
-      ["full", "max-w-[90vw]"],
-    ] as const)("applies size '%s' using class '%s'", (size, expectedClass) => {
+      ["sm", "sm"],
+      ["default", "default"],
+      ["lg", "lg"],
+      ["xl", "xl"],
+      ["full", "full"],
+    ] as const)("applies data-size '%s'", (size, expectedDataSize) => {
       renderDialog({ size });
       const dialog = screen.getByRole("dialog");
-      expect(dialog).toHaveClass(expectedClass);
+      expect(dialog).toHaveAttribute("data-size", expectedDataSize);
     });
   });
 
@@ -217,9 +217,9 @@ describe("Dialog", () => {
       query: () => Element | null;
     }> = [
       {
-        key: "overlay",
-        className: "custom-overlay",
-        query: () => document.body.querySelector(".custom-overlay"),
+        key: "dialog",
+        className: "custom-dialog",
+        query: () => document.body.querySelector(".custom-dialog"),
       },
       {
         key: "content",

@@ -1,0 +1,80 @@
+/* Demo overrides for Custom Styles story – cyan palette */
+
+.content {
+  max-width: 28rem;
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.header {
+  background-color: #006064;
+  color: white;
+  padding: 1rem 1.5rem;
+}
+
+.title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.body {
+  background-color: #e0f7fa;
+  color: #004d40;
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  font-size: 1.125rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.footer {
+  background-color: #00838f;
+  color: white;
+  padding: 1rem 1.5rem;
+}
+
+/* Footer action button – match Button’s [data-variant][data-size] specificity so overrides win over button.module.css */
+.footer button[data-variant="default"] {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  height: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.footer button[data-variant="default"]:not(:disabled):not([data-disabled="true"]):hover {
+  background-color: #0097a7;
+}
+
+.footer button[data-variant="default"]:not(:disabled):not([data-disabled="true"]):active {
+  background-color: #006064;
+}
+
+.footer button[data-variant="default"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #b2ebf2;
+}
+
+/* Header X close button – use .header .closeButton so overrides win over component base (specificity) */
+.header .closeButton {
+  color: #b2ebf2;
+}
+
+.header .closeButton:hover {
+  background-color: rgba(178, 235, 242, 0.25);
+}
+
+.header .closeButton:active {
+  background-color: rgba(0, 188, 212, 0.4);
+}
+
+.header .closeButton:focus-visible {
+  outline: none;
+  background-color: rgba(178, 235, 242, 0.25);
+  box-shadow: 0 0 0 2px #00bcd4;
+}

@@ -1,89 +1,177 @@
-@reference "../../../styles/globals.css";
-
-.container {
-  @apply flex flex-col gap-[8px] w-[336px];
+/* Slider – outermost wrapper (component scope) */
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 336px;
 }
 
 .label {
-  @apply font-sans text-[14px] font-medium leading-[18px] text-neutral-9;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--neutral-9);
 }
 
 .controls {
-  @apply flex items-center gap-[8px];
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .minLabel {
-  @apply font-sans text-[14px] font-normal text-neutral-7 min-w-[32px] text-center;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--neutral-7);
+  min-width: 32px;
+  text-align: center;
 }
 
 .maxLabel {
-  @apply font-sans text-[14px] font-normal text-neutral-7 min-w-[32px] text-center;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--neutral-7);
+  min-width: 32px;
+  text-align: center;
 }
 
 .sliderContainer {
-  @apply flex-1 relative flex items-center;
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
+/* Radix Root */
 .root {
-  @apply relative flex items-center select-none touch-none w-full h-[20px];
+  position: relative;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  touch-action: none;
+  width: 100%;
+  height: 20px;
 }
 
-.rootDisabled {
-  @apply cursor-not-allowed;
+.root[data-disabled="true"] {
+  cursor: not-allowed;
 }
 
+/* Track */
 .track {
-  @apply relative grow rounded-full h-[4px];
+  position: relative;
+  flex-grow: 1;
+  height: 4px;
+  border-radius: 9999px;
 }
 
-.trackDisabled {
-  @apply bg-neutral-3;
+.root[data-disabled="true"] .track {
+  background-color: var(--neutral-3);
+  cursor: not-allowed;
 }
 
-.trackEnabled {
-  @apply bg-neutral-4;
+.root:not([data-disabled="true"]) .track {
+  background-color: var(--neutral-4);
 }
 
+/* Range fill */
 .range {
-  @apply absolute h-full rounded-full;
+  position: absolute;
+  height: 100%;
+  border-radius: 9999px;
 }
 
-.rangeDisabled {
-  @apply bg-neutral-5;
+.root[data-disabled="true"] .range {
+  background-color: var(--neutral-5);
+  cursor: not-allowed;
 }
 
-.rangeEnabled {
-  @apply bg-brand-8;
+.root:not([data-disabled="true"]) .range {
+  background-color: var(--brand-8);
 }
 
+/* Thumb */
 .thumb {
-  @apply block w-[20px] h-[20px] rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-8 focus-visible:ring-offset-0;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  transition: background-color 0.15s ease;
 }
 
-.thumbDisabled {
-  @apply bg-neutral-5 cursor-not-allowed;
+.thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--brand-8);
 }
 
-.thumbEnabled {
-  @apply bg-brand-8 hover:bg-brand-7 cursor-grab active:cursor-grabbing;
+.root[data-disabled="true"] .thumb {
+  background-color: var(--neutral-5);
+  cursor: not-allowed;
 }
 
+.root:not([data-disabled="true"]) .thumb {
+  background-color: var(--brand-8);
+  cursor: grab;
+}
+
+.root:not([data-disabled="true"]) .thumb:hover {
+  background-color: var(--brand-7);
+}
+
+.root:not([data-disabled="true"]) .thumb:active {
+  cursor: grabbing;
+}
+
+/* Number inputs */
 .inputs {
-  @apply flex justify-between;
+  display: flex;
+  justify-content: space-between;
 }
 
-.input {
-  @apply w-[60px] h-[36px] rounded-[4px] border bg-neutral-0 px-[8px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 text-center transition-colors focus-visible:outline-none;
+.inputBox {
+  width: 60px;
+  height: 36px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background-color: var(--neutral-0);
+  padding: 8px;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--neutral-9);
+  text-align: center;
+  transition: border-color 0.15s ease;
 }
 
-.inputDisabled {
-  @apply border-neutral-4 bg-neutral-1 text-neutral-5 cursor-not-allowed;
+.inputBox:focus-visible {
+  outline: none;
 }
 
-.inputEnabled {
-  @apply border-neutral-5 hover:border-neutral-7 focus:border-brand-6;
+.inputBox:disabled {
+  border-color: var(--neutral-4);
+  background-color: var(--neutral-1);
+  color: var(--neutral-5);
+  cursor: not-allowed;
+}
+
+.inputBox:not(:disabled) {
+  border-color: var(--neutral-5);
+}
+
+.inputBox:not(:disabled):hover {
+  border-color: var(--neutral-7);
+}
+
+.inputBox:not(:disabled):focus {
+  border-color: var(--brand-6);
 }
 
 .inputContainer {
-  @apply flex justify-end w-full;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }

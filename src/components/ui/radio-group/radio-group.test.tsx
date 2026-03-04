@@ -90,7 +90,7 @@ describe('RadioGroup', () => {
       />
     )
     const radioGroup = screen.getByRole('radiogroup')
-    expect(radioGroup).toHaveClass(styles.groupOrientationHorizontal)
+    expect(radioGroup).toHaveAttribute('data-orientation', 'horizontal')
   })
 
   it('applies custom className', () => {
@@ -105,20 +105,9 @@ describe('RadioGroup', () => {
     expect(radioGroup).toHaveClass('custom-class')
   })
 
-  it('renders with default testId', () => {
+  it('renders with data-testid', () => {
     render(<RadioGroup options={defaultOptions} />)
     const radioGroup = screen.getByTestId('ipa_radio_group')
-    expect(radioGroup).toBeInTheDocument()
-  })
-
-  it('renders with custom testId', () => {
-    render(
-      <RadioGroup
-        options={defaultOptions}
-        testId="test-radio"
-      />
-    )
-    const radioGroup = screen.getByTestId('test-radio')
     expect(radioGroup).toBeInTheDocument()
   })
 })
