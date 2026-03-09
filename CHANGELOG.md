@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+
+## [1.1.4] - 2026-03-09
+
+### Fixed
+- drop darwin-arm64 oxide dep to fix Cloudflare (Linux x64) build
+
+
+
+## [1.1.3] - 2026-02-26
+
+### Changed
+- 1.1.3
+- 1.1.3-0
+- fixed tailwind optional dependencies
+
+
+
 ## [1.1.2] - 2026-02-26
 
 ### Changed
