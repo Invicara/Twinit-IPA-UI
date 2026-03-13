@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [v1.1.5] - 2026-03-13
+
+### Breaking
+- dropdown converted, styleOverrides pattern, docs refined, added standard attribs
+- all but dropdown converted, missing tests added, bug fixing, renaming things
+- first 2 comps remove tailwind, use data-state, cleanup props
+### Changed
+- Merge pull request #3 from Invicara/remove-tailwind-refactor
+- Merge remote-tracking branch 'origin/master' into remove-tailwind-refactor
+
+
+
 ## [1.1.4] - 2026-03-09
 
 ### Fixed
