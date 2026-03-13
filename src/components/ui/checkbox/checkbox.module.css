@@ -1,13 +1,62 @@
-@reference "../../../styles/globals.css";
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background-color: var(--neutral-0);
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
 
-.root {
-  @apply border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50;
+.checkbox:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-3);
+}
+
+.checkbox:disabled,
+.checkbox[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.checkbox:not(:disabled):not([data-disabled="true"]) {
+  cursor: pointer;
+}
+
+.checkbox[data-state="unchecked"] {
+  border-color: var(--neutral-5);
+}
+
+.checkbox[data-state="unchecked"]:not(:disabled):not([data-disabled="true"]):hover {
+  border-color: var(--neutral-7);
+}
+
+.checkbox[data-state="checked"],
+.checkbox[data-state="indeterminate"] {
+  border-color: var(--brand-8);
+  background-color: var(--brand-8);
+  color: var(--neutral-0);
 }
 
 .indicator {
-  @apply flex items-center justify-center text-current transition-none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
 }
 
 .icon {
-  @apply size-3.5;
+  width: 14px;
+  height: 14px;
+}
+
+.checkbox[data-state="checked"] .iconIndeterminate {
+  display: none;
+}
+
+.checkbox[data-state="indeterminate"] .iconCheck {
+  display: none;
 }

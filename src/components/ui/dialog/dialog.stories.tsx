@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 import { Dialog } from './dialog';
-import Button from '../button/button';
+import { Button } from "../button";
+import customStyles from './dialog.custom-styles.module.css';
 
 const meta: Meta<typeof Dialog> = {
   title: 'UI/Dialog',
@@ -47,9 +48,9 @@ const meta: Meta<typeof Dialog> = {
       control: { type: 'text' },
       description: 'Additional CSS classes',
     },
-    classNames: {
-      control: { type: 'object' },
-      description: 'Custom class names for sub-components (not editable in controls)',
+    styleOverrides: {
+      control: false,
+      description: 'Style overrides (CSS module or plain object). See README Custom Style Overrides.',
     },
   },
 };
@@ -77,7 +78,7 @@ export const Default: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -128,7 +129,7 @@ export const Acknowledgment: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={handleOpenChange}
         >
@@ -161,7 +162,7 @@ export const Passive: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={setOpen}
         >
@@ -177,7 +178,7 @@ export const NonModal: Story = {
   args: {
     title: 'Non-Modal Dialog',
     size: 'default',
-    hideOverlay: false,
+    hideOverlay: true,
   },
   render: (args) => {
     const [open, setOpen] = useState(false);
@@ -194,7 +195,7 @@ export const NonModal: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -215,12 +216,6 @@ export const CustomStyles: Story = {
   args: {
     title: 'Custom Styled Dialog',
     size: 'lg',
-    classNames: {
-      header: 'bg-brand-1 text-brand-8',
-      title: 'text-xl font-bold',
-      body: 'bg-neutral-05',
-      footer: 'bg-brand-1',
-    },
   },
   render: (args) => {
     const [open, setOpen] = useState(false);
@@ -237,7 +232,7 @@ export const CustomStyles: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={customStyles}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -246,8 +241,8 @@ export const CustomStyles: Story = {
             </Button>
           }
         >
-          <p>This dialog demonstrates custom classNames prop.</p>
-          <p>Each section can be styled independently using the classNames object.</p>
+          <p>This dialog uses a CSS module for customisation.</p>
+          <p>Header: dark cyan; body: light cyan, monospace; footer: medium cyan. Close button uses cyan shades for hover, focus ring and pressed state.</p>
         </Dialog>
       </div>
     );
@@ -274,7 +269,7 @@ export const Large: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={setOpen}
           footer={

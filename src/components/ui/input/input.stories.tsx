@@ -1,7 +1,7 @@
 import React from "react";
 import { StoryFn, Meta } from "@storybook/react";
 import { Bell, Mail } from "lucide-react";
-import Input from "./input";
+import { Input } from "./input";
 
 // Helper function to capitalize first letter
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -46,11 +46,10 @@ export default {
 } as Meta<typeof Input>;
 
 const Template: StoryFn<typeof Input> = (args) => {
-  // Auto-set placeholder based on state if not explicitly provided
-  const placeholder = args.placeholder || capitalize(args.state || 'default');
-  
+  // Use placeholder from controls when provided; otherwise derive from state
+  const placeholder = args.placeholder !== undefined ? args.placeholder : capitalize(args.state || 'default');
   return (
-    <div className="w-[224px]">
+    <div style={{ width: 224 }}>
       <Input {...args} placeholder={placeholder} />
     </div>
   );
@@ -64,8 +63,8 @@ Default.args = {
 };
 
 export const WithIcon: StoryFn<typeof Input> = (args) => (
-  <div className="w-[224px]">
-    <Input {...args} icon={Bell} placeholder="Notifications" />
+  <div style={{ width: 224 }}>
+    <Input {...args} icon={<Bell />} placeholder={args.placeholder ?? "Notifications"} />
   </div>
 );
 WithIcon.args = {
@@ -74,8 +73,8 @@ WithIcon.args = {
 };
 
 export const Password: StoryFn<typeof Input> = (args) => (
-  <div className="w-[224px]">
-    <Input {...args} password placeholder="Enter password" />
+  <div style={{ width: 224 }}>
+    <Input {...args} password placeholder={args.placeholder ?? "Enter password"} />
   </div>
 );
 Password.args = {
@@ -84,8 +83,8 @@ Password.args = {
 };
 
 export const TextArea: StoryFn<typeof Input> = (args) => (
-  <div className="w-[272px]">
-    <Input {...args} textarea placeholder="Enter your message" />
+  <div style={{ width: 272 }}>
+    <Input {...args} textarea placeholder={args.placeholder ?? "Enter your message"} />
   </div>
 );
 TextArea.args = {
@@ -94,8 +93,8 @@ TextArea.args = {
 };
 
 export const PasswordWithIcon: StoryFn<typeof Input> = (args) => (
-  <div className="w-[224px]">
-    <Input {...args} password icon={Mail} placeholder="Email password" />
+  <div style={{ width: 224 }}>
+    <Input {...args} password icon={<Mail />} placeholder={args.placeholder ?? "Email password"} />
   </div>
 );
 PasswordWithIcon.args = {

@@ -1,54 +1,80 @@
-import React from "react";
-import { StoryFn, Meta } from "@storybook/react";
+import React from "react"
+import { StoryFn, Meta } from "@storybook/react"
 import { Checkbox } from "./checkbox"
-
 
 export default {
   title: "ui/Checkbox",
   component: Checkbox,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     label: {
-      control: 'text',
-      description: 'Label text next to the checkbox',
+      control: "text",
+      description: "Label text next to the checkbox",
     },
     disabled: {
-      control: 'boolean',
-      description: 'Disable the checkbox',
+      control: "boolean",
+      description: "Disable the checkbox",
     },
     defaultChecked: {
-      control: 'select',
-      options: [false, true, 'indeterminate'],
-      description: 'Initial checked state (true, false, or indeterminate)',
+      control: "select",
+      options: [false, true, "indeterminate"],
+      description: "Initial checked state (true, false, or indeterminate)",
     },
   },
-} as Meta<typeof Checkbox>;
+  parameters: {
+    layout: "centered",
+  },
+} as Meta<typeof Checkbox>
 
-const Template: StoryFn<React.ComponentProps<typeof Checkbox> & { label: string }> = (args) => {
-  const { label, ...checkboxProps } = args;
+const Template: StoryFn<
+  React.ComponentProps<typeof Checkbox> & { label?: string }
+> = (args) => {
+  const { label = "Accept terms and conditions", ...checkboxProps } = args
   return (
-    <div className="flex items-center space-x-2">
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif",
+        fontSize: 14,
+        fontWeight: 500,
+        lineHeight: 1.25,
+        color: "var(--neutral-9)",
+        cursor: checkboxProps.disabled ? "not-allowed" : "pointer",
+        opacity: checkboxProps.disabled ? 0.7 : 1,
+      }}
+    >
       <Checkbox {...checkboxProps} />
-      <label
-        htmlFor="terms"
-        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-      >
-        {label}
-      </label>
-    </div>
-  );
-};
+      <span>{label}</span>
+    </label>
+  )
+}
 
-export const CheckboxDefault = Template.bind({});
-CheckboxDefault.args = {
+export const Default = Template.bind({})
+Default.args = {
   label: "Accept terms and conditions",
   disabled: false,
   defaultChecked: false,
-};
+}
 
-export const CheckboxIndeterminate = Template.bind({});
-CheckboxIndeterminate.args = {
+export const Checked = Template.bind({})
+Checked.args = {
   label: "Accept terms and conditions",
   disabled: false,
-  defaultChecked: 'indeterminate',
-};
+  defaultChecked: true,
+}
+
+export const Indeterminate = Template.bind({})
+Indeterminate.args = {
+  label: "Accept terms and conditions",
+  disabled: false,
+  defaultChecked: "indeterminate",
+}
+
+export const Disabled = Template.bind({})
+Disabled.args = {
+  label: "Accept terms and conditions",
+  disabled: true,
+  defaultChecked: false,
+}

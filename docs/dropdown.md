@@ -48,30 +48,7 @@ const [value, setValue] = useState<string | undefined>();
 | `disableCloseOnOutsideClick` | `boolean` | `false` | Keep open when clicking outside. |
 | `closeOnInputClick` | `boolean` | — | Close when clicking the trigger input (filter mode). |
 | `icons` | `{ trigger?: ReactNode; footer?: ReactNode }` | — | Custom trigger or footer icons. |
-| `classNames` | `object` | — | Override classes for sub-elements (see **SingleSelect classNames** below). |
-
-### SingleSelect classNames
-
-All properties are optional. Pass only the keys you need to override.
-
-| Property              | Applies to |
-|-----------------------|------------|
-| `container`           | Root wrapper around trigger and popup. |
-| `inputContainer`      | Wrapper around the trigger input (filter mode). |
-| `trigger`             | Clickable trigger (input or button). |
-| `triggerIconContainer`| Wrapper around the trigger chevron/icon. |
-| `triggerIcon`         | Trigger chevron/icon. |
-| `popup`               | Dropdown panel container. |
-| `scrollContent`       | Scrollable list area inside the popup. |
-| `item`                | Option row. |
-| `itemFocused`         | Option row when focused/highlighted. |
-| `itemDisabled`        | Option row when disabled. |
-| `itemText`            | Label text inside an option. |
-| `ellipsis`            | Ellipsis for truncated long text. |
-| `highlightedText`     | Matched filter text highlight. |
-| `noResults`           | “No results” message. |
-| `footer`              | Footer area. |
-| `footerIcon`          | Icon in the footer. |
+| `styleOverrides` | `Record<string, string>` | — | Object mapping style slot names (e.g. `scrollContent`, `trigger`) to class names. Plain object for plain CSS; or pass a CSS module directly. See [Custom Style Overrides](../README.md#custom-style-overrides) in the main README. |
 
 ---
 
@@ -114,36 +91,7 @@ const [value, setValue] = useState<string[]>([]);
 | `disableCloseOnOutsideClick` | `boolean` | `false` | Keep open when clicking outside. |
 | `disableCloseOnTriggerClick` | `boolean` | — | Don’t close when clicking trigger again. |
 | `icons` | `{ trigger?: ReactNode; badgeClose?: ReactNode; check?: ReactNode }` | — | Custom icons. |
-| `classNames` | `object` | — | Override classes for sub-elements (see **MultiSelect classNames** below). |
-
-### MultiSelect classNames
-
-All properties are optional. Pass only the keys you need to override.
-
-| Property          | Applies to |
-|-------------------|------------|
-| `container`       | Root wrapper around trigger and popup. |
-| `trigger`        | Clickable trigger (shows placeholder or badges). |
-| `triggerContent` | Inner content of the trigger. |
-| `triggerIcon`    | Trigger chevron/icon. |
-| `popup`          | Dropdown panel container. |
-| `scrollContent`   | Scrollable list area inside the popup. |
-| `item`           | Option row. |
-| `itemFocused`    | Option row when focused/highlighted. |
-| `itemDisabled`   | Option row when disabled. |
-| `itemText`       | Label text inside an option. |
-| `ellipsis`       | Ellipsis for truncated long text. |
-| `footer`         | Footer area. |
-| `badge`          | Selected-item badge in the trigger. |
-| `badgeText`      | Text inside a badge. |
-| `badgeRemove`    | Remove button on a badge. |
-| `badgeRemoveIcon`| Remove icon inside the badge button. |
-| `remainingBadge` | “+N” badge when more than `maxDisplayBadges` selected. |
-| `placeholder`    | Placeholder text when nothing selected. |
-| `header`         | Optional header inside the popup. |
-| `checkbox`       | Checkbox next to an option. |
-| `checkboxChecked`| Checkbox when checked. |
-| `checkIcon`      | Checkmark icon inside the checkbox. |
+| `styleOverrides` | `Record<string, string>` | — | Object mapping style slot names (e.g. `scrollContent`, `trigger`) to class names. Plain object for plain CSS; or pass a CSS module directly. See [Custom Style Overrides](../README.md#custom-style-overrides) in the main README. |
 
 ---
 
@@ -168,10 +116,6 @@ For backward compatibility, a single **Dropdown** component can render either Si
 Prefer importing **SingleSelect** or **MultiSelect** directly for new code.
 
 ---
-
-## Styling
-
-Both components use internal CSS modules. Use `className` on the root and `classNames` for inner parts (trigger, popup, items, badges, footer) to match your theme. Long labels can show ellipsis; optional tooltips and text animation are configurable via props.
 
 ## Accessibility
 

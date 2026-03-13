@@ -1,106 +1,165 @@
-@reference "../../../styles/globals.css";
+/* MultiSelect – component scope and trigger/badge/item styles.
+   Root uses .multiSelect; data-disabled on root for disabled state. */
+
+.multiSelect {
+  position: relative;
+  width: fit-content;
+}
 
 .trigger {
-  @apply min-h-[36px];
+  min-height: 36px;
+  box-sizing: border-box;
 }
 
 .triggerContent {
-  @apply flex gap-1 flex-1 min-w-0;
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
 }
 
 .triggerContentWrap {
-  @apply flex-wrap;
+  flex-wrap: wrap;
 }
 
 .triggerContentNoWrap {
-  @apply overflow-x-hidden;
+  overflow-x: hidden;
 }
 
 .badge {
-  @apply inline-flex items-center gap-1 bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium whitespace-nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--brand-3);
+  color: var(--brand-8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .badgeText {
-  @apply whitespace-nowrap;
+  white-space: nowrap;
 }
 
 .badgeRemove {
-  @apply hover:bg-brand-8/20 rounded-[4px] p-0.5 cursor-pointer;
+  border-radius: 4px;
+  padding: 2px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badgeRemove:hover {
+  background-color: rgba(223, 21, 140, 0.2);
+}
+
+.badgeRemoveIcon {
+  color: var(--brand-8);
 }
 
 .remainingBadge {
-  @apply inline-flex items-center bg-brand-3 text-brand-8 px-2 py-1 rounded-[4px] text-xs font-medium whitespace-nowrap;
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--brand-3);
+  color: var(--brand-8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .placeholder {
-  @apply text-neutral-4;
+  color: var(--neutral-4);
 }
 
 .header {
-  @apply px-[4px] py-[4px] bg-neutral-0 flex flex-shrink-0;
+  padding: 4px;
+  background-color: var(--neutral-0);
+  flex-shrink: 0;
 }
 
 .headerText {
-  @apply px-[6px] text-[13px] text-neutral-4;
+  padding: 0 6px;
+  font-size: 13px;
+  color: var(--neutral-4);
 }
 
-.itemFocused {
-  @apply bg-brand-1;
-}
-
-.itemHover {
-  @apply hover:bg-brand-1;
+/* Option row – focus from data-focused in shared; hover when not keyboard nav */
+.itemHover:hover {
+  background-color: var(--brand-1);
 }
 
 .itemRightAlign {
-  @apply flex-row-reverse;
+  flex-direction: row-reverse;
 }
 
 .checkbox {
-  @apply mr-3 flex items-center justify-center;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .checkboxRightAlign {
-  @apply mr-0 ml-3;
+  margin-right: 0;
+  margin-left: 12px;
 }
 
 .checkboxIconWrapper {
-  @apply w-4 h-4 rounded-[4px] flex items-center justify-center border;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  flex-shrink: 0;
+  background-color: var(--neutral-0);
+  border-color: var(--neutral-5);
 }
 
-.checkboxIconWrapperChecked {
-  @apply bg-brand-8 border-brand-8;
-}
-
-.checkboxIconWrapperUnchecked {
-  @apply bg-white border-neutral-5;
+.checkboxIconWrapper[data-checked="true"] {
+  background-color: var(--brand-8);
+  border-color: var(--brand-8);
 }
 
 .checkboxIcon {
-  @apply text-white;
+  color: var(--neutral-0);
 }
 
 .itemContent {
-  @apply flex-1 overflow-hidden relative;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
 }
 
 .itemContentText {
-  @apply whitespace-nowrap block text-left pointer-events-none;
+  white-space: nowrap;
+  display: block;
+  text-align: left;
+  pointer-events: none;
 }
 
 .itemContentEllipsisIndicator {
-  @apply absolute right-0 top-0 px-1 text-neutral-6;
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 0 4px;
+  color: var(--neutral-6);
+  background-color: var(--neutral-0);
 }
 
-.itemContentEllipsisIndicatorFocused {
-  @apply bg-brand-1;
-}
-
-.itemContentEllipsisIndicatorUnfocused {
-  @apply bg-neutral-0;
+[data-focused="true"] .itemContentEllipsisIndicator {
+  background-color: var(--brand-1);
 }
 
 .itemContentEllipsisIndicatorHover {
-  @apply group-hover:bg-brand-1;
+  background-color: var(--brand-1);
 }
-

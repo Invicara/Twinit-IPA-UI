@@ -1,0 +1,102 @@
+.multiSelect {
+  font-family: ui-monospace, monospace;
+}
+
+.trigger {
+  border-radius: 0;
+  width: 360px;
+  min-height: 44px;
+  cursor: crosshair;
+}
+
+.trigger:focus,
+.trigger:focus-visible {
+  outline: none;
+  border-width: 2px;
+  border-color: #ea580c;
+}
+
+.trigger:hover {
+  border-color: #fb923c;
+}
+
+.triggerIcon {
+  color: #ea580c;
+}
+
+.badge {
+  border-radius: 0;
+  background-color: #ffedd5;
+  color: #c2410c;
+}
+
+.badgeText {
+  font-weight: 700;
+}
+
+.badgeRemove {
+  border-radius: 0;
+}
+
+.badgeRemove:hover {
+  background-color: #fdba74;
+}
+
+.badgeRemoveIcon {
+  color: #ea580c;
+}
+
+.remainingBadge {
+  border-radius: 0;
+  background-color: #ffedd5;
+  color: #c2410c;
+}
+
+.popup {
+  box-shadow: none;
+  border-radius: 0;
+  width: 200px;
+  border: 2px solid #ea580c;
+  color: #ea580c;
+}
+
+.scrollContent {
+  cursor: copy;
+}
+
+.header {
+  background-color: #fff7ed;
+  border-bottom: 2px solid #fed7aa;
+  color: #fed7aa;
+}
+
+.item {
+  font-family: Arial, sans-serif;
+  cursor: crosshair;
+  color: #c2410c;
+}
+
+/* Visible box is .checkboxIconWrapper – set circle here so override wins */
+.checkboxIconWrapper {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #ea580c;
+  background-color: white;
+}
+
+.checkboxIconWrapper[data-checked="true"] {
+  background-color: #ea580c;
+  border-color: #b45309;
+}
+
+.checkboxIcon {
+  display: none;
+}
+
+.triggerIconCustom {
+  width: 16px;
+  height: 16px;
+  color: #ea580c;
+}
+

@@ -2,33 +2,34 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Bell } from "lucide-react";
-import Input from "./input";
+import { Input } from "./input";
+import styles from "./input.module.css";
 
 describe("Input", () => {
   test("renders the Input component", () => {
-    render(<Input testIdPrefix="input" placeholder="test input" />);
+    render(<Input placeholder="test input" />);
 
-    expect(screen.getByTestId("input")).toBeInTheDocument();
+    expect(screen.getByTestId("ipa_input")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("test input")).toBeInTheDocument();
   });
 
   test("renders with label", () => {
-    render(<Input label="Test Label" testIdPrefix="input" />);
+    render(<Input label="Test Label" />);
 
     expect(screen.getByText("Test Label")).toBeInTheDocument();
   });
 
   test("renders with helper text", () => {
-    render(<Input helperText="Helper text" testIdPrefix="input" />);
+    render(<Input helperText="Helper text" />);
 
     expect(screen.getByText("Helper text")).toBeInTheDocument();
   });
 
   test("handles user input", async () => {
     const user = userEvent.setup();
-    render(<Input testIdPrefix="input" />);
+    render(<Input />);
 
-    const input = screen.getByTestId("input");
+    const input = screen.getByTestId("ipa_input");
     await user.type(input, "test value");
 
     expect(input).toHaveValue("test value");
@@ -39,9 +40,9 @@ describe("Input", () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();
     
-    render(<Input onFocus={onFocus} onBlur={onBlur} testIdPrefix="input" />);
+    render(<Input onFocus={onFocus} onBlur={onBlur} />);
 
-    const input = screen.getByTestId("input");
+    const input = screen.getByTestId("ipa_input");
     
     await user.click(input);
     expect(onFocus).toHaveBeenCalled();
@@ -50,91 +51,80 @@ describe("Input", () => {
     expect(onBlur).toHaveBeenCalled();
   });
 
-  test("applies correct dimensions", () => {
-    render(<Input testIdPrefix="input" />);
-    const input = screen.getByTestId("input");
-    // Figma Section 1 spec: 36px height, 4px border radius
-    expect(input).toHaveClass("h-[36px]", "rounded-[4px]");
+  test("applies correct dimensions (base and variant classes)", () => {
+    render(<Input />);
+    const input = screen.getByTestId("ipa_input");
+    expect(input).toHaveClass(styles.inputBox, styles.variantInput);
   });
 
-  test("applies correct state classes for default state", () => {
-    render(<Input state="default" testIdPrefix="input" />);
-    const input = screen.getByTestId("input");
-    expect(input).toHaveClass("border-neutral-5");
-    // Focus styling is applied via CSS :focus pseudo-class
-    expect(input).toHaveClass("focus:border-brand-6");
+  test("applies data-state for default state", () => {
+    render(<Input state="default" />);
+    const input = screen.getByTestId("ipa_input");
+    expect(input).toHaveAttribute("data-state", "default");
   });
 
-  test("applies correct state classes for error state", () => {
-    render(<Input state="error" testIdPrefix="input" />);
-    const input = screen.getByTestId("input");
-    expect(input).toHaveClass("border-alert-7");
-    // Focus styling makes border lighter
-    expect(input).toHaveClass("focus:border-alert-5");
+  test("applies data-state for error state", () => {
+    render(<Input state="error" />);
+    const input = screen.getByTestId("ipa_input");
+    expect(input).toHaveAttribute("data-state", "error");
   });
 
-  test("applies correct state classes for success state", () => {
-    render(<Input state="success" testIdPrefix="input" />);
-    const input = screen.getByTestId("input");
-    expect(input).toHaveClass("border-positive-7");
-    // Focus styling makes border lighter
-    expect(input).toHaveClass("focus:border-positive-5");
+  test("applies data-state for success state", () => {
+    render(<Input state="success" />);
+    const input = screen.getByTestId("ipa_input");
+    expect(input).toHaveAttribute("data-state", "success");
   });
 
-  test("applies correct state classes for warning state", () => {
-    render(<Input state="warning" testIdPrefix="input" />);
-    const input = screen.getByTestId("input");
-    expect(input).toHaveClass("border-warning-9");
-    // Focus styling makes border lighter
-    expect(input).toHaveClass("focus:border-warning-7");
+  test("applies data-state for warning state", () => {
+    render(<Input state="warning" />);
+    const input = screen.getByTestId("ipa_input");
+    expect(input).toHaveAttribute("data-state", "warning");
   });
 
-  test("applies correct state classes for readonly state", () => {
-    render(<Input state="readonly" testIdPrefix="input" />);
-    const input = screen.getByTestId("input");
-    expect(input).toHaveClass("border-neutral-3", "bg-neutral-1", "text-neutral-5");
+  test("applies data-state and readOnly for readonly state", () => {
+    render(<Input state="readonly" />);
+    const input = screen.getByTestId("ipa_input");
+    expect(input).toHaveAttribute("data-state", "readonly");
     expect(input).toHaveAttribute("readOnly");
   });
 
   test("disabled prop disables the input", () => {
-    render(<Input disabled testIdPrefix="input" />);
-    const input = screen.getByTestId("input");
+    render(<Input disabled />);
+    const input = screen.getByTestId("ipa_input");
     expect(input).toBeDisabled();
-    expect(input).toHaveClass("disabled:cursor-not-allowed", "disabled:opacity-50");
+    expect(input).toHaveAttribute("data-disabled", "true");
   });
 
-  test("error state changes label and helper text color", () => {
+  test("error state sets data-state on label and helper text", () => {
     render(
       <Input 
         label="Label" 
         helperText="Status Label"
         state="error"
-        testIdPrefix="input" 
       />
     );
 
     const label = screen.getByText("Label");
     const helperText = screen.getByText("Status Label");
     
-    expect(label).toHaveClass("text-alert-7");
-    expect(helperText).toHaveClass("text-alert-7");
+    expect(label).toHaveAttribute("data-state", "error");
+    expect(helperText).toHaveAttribute("data-state", "error");
   });
 
-  test("success state changes label and helper text color", () => {
+  test("success state sets data-state on label and helper text", () => {
     render(
       <Input 
         label="Label" 
         helperText="Status Label"
         state="success"
-        testIdPrefix="input" 
       />
     );
 
     const label = screen.getByText("Label");
     const helperText = screen.getByText("Status Label");
     
-    expect(label).toHaveClass("text-positive-7");
-    expect(helperText).toHaveClass("text-positive-7");
+    expect(label).toHaveAttribute("data-state", "success");
+    expect(helperText).toHaveAttribute("data-state", "success");
   });
 
   test("has proper accessibility attributes", () => {
@@ -142,32 +132,31 @@ describe("Input", () => {
       <Input 
         label="Test Label" 
         helperText="Helper text"
-        testIdPrefix="input" 
       />
     );
 
-    const input = screen.getByTestId("input");
+    const input = screen.getByTestId("ipa_input");
     expect(input).toHaveAttribute("aria-describedby");
   });
 
   describe("Password mode", () => {
     test("renders password input with type='password' by default", () => {
-      render(<Input password testIdPrefix="input" />);
-      const input = screen.getByTestId("input");
+      render(<Input password />);
+      const input = screen.getByTestId("ipa_input");
       expect(input).toHaveAttribute("type", "password");
     });
 
     test("renders eye icon toggle button", () => {
-      render(<Input password testIdPrefix="input" />);
+      render(<Input password />);
       const toggleButton = screen.getByLabelText("Show password");
       expect(toggleButton).toBeInTheDocument();
     });
 
     test("toggles password visibility when eye icon is clicked", async () => {
       const user = userEvent.setup();
-      render(<Input password testIdPrefix="input" />);
+      render(<Input password />);
       
-      const input = screen.getByTestId("input");
+      const input = screen.getByTestId("ipa_input");
       const toggleButton = screen.getByLabelText("Show password");
       
       // Initially password is hidden
@@ -185,30 +174,30 @@ describe("Input", () => {
     });
 
     test("applies correct padding for password toggle icon", () => {
-      render(<Input password testIdPrefix="input" />);
-      const input = screen.getByTestId("input");
-      expect(input).toHaveClass("pr-[36px]");
+      render(<Input password />);
+      const input = screen.getByTestId("ipa_input");
+      expect(input).toHaveClass(styles.withPassword);
     });
   });
 
   describe("Textarea mode", () => {
     test("renders textarea element instead of input", () => {
-      render(<Input textarea testIdPrefix="input" />);
-      const textarea = screen.getByTestId("input");
+      render(<Input textarea />);
+      const textarea = screen.getByTestId("ipa_input");
       expect(textarea.tagName).toBe("TEXTAREA");
     });
 
     test("applies correct textarea classes", () => {
-      render(<Input textarea testIdPrefix="input" />);
-      const textarea = screen.getByTestId("input");
-      expect(textarea).toHaveClass("min-h-[80px]", "resize-y");
+      render(<Input textarea />);
+      const textarea = screen.getByTestId("ipa_input");
+      expect(textarea).toHaveClass(styles.variantTextarea);
     });
 
     test("handles textarea input", async () => {
       const user = userEvent.setup();
-      render(<Input textarea testIdPrefix="input" />);
+      render(<Input textarea />);
       
-      const textarea = screen.getByTestId("input");
+      const textarea = screen.getByTestId("ipa_input");
       await user.type(textarea, "Multi-line\ntext content");
       
       expect(textarea).toHaveValue("Multi-line\ntext content");
@@ -217,22 +206,24 @@ describe("Input", () => {
 
   describe("Icon mode", () => {
     test("renders icon on the left side", () => {
-      const { container } = render(<Input icon={Bell} testIdPrefix="input" />);
-      const iconContainer = container.querySelector(".absolute.left-\\[12px\\]");
+      const { container } = render(<Input icon={<Bell />} />);
+      const input = screen.getByTestId("ipa_input");
+      const iconContainer = input.previousElementSibling;
       expect(iconContainer).toBeInTheDocument();
+      expect(iconContainer).toContainElement(container.querySelector("svg"));
     });
 
     test("applies correct padding when icon is present", () => {
-      render(<Input icon={Bell} testIdPrefix="input" />);
-      const input = screen.getByTestId("input");
-      expect(input).toHaveClass("pl-[36px]");
+      render(<Input icon={<Bell />} />);
+      const input = screen.getByTestId("ipa_input");
+      expect(input).toHaveClass(styles.withIcon);
     });
 
     test("icon does not interfere with input", async () => {
       const user = userEvent.setup();
-      render(<Input icon={Bell} testIdPrefix="input" />);
+      render(<Input icon={<Bell />} />);
       
-      const input = screen.getByTestId("input");
+      const input = screen.getByTestId("ipa_input");
       await user.type(input, "test");
       
       expect(input).toHaveValue("test");
@@ -241,16 +232,16 @@ describe("Input", () => {
 
   describe("Combined features", () => {
     test("password mode with icon applies both paddings", () => {
-      render(<Input password icon={Bell} testIdPrefix="input" />);
-      const input = screen.getByTestId("input");
-      expect(input).toHaveClass("pl-[36px]", "pr-[36px]");
+      render(<Input password icon={<Bell />} />);
+      const input = screen.getByTestId("ipa_input");
+      expect(input).toHaveClass(styles.withIcon, styles.withPassword);
     });
 
     test("password toggle works with icon present", async () => {
       const user = userEvent.setup();
-      render(<Input password icon={Bell} testIdPrefix="input" />);
+      render(<Input password icon={<Bell />} />);
       
-      const input = screen.getByTestId("input");
+      const input = screen.getByTestId("ipa_input");
       const toggleButton = screen.getByLabelText("Show password");
       
       expect(input).toHaveAttribute("type", "password");

@@ -1,69 +1,70 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { Slider } from './slider'
+import React from "react";
+import { StoryFn, Meta } from "@storybook/react";
+import { Slider } from "./slider";
 
-const meta: Meta<typeof Slider> = {
-  title: 'UI/Slider',
+export default {
+  title: "ui/Slider",
   component: Slider,
-  parameters: {
-    layout: 'centered',
-  },
   argTypes: {
-    variant: {
-      control: 'select',
-      options: ['default', 'range'],
+    range: {
+      control: { type: "boolean" },
+      description: "Use two thumbs for range selection",
     },
     label: {
-      control: 'text',
+      control: { type: "text" },
     },
     minLabel: {
-      control: 'text',
+      control: { type: "text" },
     },
     maxLabel: {
-      control: 'text',
+      control: { type: "text" },
     },
     disabled: {
-      control: 'boolean',
+      control: { type: "boolean" },
     },
     min: {
-      control: 'number',
+      control: { type: "number" },
     },
     max: {
-      control: 'number',
+      control: { type: "number" },
     },
     step: {
-      control: 'number',
+      control: { type: "number" },
     },
   },
-}
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
-  args: {
-    label: 'Select Amount',
-    minLabel: '0',
-    maxLabel: '100',
-    variant: 'default',
-    disabled: false,
-    min: 0,
-    max: 100,
-    step: 1,
-    defaultValue: [50],
+  parameters: {
+    layout: "centered",
   },
-}
+} as Meta<typeof Slider>;
 
-export const Range: Story = {
-  args: {
-    label: 'Select Range',
-    minLabel: '0',
-    maxLabel: '100',
-    variant: 'range',
-    disabled: false,
-    min: 0,
-    max: 100,
-    step: 1,
-    defaultValue: [25, 75],
-  },
-}
+const Template: StoryFn<typeof Slider> = (args) => (
+  <div style={{ width: 336 }}>
+    <Slider {...args} />
+  </div>
+);
 
+export const Default = Template.bind({});
+Default.args = {
+  label: "Select Amount",
+  minLabel: "0",
+  maxLabel: "100",
+  range: false,
+  disabled: false,
+  min: 0,
+  max: 100,
+  step: 1,
+  defaultValue: [50],
+};
+
+export const Range = Template.bind({});
+Range.args = {
+  label: "Select Range",
+  minLabel: "0",
+  maxLabel: "100",
+  range: true,
+  disabled: false,
+  min: 0,
+  max: 100,
+  step: 1,
+  defaultValue: [25, 75],
+};

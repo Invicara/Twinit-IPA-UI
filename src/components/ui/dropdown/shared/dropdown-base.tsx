@@ -1,30 +1,7 @@
 import * as React from 'react';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
-import styles from './dropdown-base.module.css';
 import { cn } from '../../../../lib/utils';
 import type { ReactNode } from 'react';
-
-interface DropdownPopupProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: ReactNode;
-  className?: string;
-  footer?: boolean;
-  popAbove?: boolean;
-}
-
-interface DropdownTriggerProps {
-  onClick: () => void;
-  disabled?: boolean;
-  children: ReactNode;
-  isOpen?: boolean;
-  className?: string;
-  customTrigger?: ReactNode;
-  onKeyDown?: (e: React.KeyboardEvent) => void;
-  customIcon?: ReactNode;
-  iconClassName?: string;
-  enableIconAnimation?: boolean;
-}
 
 export function DropdownTrigger({
   onClick,
@@ -36,8 +13,21 @@ export function DropdownTrigger({
   onKeyDown,
   customIcon,
   iconClassName,
-  enableIconAnimation = true
-}: DropdownTriggerProps) {
+  enableIconAnimation = true,
+  styles: s
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+  isOpen?: boolean;
+  className?: string;
+  customTrigger?: ReactNode;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
+  customIcon?: ReactNode;
+  iconClassName?: string;
+  enableIconAnimation?: boolean;
+  styles: Record<string, string>;
+}) {
   if (customTrigger) {
     return <>{customTrigger}</>;
   }
@@ -48,27 +38,23 @@ export function DropdownTrigger({
       onClick={onClick}
       onKeyDown={onKeyDown}
       disabled={disabled}
-      className={cn(
-        styles.triggerBase,
-        styles.trigger,
-        disabled && styles.triggerDisabled,
-        className
-      )}
+      data-disabled={disabled ? "true" : undefined}
+      data-state={isOpen ? "open" : "closed"}
+      className={cn(s.triggerBase, className)}
     >
       {children}
       {customIcon ? (
         <div className={cn(
-          enableIconAnimation && styles.triggerIconTransition,
-          enableIconAnimation && isOpen && styles.triggerIconRotate180,
+          enableIconAnimation && s.triggerIconTransition,
+          s.triggerIcon,
           iconClassName
         )}>
           {customIcon}
         </div>
       ) : (
         <ChevronDownIcon className={cn(
-          styles.triggerIcon,
-          enableIconAnimation && styles.triggerIconTransition,
-          enableIconAnimation && isOpen && styles.triggerIconRotate180,
+          s.triggerIcon,
+          enableIconAnimation && s.triggerIconTransition,
           iconClassName
         )} />
       )}
@@ -82,22 +68,31 @@ export function DropdownPopup({
   children,
   className,
   footer = true,
-  popAbove = false
-}: DropdownPopupProps) {
+  popAbove = false,
+  styles: s
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  children: ReactNode;
+  className?: string;
+  footer?: boolean;
+  popAbove?: boolean;
+  styles: Record<string, string>;
+}) {
   if (!isOpen) return null;
 
   const footerElement = footer && (
-    <div className={styles.footer} onClick={onClose}>
-      <ChevronDownIcon className={cn(styles.triggerIcon)} />
+    <div className={s.footer} onClick={onClose}>
+      <ChevronDownIcon className={s.triggerIcon} />
     </div>
   );
 
   return (
-    <div className={cn(
-      styles.popup,
-      popAbove ? styles.popupBottom : styles.popupTop,
-      className
-    )}>
+    <div
+      role="listbox"
+      data-position={popAbove ? "top" : "bottom"}
+      className={cn(s.popup, className)}
+    >
       {popAbove && footerElement}
       {children}
       {!popAbove && footerElement}
@@ -105,16 +100,22 @@ export function DropdownPopup({
   );
 }
 
-export function DropdownScrollableContent({ 
+export function DropdownScrollableContent({
   children,
   className,
-  scrollable = true
-}: { children: ReactNode; className?: string; scrollable?: boolean }) {
+  scrollable = true,
+  styles: s
+}: {
+  children: ReactNode;
+  className?: string;
+  scrollable?: boolean;
+  styles: Record<string, string>;
+}) {
   return (
-    <div className={cn(
-      scrollable ? cn(styles.scrollContent, 'custom-scrollbar') : styles.noScrollContent,
-      className
-    )}>
+    <div
+      className={cn(s.scrollContent, scrollable && 'custom-scrollbar', className)}
+      data-scrollable={scrollable ? "true" : undefined}
+    >
       {children}
     </div>
   );

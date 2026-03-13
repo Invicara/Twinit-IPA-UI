@@ -1,51 +1,63 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
-import { Link } from './link'
+import React from "react"
+import { StoryFn, Meta } from "@storybook/react"
+import { Pencil } from "lucide-react"
+import { Link } from "./link"
 
-const meta: Meta<typeof Link> = {
-  title: 'UI/Link',
+export default {
+  title: "ui/Link",
   component: Link,
-  parameters: {
-    layout: 'centered',
-  },
   argTypes: {
-    variant: {
-      control: 'select',
-      options: ['default', 'inline'],
+    inline: {
+      control: { type: "boolean" },
+      description: "Underline style for inline text",
     },
     disabled: {
-      control: 'boolean',
+      control: { type: "boolean" },
     },
     href: {
-      control: 'text',
+      control: { type: "text" },
     },
   },
+  parameters: {
+    layout: "centered",
+  },
+} as Meta<typeof Link>
+
+const Template: StoryFn<typeof Link> = (args) => <Link {...args} />
+
+export const Default = Template.bind({})
+Default.args = {
+  href: "#",
+  children: "Click This Link",
+  inline: false,
+  disabled: false,
 }
 
-export default meta
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
-  args: {
-    href: '#',
-    children: 'Click This Link',
-    variant: 'default',
-    disabled: false,
-  },
+export const WithIcon = Template.bind({})
+WithIcon.args = {
+  href: "#",
+  children: "Click This Link",
+  inline: false,
+  disabled: false,
+  icon: <Pencil />,
 }
 
-export const Inline: Story = {
-  args: {
-    href: '#',
-    children: 'Click This Link',
-    variant: 'inline',
-    disabled: false,
-  },
-  render: (args) => (
-    <div className="max-w-md">
-      <p className="font-sans text-[14px] font-normal leading-[18px] text-neutral-9">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea <Link href={args.href} variant={args.variant} disabled={args.disabled}>{args.children}</Link> commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. consectetur adipiscing elit.
+export const Inline = Template.bind({})
+Inline.args = {
+  href: "#",
+  children: "Edit",
+  inline: true,
+  disabled: false,
+}
+
+Inline.decorators = [
+  (Story) => (
+    <div style={{ maxWidth: 480, fontFamily: "'Inter', sans-serif", fontSize: 14, lineHeight: 1.5, color: "var(--neutral-9)" }}>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea{" "}
+        <Story />
+        {" "}commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
       </p>
     </div>
   ),
-}
+]

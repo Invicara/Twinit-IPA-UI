@@ -1,3 +1,3 @@
-export { RadioGroup, radioGroupVariants } from './radio-group'
-export type { RadioGroupProps, RadioGroupOption } from './radio-group.types'
+export { RadioGroup } from "./radio-group"
+export type { RadioGroupProps } from "./radio-group"
 

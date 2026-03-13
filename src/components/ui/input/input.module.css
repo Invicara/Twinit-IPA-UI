@@ -1,113 +1,221 @@
-@reference "../../../styles/globals.css";
-
-.base {
-  @apply flex w-full rounded-[4px] border bg-neutral-0 px-[12px] py-[8px] font-sans text-[14px] font-normal leading-[18px] text-neutral-9 placeholder:text-neutral-4 transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50;
+/* Input – outermost wrapper (component scope) */
+.input {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.stateDefault {
-  @apply border-neutral-5 hover:border-neutral-7 focus:border-brand-6;
+/* Input box – the actual input/textarea element, typography and states */
+.inputBox {
+  display: flex;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background-color: var(--neutral-0);
+  padding: 8px 12px;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--neutral-9);
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
-.stateError {
-  @apply border-alert-7 focus:border-alert-5;
+.inputBox::placeholder {
+  color: var(--neutral-4);
 }
 
-.stateSuccess {
-  @apply border-positive-7 focus:border-positive-5;
+.inputBox:focus-visible {
+  outline: none;
 }
 
-.stateWarning {
-  @apply border-warning-9 focus:border-warning-7;
+.inputBox:disabled,
+.inputBox[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
-.stateReadonly {
-  @apply border-neutral-3 bg-neutral-1 text-neutral-5 placeholder:text-neutral-3 select-text cursor-text;
+/* Input box state – via data-state for inspectability */
+.inputBox[data-state="default"] {
+  border-color: var(--neutral-5);
 }
 
+.inputBox[data-state="default"]:hover {
+  border-color: var(--neutral-7);
+}
+
+.inputBox[data-state="default"]:focus,
+.inputBox[data-state="default"]:focus-visible {
+  border-color: var(--brand-6);
+}
+
+.inputBox[data-state="error"] {
+  border-color: var(--alert-7);
+}
+
+.inputBox[data-state="error"]:focus,
+.inputBox[data-state="error"]:focus-visible {
+  border-color: var(--alert-5);
+}
+
+.inputBox[data-state="success"] {
+  border-color: var(--positive-7);
+}
+
+.inputBox[data-state="success"]:focus,
+.inputBox[data-state="success"]:focus-visible {
+  border-color: var(--positive-5);
+}
+
+.inputBox[data-state="warning"] {
+  border-color: var(--warning-9);
+}
+
+.inputBox[data-state="warning"]:focus,
+.inputBox[data-state="warning"]:focus-visible {
+  border-color: var(--warning-7);
+}
+
+.inputBox[data-state="readonly"] {
+  border-color: var(--neutral-3);
+  background-color: var(--neutral-1);
+  color: var(--neutral-5);
+  user-select: text;
+  cursor: text;
+}
+
+.inputBox[data-state="readonly"]::placeholder {
+  color: var(--neutral-3);
+}
+
+/* Variant: single-line input */
 .variantInput {
-  @apply h-[36px];
+  height: 36px;
 }
 
+/* Variant: textarea */
 .variantTextarea {
-  @apply min-h-[80px] resize-y;
+  min-height: 80px;
+  resize: vertical;
 }
 
+/* With left icon – extra padding so text doesn't overlap */
 .withIcon {
-  @apply pl-[36px];
+  padding-left: 36px;
 }
 
+/* With password toggle – extra padding for the button */
 .withPassword {
-  @apply pr-[36px];
-}
-
-.container {
-  @apply w-full flex flex-col gap-[4px];
+  padding-right: 36px;
 }
 
 .wrapper {
-  @apply relative w-full;
+  position: relative;
+  width: 100%;
 }
 
+/* Left icon (e.g. search icon) – decorative, not interactive */
 .iconContainer {
-  @apply absolute left-[12px] top-1/2 -translate-y-1/2 text-neutral-5 pointer-events-none;
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neutral-5);
+  pointer-events: none;
 }
 
 .icon {
-  @apply h-[16px] w-[16px];
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
+/* Constrain any SVG inside (e.g. Lucide icons passed as ReactNode) to match eye icon size */
+.icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Password show/hide toggle button */
 .passwordToggle {
-  @apply absolute right-[12px] top-1/2 -translate-y-1/2 text-neutral-5 hover:text-neutral-7 transition-colors cursor-pointer;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neutral-5);
+  transition: color 0.15s ease;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.passwordToggle:hover {
+  color: var(--neutral-7);
+}
+
+.passwordToggle:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.passwordToggle:disabled:hover {
+  color: var(--neutral-5);
 }
 
 .passwordToggleIcon {
-  @apply h-[16px] w-[16px];
+  width: 16px;
+  height: 16px;
 }
 
+/* Label – default color; data-state overrides for error/success/warning */
 .label {
-  @apply font-sans text-[14px] font-medium leading-[18px] flex items-center gap-[8px];
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--neutral-9);
 }
 
-.labelStateDefault {
-  @apply text-neutral-9;
+.label[data-state="error"] {
+  color: var(--alert-7);
 }
 
-.labelStateError {
-  @apply text-alert-7;
+.label[data-state="success"] {
+  color: var(--positive-7);
 }
 
-.labelStateSuccess {
-  @apply text-positive-7;
+.label[data-state="warning"] {
+  color: var(--warning-9);
 }
 
-.labelStateWarning {
-  @apply text-warning-9;
-}
-
-.labelStateReadonly {
-  @apply text-neutral-9;
-}
-
+/* Helper text – default color; data-state overrides for error/success/warning */
 .helperText {
-  @apply font-sans text-[13px] font-normal leading-[17.5px];
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 17.5px;
+  color: var(--neutral-7);
 }
 
-.helperTextStateDefault {
-  @apply text-neutral-7;
+.helperText[data-state="error"] {
+  color: var(--alert-7);
 }
 
-.helperTextStateError {
-  @apply text-alert-7;
+.helperText[data-state="success"] {
+  color: var(--positive-7);
 }
 
-.helperTextStateSuccess {
-  @apply text-positive-7;
-}
-
-.helperTextStateWarning {
-  @apply text-warning-9;
-}
-
-.helperTextStateReadonly {
-  @apply text-neutral-7;
+.helperText[data-state="warning"] {
+  color: var(--warning-9);
 }

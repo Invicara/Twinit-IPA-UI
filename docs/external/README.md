@@ -41,8 +41,8 @@ npm run tailwind-dev   # Watch Tailwind (globals.css → output.css)
 1. **Simple components (CVA)**  
    `Button`, `Input`, `Checkbox`, `RadioGroup`, `Slider`, `Link` use **Class Variance Authority (CVA)** with a limited set of variants/sizes. Use `variant` and `size` props; expose a `*Variants` export (e.g. `buttonVariants`) for advanced use.
 
-2. **Complex components (classNames)**  
-   `Dialog`, `SingleSelect`, `MultiSelect`, `Accordion`, `Breadcrumb` use an interface-based approach with a **`classNames`** prop. Each key maps to a specific sub-component. Classes are merged with defaults using `cn()` (clsx + tailwind-merge). You can override any default by providing that key.
+2. **Complex components (styleOverrides)**
+   `SingleSelect`, `MultiSelect`, `Dialog`, `Accordion`, `Breadcrumb`, `Input`, `Button`, `Link`, `Checkbox`, `RadioGroup`, and `Slider` use **`styleOverrides`**: pass a CSS module or plain object mapping slot names to class names. The component merges your classes with the defaults via `mergeStyles`. **Import your override file last** in your app so override CSS appears after the library’s and wins. See [data-attributes.md](../data-attributes.md#customising-with-css-modules-styleoverrides), [dropdown.md](../dropdown.md#styling), and [README Custom Style Overrides](../README.md#custom-style-overrides).
 
 ### Component variants (dropdown)
 

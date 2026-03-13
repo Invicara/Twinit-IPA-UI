@@ -1,5 +1,5 @@
-import React from "react";
-import { StoryFn, Meta } from "@storybook/react";
+import React from "react"
+import { StoryFn, Meta } from "@storybook/react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,14 +14,17 @@ export default {
   component: Breadcrumb,
   argTypes: {
     className: {
-      control: 'text',
-      description: 'Additional CSS classes',
+      control: "text",
+      description: "Additional CSS classes for the nav",
     },
   },
-} as Meta<typeof Breadcrumb>;
+  parameters: {
+    layout: "centered",
+  },
+} as Meta<typeof Breadcrumb>
 
-const Template: StoryFn<typeof Breadcrumb> = (args) => (
-  <Breadcrumb className={args.className}>
+const Template: StoryFn<React.ComponentProps<typeof Breadcrumb>> = (args) => (
+  <Breadcrumb {...args}>
     <BreadcrumbList>
       <BreadcrumbItem>
         <BreadcrumbLink href="/">Home</BreadcrumbLink>
@@ -36,7 +39,7 @@ const Template: StoryFn<typeof Breadcrumb> = (args) => (
       </BreadcrumbItem>
     </BreadcrumbList>
   </Breadcrumb>
-);
+)
 
-export const BreadcrumbDefault = Template.bind({});
-BreadcrumbDefault.args = {};
+export const Default = Template.bind({})
+Default.args = {}
