@@ -45,14 +45,14 @@ const [open, setOpen] = useState(false);
 | `disableCloseButton`    | `boolean`  | `false`     | Hide the X close button in the header. |
 | `disableEscapeKey`      | `boolean`  | `false`     | Escape key does not close. |
 | `container`             | `HTMLElement \| null` | — | Portal mount node. Defaults to `document.getElementById('ipa-ui-modal-root')` if present. |
-| `classNames`            | `object`   | —           | Override classes for sub-elements (see **classNames** below). |
+| `styleOverrides`        | `Record<string, string>` | — | Override classes for sub-elements (see **styleOverrides** below). Plain object or CSS module. |
 | `className`             | `string`  | —           | Applied to the content wrapper. |
 
-### classNames (Dialog)
+### styleOverrides (Dialog)
 
-All properties are optional. Pass only the keys you need to override.
+Pass an object (or CSS module) mapping slot names to class names. Keys match the internal slots; pass only the keys you need to override. See [README Custom Style Overrides](../README.md#custom-style-overrides) for plain CSS vs CSS modules.
 
-| Property       | Applies to |
+| Key            | Applies to |
 |----------------|------------|
 | `dialog`       | Backdrop overlay (outermost). |
 | `content`      | Main dialog panel (wrapper around header, body, footer). |
@@ -103,11 +103,11 @@ Ensure modals inherit your app’s theme by rendering them inside a wrapper that
 <Dialog container={document.getElementById('my-modal-root')} ... />
 ```
 
-**Custom footer and classNames**
+**Custom footer and styleOverrides**
 
 ```tsx
 <Dialog
-  classNames={{ footer: 'my-footer-class', title: 'my-title-class' }}
+  styleOverrides={{ footer: 'my-footer-class', title: 'my-title-class' }}
   footer={<Button>Custom action</Button>}
   ...
 />
@@ -115,7 +115,7 @@ Ensure modals inherit your app’s theme by rendering them inside a wrapper that
 
 ## Styling
 
-The dialog uses internal CSS modules for layout, overlay, and animations. Override specific areas with `classNames` or the root `className`. For implementation details (e.g. animation strategy), see [dialog-animations.md](external/dialog-animations.md) (contributors).
+The dialog uses internal CSS modules for layout, overlay, and animations. Override specific areas with `styleOverrides` or the root `className`. For implementation details (e.g. animation strategy), see [dialog-animations.md](external/dialog-animations.md) (contributors).
 
 ## Accessibility
 

@@ -48,9 +48,9 @@ const meta: Meta<typeof Dialog> = {
       control: { type: 'text' },
       description: 'Additional CSS classes',
     },
-    classNames: {
-      control: { type: 'object' },
-      description: 'Custom class names for sub-components (not editable in controls)',
+    styleOverrides: {
+      control: false,
+      description: 'Style overrides (CSS module or plain object). See README Custom Style Overrides.',
     },
   },
 };
@@ -78,7 +78,7 @@ export const Default: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -129,7 +129,7 @@ export const Acknowledgment: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={handleOpenChange}
         >
@@ -162,7 +162,7 @@ export const Passive: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={setOpen}
         >
@@ -195,7 +195,7 @@ export const NonModal: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -232,14 +232,7 @@ export const CustomStyles: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={{
-            content: customStyles.content,
-            header: customStyles.header,
-            title: customStyles.title,
-            body: customStyles.body,
-            footer: customStyles.footer,
-            closeButton: customStyles.closeButton,
-          }}
+          styleOverrides={customStyles}
           open={open}
           onOpenChange={setOpen}
           footer={
@@ -276,7 +269,7 @@ export const Large: Story = {
           disableClickOutside={args.disableClickOutside}
           disableCloseButton={args.disableCloseButton}
           disableEscapeKey={args.disableEscapeKey}
-          classNames={args.classNames}
+          styleOverrides={args.styleOverrides}
           open={open}
           onOpenChange={setOpen}
           footer={

@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "../../../lib/utils"
+import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./link.module.css"
 
 export interface LinkProps
@@ -10,10 +10,8 @@ export interface LinkProps
   inline?: boolean // When true, underline style for inline text; default is button-like
   icon?: React.ReactNode
 
-  classNames?: {
-    link?: string
-    icon?: string
-  }
+  /** Style overrides: object mapping slot names (link, icon) to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
 
   children: React.ReactNode
 }
@@ -26,13 +24,14 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
       disabled = false,
       href,
       icon,
-      classNames,
+      styleOverrides,
       children,
       onClick,
       ...props
     },
     ref
   ) => {
+    const s = mergeStyles(styles, styleOverrides)
     const isDisabled = disabled || !href
 
     return (
@@ -40,10 +39,9 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         ref={ref}
         href={isDisabled ? undefined : href}
         className={cn(
-          styles.link,
-          inline && icon != null && styles.withIcon,
-          className,
-          classNames?.link
+          s.link,
+          inline && icon != null && s.withIcon,
+          className
         )}
         data-testid="ipa_link"
         data-variant={inline ? "inline" : "default"}
@@ -60,7 +58,7 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         {...props}
       >
         {icon != null && (
-          <span className={cn(styles.icon, classNames?.icon)}>{icon}</span>
+          <span className={s.icon}>{icon}</span>
         )}
         {children}
       </a>

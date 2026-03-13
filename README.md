@@ -4,6 +4,17 @@ A React component library implementing Invicara's design system with TypeScript 
 
 > **BETA disclaimer:** This library is currently in **BETA**. Integrators should expect **breaking changes** to the component API as the library evolves. Use at your own risk.
 
+## Table of contents
+
+- [Quick Start](#quick-start)
+- [Component documentation](#component-documentation)
+- [Component Architecture](#component-architecture)
+- [Component Variants](#component-variants)
+- [Composed Components](#composed-components)
+- [Custom Style Overrides](#custom-style-overrides)
+- [Theming and Dialog Portals](#theming-and-dialog-portals)
+- [Common Patterns](#common-patterns)
+
 ## Quick Start
 
 ### Installation
@@ -68,122 +79,26 @@ Simple components use **Class Variance Authority (CVA)** for variant-based styli
 - Use `size` prop for size variants (e.g., `default`, `sm`, `icon`)
 - Use `className` prop to add additional Tailwind classes that merge with the base styles
 
-### 2. Complex Components (Interface Pattern with classNames)
+### 2. Complex Components (styleOverrides)
 
-**Components:** `Dialog`, `Dropdown` (SingleSelect/MultiSelect), `Accordion`, `Breadcrumb`
+**Components:** `Dropdown` (SingleSelect/MultiSelect); others (e.g. `Dialog`, `Accordion`, `Breadcrumb`) will follow.
 
-Complex components use an **interface-based approach** with a `classNames` prop for granular styling control. These components have multiple sub-components that can be individually styled.
+Complex components expose a **`styleOverrides`** prop: an object that maps style slot names (e.g. `trigger`, `popup`, `scrollContent`) to class names. Use plain CSS or a CSS module; see [Custom Style Overrides](#custom-style-overrides) for the full guide.
 
-**Example:**
+**Example (Dropdown):**
 ```tsx
-<Dialog
-  title="My Dialog"
-  hideOverlay          // Show/hide backdrop overlay
-  disableCloseButton   // Enable/disable close button
-  disableEscapeKey       // Allow/prevent closing with Escape
-  enableLongTextAnimation   // Enable long text scrolling animation
-  classNames={{
-    overlay: "bg-black/50",
-    content: "rounded-lg",
-    header: "bg-blue-500",
-    body: "p-4",
-    footer: "border-t"
-  }}
->
-  Content here
-</Dialog>
+import { MultiSelect } from '@dtplatform/ipa-ui';
+import myOverrides from './my-dropdown-overrides.module.css';  // or use a plain object + .css file
 
-<SingleSelect
+<MultiSelect
   options={options}
-  hideFooter={false}              // Show/hide footer
-  hideRowHighlight={false}        // Show/hide row highlight on hover
-  disableKeyboardNavigation={false} // Enable/disable keyboard navigation
-  enableLongTextAnimation={true}   // Enable text scrolling for long items
-  classNames={{
-    trigger: "custom-trigger",
-    popup: "custom-popup",
-    item: "custom-item"
-  }}
+  value={value}
+  onChange={setValue}
+  styleOverrides={myOverrides}
 />
 ```
 
-**The `classNames` Pattern:**
-
-The `classNames` prop is an object that maps to specific sub-components within a complex component. This allows you to drill down and customize individual parts:
-
-```tsx
-// Dialog example
-classNames={{
-  dialog: "custom-dialog-styles",        // Styles the backdrop overlay (outermost)
-  content: "custom-content-styles",      // Styles the main dialog panel
-  header: "custom-header-styles",        // Styles the header section
-  title: "custom-title-styles",          // Styles the title text
-  closeButton: "custom-close-styles",    // Styles the X close button
-  body: "custom-body-styles",            // Styles the content area
-  footer: "custom-footer-styles"         // Styles the footer section
-}}
-
-// Dropdown example
-classNames={{
-  container: "custom-container",        // Styles the wrapper div
-  trigger: "custom-trigger",              // Styles the input/button trigger
-  popup: "custom-popup",                  // Styles the dropdown menu
-  item: "custom-item",                    // Styles each dropdown item
-  itemText: "custom-item-text",           // Styles the text within items
-  ellipsis: "custom-ellipsis",            // Styles the ellipsis indicator
-  footer: "custom-footer"                 // Styles the footer
-}}
-```
-
-**How it works:**
-- Each key in `classNames` corresponds to a specific sub-component
-- The provided Tailwind classes are merged with the component's default styles using `cn()` (clsx + tailwind-merge)
-- You can override any default styling by providing your own classes
-- Classes are applied using the `className={cn(defaultStyles, classNames?.key)}` pattern
-
-### Input: Styling subparts (no Tailwind)
-
-The `Input` component supports the same pattern via **`classNames`**. Pass custom classes (e.g. from your CSS module) to target each subpart without rewriting the component's CSS.
-
-**Available keys:** `input`, `label`, `wrapper`, `iconContainer`, `icon`, `inputBox`, `passwordToggle`, `passwordToggleIcon`, `helperText`
-
-**Example – Custom classes (e.g. from your CSS module):**
-
-```tsx
-import { Input } from '@invicara/ipa-ui'
-import formStyles from './MyForm.module.css'
-
-<Input
-  label="Email"
-  helperText="We'll never share your email"
-  placeholder="you@example.com"
-  classNames={{
-    input: formStyles.inputGroup,
-    label: formStyles.inputLabel,
-    inputBox: formStyles.inputField,
-    helperText: formStyles.inputHelper,
-  }}
-/>
-```
-
-```css
-/* MyForm.module.css */
-.inputGroup {
-  margin-bottom: 1rem;
-}
-.inputLabel {
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-.inputField {
-  max-width: 20rem;
-}
-.inputHelper {
-  font-size: 0.75rem;
-  color: var(--neutral-6);
-  margin-top: 0.25rem;
-}
-```
+Component docs (e.g. [Dropdown](docs/dropdown.md)) list the available slot names and props.
 
 ## Component Variants
 
@@ -250,43 +165,89 @@ The dialog also supports an `acknowledgment` prop that automatically generates a
 </Dialog>
 ```
 
-## Styling with Tailwind
+## Custom Style Overrides
 
-All components use Tailwind CSS for styling. You can customize components in several ways:
+Components that expose a **`styleOverrides`** prop (e.g. **SingleSelect**, **MultiSelect**; others will follow) let you theme inner parts by passing an object that maps **style slot names** to **class names**. Each key is the name of a slot (the same names used internally on the component, e.g. `s.trigger`, `s.scrollContent`, `s.popup`); each value is the class name string to apply to that element. You can use **plain CSS** (no CSS modules) or **CSS modules** (pass the module directly and skip the mapping object). The convention below applies to all such components.
 
-1. **Using className prop** (simple components):
-   ```tsx
-   <Button className="w-full bg-blue-500 hover:bg-blue-600">
-     Custom Button
-   </Button>
-   ```
+### Plain CSS (no CSS modules required)
 
-2. **Using classNames prop** (complex components):
-   ```tsx
-   <Dialog
-     classNames={{
-       content: "max-w-2xl",
-       header: "bg-gradient-to-r from-blue-500 to-purple-500",
-       body: "text-lg"
-     }}
-   >
-     Content
-   </Dialog>
-   ```
+Use a normal `.css` file and an object that maps each style slot to your class name. The object keys must match the component’s slot names; the values are the class names you use in your CSS.
 
-3. **Overriding default styles**:
-   The `cn()` utility function merges classes intelligently, so you can override defaults:
-   ```tsx
-   <Button className="bg-red-500">  // Overrides default variant background
-     Red Button
-   </Button>
-   ```
+1. **Write your CSS** with the class names you want (for a 1:1 setup, use the same names as the slots):
+
+```css
+/* my-dropdown-overrides.css */
+.trigger {
+  border-radius: 0;
+  width: 360px;
+}
+.scrollContent {
+  cursor: copy;
+}
+.checkboxIconWrapper {
+  border-radius: 50%;
+}
+```
+
+2. **Define the mapping object**: keys = slot names (same as `s.xyz` in the component), values = the class names in your CSS:
+
+```ts
+const myOverrides = {
+  trigger: "trigger",
+  scrollContent: "scrollContent",
+  checkboxIconWrapper: "checkboxIconWrapper",
+  // … only the slots you override
+};
+```
+
+3. **Load your CSS file** (import it so it’s in the bundle), then pass the object. Prefer **importing your override file last** in your app entry so your overrides win (see convention below):
+
+```tsx
+import { MultiSelect } from '@dtplatform/ipa-ui';
+import './my-dropdown-overrides.css';  // load override CSS (import last – see convention below)
+
+const myOverrides = { trigger: "trigger", ... };  // from step 2
+
+<MultiSelect styleOverrides={myOverrides} options={...} value={...} onChange={...} />
+```
+
+No CSS modules are required; the mapping object tells the component which class to apply to each element (`s.trigger`, `s.scrollContent`, etc.).
+
+### CSS modules (skip the mapping object)
+
+If your project uses CSS modules, you can pass your override **module** directly. The build produces an object whose keys are the selector names and whose values are the hashed class names—so the keys already match the component’s slot names, and you skip writing the mapping object. Import your override CSS last so it wins (see convention below):
+
+```tsx
+import { MultiSelect } from '@dtplatform/ipa-ui';
+import myOverrides from './my-dropdown-overrides.module.css';
+
+<MultiSelect styleOverrides={myOverrides} options={...} value={...} onChange={...} />
+```
+
+### Override convention: import your override file last
+
+For your overrides to win over the library defaults, **your override CSS must appear after the component’s CSS** in the final bundle. **Import your override file last** in your app entry (or in a dedicated file that you import last):
+
+```ts
+// e.g. main.tsx or index.tsx
+import './app.css';
+import { MultiSelect } from '@dtplatform/ipa-ui';
+// ... other imports and app code
+
+// Last: import overrides so their CSS is emitted after the library’s
+import './style-overrides';
+```
+
+If your override file is not loaded last, default and override rules can have the same specificity and the one that appears later wins—which may be the default.
+
+For component-specific slot names and data-attribute selectors (e.g. `[data-checked="true"]`), see the component docs (e.g. [Dropdown](docs/dropdown.md)) and [Data attributes](docs/data-attributes.md#customising-with-styleoverrides).
 
 ## Theming and Dialog Portals
 
 ### Theme wrapper (`data-theme="invicara"`)
 
-ipa-ui ships with an `invicara` design theme based on CSS variables.  
+ipa-ui ships with an `invicara` design theme based on CSS custom properties. The theme is defined in **[`src/styles/globals.css`](src/styles/globals.css)** — you can open that file to see the full set of variables. It defines **global variables** for colours and other tokens that components use via `var(--...)`. Main palettes include **brand** (`--brand-1` … `--brand-10`), **neutral** (`--neutral-0` … `--neutral-10`), and semantic sets such as **alert**, **warning**, **positive**, and **blue**. To rebrand or change the palette, override these variables (e.g. in your own stylesheet or under a wrapper) by copy-pasting the same variable names from `globals.css` and setting your own values; components will pick them up automatically.
+
 To ensure all components (especially those using `var(--primary)` and other tokens) are themed correctly and isolated from host CSS (e.g. Bootstrap):
 
 - Wrap the part of your app that uses ipa-ui in a theme container:

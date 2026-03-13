@@ -202,12 +202,12 @@ describe("SingleSelect", () => {
       // Test navigation down
       await user.keyboard("{ArrowDown}");
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).toHaveClass("itemFocused");
+      expect(firstOption).toHaveAttribute("data-focused", "true");
       
       // Test navigation further down then up
       await user.keyboard("{ArrowDown}");
       await user.keyboard("{ArrowUp}");
-      expect(firstOption).toHaveClass("itemFocused");
+      expect(firstOption).toHaveAttribute("data-focused", "true");
       
       // Test selection with Enter
       await user.keyboard("{Enter}");
@@ -260,7 +260,7 @@ describe("SingleSelect", () => {
       await user.keyboard("{ArrowDown}");
       
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveClass("itemFocused");
+      expect(firstOption).not.toHaveAttribute("data-focused");
     });
 
     test("handles rapid keyboard navigation without exceeding bounds", async () => {
@@ -277,7 +277,7 @@ describe("SingleSelect", () => {
       await user.keyboard("{ArrowDown}");
       
       const lastOption = screen.getByText("Option 5").closest("button");
-      expect(lastOption).toHaveClass("itemFocused");
+      expect(lastOption).toHaveAttribute("data-focused", "true");
     });
   });
 
@@ -322,14 +322,14 @@ describe("SingleSelect", () => {
     });
 
     test.each([
-      ['container', { container: "custom-container" }, '.custom-container', false],
+      ['singleSelect', { singleSelect: "custom-singleSelect" }, '.custom-singleSelect', false],
       ['trigger', { trigger: "custom-trigger" }, null, false],
       ['popup', { popup: "custom-popup" }, '.custom-popup', true],
-      ['item', { item: "custom-item" }, null, true],
-    ])('applies custom %s className', async (name, classNames, selector, needsOpen) => {
+      ['itemBase', { itemBase: "custom-item" }, null, true],
+    ])('applies custom %s styleOverride', async (name, styleOverrides, selector, needsOpen) => {
       const user = userEvent.setup();
       const { container } = render(
-        <SingleSelect options={defaultOptions} classNames={classNames} />
+        <SingleSelect options={defaultOptions} styleOverrides={styleOverrides} />
       );
       
       const input = screen.getByPlaceholderText("Select an option");
@@ -344,7 +344,7 @@ describe("SingleSelect", () => {
         expect(input).toHaveClass("custom-trigger");
       } else if (name === 'popup') {
         expect(container.querySelector(selector!)).toBeInTheDocument();
-      } else if (name === 'item') {
+      } else if (name === 'itemBase') {
         const element = screen.getByText("Option 1").closest("button");
         expect(element).toHaveClass("custom-item");
       }
@@ -362,14 +362,14 @@ describe("SingleSelect", () => {
       const input = screen.getByPlaceholderText("Select an option");
       await user.click(input);
       
-      expect(container.querySelector(".popupTop")).toBeInTheDocument();
+      expect(container.querySelector('[data-position="bottom"]')).toBeInTheDocument();
       
       await user.keyboard("{Escape}");
       
       rerender(<SingleSelect options={defaultOptions} popAbove />);
       await user.click(input);
       
-      expect(container.querySelector(".popupBottom")).toBeInTheDocument();
+      expect(container.querySelector('[data-position="top"]')).toBeInTheDocument();
     });
   });
 
@@ -392,7 +392,7 @@ describe("SingleSelect", () => {
       } else if (propName === 'hideRowHighlight') {
         await user.keyboard("{ArrowDown}");
         const firstOption = screen.getByText("Option 1").closest("button");
-        expect(firstOption).not.toHaveClass("itemFocused");
+        expect(firstOption).not.toHaveAttribute("data-focused");
       } else if (propName === 'hideLongTextEllipsis') {
         expect(container.querySelector(".itemContentEllipsisIndicator")).not.toBeInTheDocument();
       }
@@ -431,7 +431,7 @@ describe("SingleSelect", () => {
       const input = screen.getByPlaceholderText("Select an option");
       await user.click(input);
       
-      expect(container.querySelector(".scrollContent")).not.toBeInTheDocument();
+      expect(container.querySelector(".scrollContent")).not.toHaveAttribute("data-scrollable", "true");
     });
 
     test("disableCloseOnOutsideClick keeps dropdown open", async () => {
@@ -470,22 +470,22 @@ describe("SingleSelect", () => {
           hideFooter
           hideRowHighlight
           disableIconAnimation
-          classNames={{ popup: "custom-popup" }}
+          styleOverrides={{ popup: "custom-popup" }}
         />
       );
       
       const input = screen.getByPlaceholderText("Select an option");
       await user.click(input);
       
-      expect(container.querySelector(".popupBottom.custom-popup")).toBeInTheDocument();
+      expect(container.querySelector('[data-position="top"].custom-popup')).toBeInTheDocument();
       expect(container.querySelector('[class*="footer"]')).not.toBeInTheDocument();
       
       await user.keyboard("{ArrowDown}");
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveClass("itemFocused");
+      expect(firstOption).not.toHaveAttribute("data-focused");
     });
 
-    test("works with filter and custom icons/classNames", async () => {
+    test("works with filter and custom icons/styleOverrides", async () => {
       const user = userEvent.setup();
       const CustomIcon = () => <div data-testid="custom-icon">Icon</div>;
       
@@ -494,7 +494,7 @@ describe("SingleSelect", () => {
           options={defaultOptions}
           filter
           icons={{ trigger: <CustomIcon /> }}
-          classNames={{ trigger: "custom-trigger", popup: "custom-popup" }}
+          styleOverrides={{ trigger: "custom-trigger", popup: "custom-popup" }}
         />
       );
       

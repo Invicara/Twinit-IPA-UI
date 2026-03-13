@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
 
-import { cn } from "../../../lib/utils"
+import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./slider.module.css"
 
 export interface SliderProps
@@ -15,21 +15,8 @@ export interface SliderProps
   disabled?: boolean
   range?: boolean // When true, use two thumbs for range selection
 
-  classNames?: {
-    slider?: string
-    label?: string
-    controls?: string
-    minLabel?: string
-    maxLabel?: string
-    sliderContainer?: string
-    root?: string
-    track?: string
-    range?: string
-    thumb?: string
-    inputs?: string
-    inputBox?: string
-    inputContainer?: string
-  }
+  /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
 }
 
 const Slider = React.forwardRef<
@@ -44,7 +31,7 @@ const Slider = React.forwardRef<
       maxLabel = "100",
       range = false,
       disabled = false,
-      classNames,
+      styleOverrides,
       value,
       defaultValue,
       onValueChange,
@@ -55,6 +42,7 @@ const Slider = React.forwardRef<
     },
     ref
   ) => {
+    const s = mergeStyles(styles, styleOverrides)
     const sliderId = React.useId()
 
     const [internalValue, setInternalValue] = React.useState<number[]>(
@@ -83,29 +71,29 @@ const Slider = React.forwardRef<
 
     return (
       <div
-        className={cn(styles.slider, classNames?.slider)}
+        className={s.slider}
         data-disabled={disabled}
       >
         {label && (
           <label
-            className={cn(styles.label, classNames?.label)}
+            className={s.label}
             id={sliderId}
           >
             {label}
           </label>
         )}
 
-        <div className={cn(styles.controls, classNames?.controls)}>
-          <span className={cn(styles.minLabel, classNames?.minLabel)}>
+        <div className={s.controls}>
+          <span className={s.minLabel}>
             {minLabel}
           </span>
 
           <div
-            className={cn(styles.sliderContainer, classNames?.sliderContainer)}
+            className={s.sliderContainer}
           >
             <SliderPrimitive.Root
               ref={ref}
-              className={cn(styles.root, className, classNames?.root)}
+              className={cn(s.root, className)}
               value={currentValue}
               onValueChange={handleValueChange}
               min={min}
@@ -118,28 +106,28 @@ const Slider = React.forwardRef<
               {...props}
             >
               <SliderPrimitive.Track
-                className={cn(styles.track, classNames?.track)}
+                className={s.track}
               >
                 <SliderPrimitive.Range
-                  className={cn(styles.range, classNames?.range)}
+                  className={s.range}
                 />
               </SliderPrimitive.Track>
 
               {currentValue.map((_: number, index: number) => (
                 <SliderPrimitive.Thumb
                   key={index}
-                  className={cn(styles.thumb, classNames?.thumb)}
+                  className={s.thumb}
                 />
               ))}
             </SliderPrimitive.Root>
           </div>
 
-          <span className={cn(styles.maxLabel, classNames?.maxLabel)}>
+          <span className={s.maxLabel}>
             {maxLabel}
           </span>
         </div>
 
-        <div className={cn(styles.inputs, classNames?.inputs)}>
+        <div className={s.inputs}>
           {range ? (
             <>
               <input
@@ -150,7 +138,7 @@ const Slider = React.forwardRef<
                 min={min}
                 max={max}
                 step={step}
-                className={cn(styles.inputBox, classNames?.inputBox)}
+                className={s.inputBox}
               />
               <input
                 type="number"
@@ -160,11 +148,11 @@ const Slider = React.forwardRef<
                 min={min}
                 max={max}
                 step={step}
-                className={cn(styles.inputBox, classNames?.inputBox)}
+                className={s.inputBox}
               />
             </>
           ) : (
-            <div className={cn(styles.inputContainer, classNames?.inputContainer)}>
+            <div className={s.inputContainer}>
               <input
                 type="number"
                 value={currentValue[0]}
@@ -173,7 +161,7 @@ const Slider = React.forwardRef<
                 min={min}
                 max={max}
                 step={step}
-                className={cn(styles.inputBox, classNames?.inputBox)}
+                className={s.inputBox}
               />
             </div>
           )}

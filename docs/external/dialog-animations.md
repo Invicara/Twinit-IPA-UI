@@ -131,25 +131,14 @@ The CSS module reacts to those attributes and plays the correct keyframes.
 
 #### 4. JSX stays clean and library-friendly
 
-In `dialog.tsx`, we only apply **CSS module classes** and optional overrides via `classNames`:
+In `dialog.tsx`, we only apply **CSS module classes** merged with optional overrides via `styleOverrides` (using `mergeStyles(styles, styleOverrides)` to get `s`, then `s.dialog`, `s.content`, etc.):
 
 ```tsx
-<DialogPrimitive.Overlay
-  className={cn(
-    styles.dialog,
-    classNames?.dialog
-  )}
-/>;
+<DialogPrimitive.Overlay className={s.dialog} />;
 
 <DialogPrimitive.Content
   ref={ref}
-  className={cn(
-    styles.content,
-    sizeClasses[size],
-    hideOverlay && styles.contentPointerEventsAuto,
-    classNames?.content,
-    className
-  )}
+  className={cn(s.content, hideOverlay && s.contentPointerEventsAuto, className)}
   onInteractOutside={(e) => {
     if (disableClickOutside) e.preventDefault();
   }}
@@ -165,7 +154,7 @@ In `dialog.tsx`, we only apply **CSS module classes** and optional overrides via
 There are **no Tailwind animation utilities** in the JSX. Consuming apps only see:
 
 - The CSS module class names (e.g. `dialog_module__content__abc123`).
-- Any extra classes provided via `classNames` or `className`.
+- Any extra classes provided via `styleOverrides` or `className`.
 
 ---
 

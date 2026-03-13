@@ -2,15 +2,16 @@ import * as React from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDownIcon } from "lucide-react"
 
-import { cn } from "../../../lib/utils"
+import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./accordion.module.css"
+
+const AccordionStylesContext = React.createContext<Record<string, string> | null>(null)
 
 export type AccordionProps = React.ComponentProps<
   typeof AccordionPrimitive.Root
 > & {
-  classNames?: {
-    accordion?: string
-  }
+  /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
 }
 
 export interface AccordionItemProps
@@ -25,57 +26,71 @@ export interface AccordionContentProps
 const AccordionItem = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
   AccordionItemProps
->(({ className, ...props }, ref) => (
-  <AccordionPrimitive.Item
-    ref={ref}
-    className={cn(styles.item, className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const s = React.useContext(AccordionStylesContext) ?? styles
+  return (
+    <AccordionPrimitive.Item
+      ref={ref}
+      className={cn(s.item, className)}
+      {...props}
+    />
+  )
+})
 AccordionItem.displayName = "AccordionItem"
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   AccordionTriggerProps
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Header className={styles.header}>
-    <AccordionPrimitive.Trigger
-      ref={ref}
-      className={cn(styles.trigger, className)}
-      {...props}
-    >
-      {children}
-      <ChevronDownIcon className={styles.icon} />
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-))
+>(({ className, children, ...props }, ref) => {
+  const s = React.useContext(AccordionStylesContext) ?? styles
+  return (
+    <AccordionPrimitive.Header className={s.header}>
+      <AccordionPrimitive.Trigger
+        ref={ref}
+        className={cn(s.trigger, className)}
+        {...props}
+      >
+        {children}
+        <ChevronDownIcon className={s.icon} />
+      </AccordionPrimitive.Trigger>
+    </AccordionPrimitive.Header>
+  )
+})
 AccordionTrigger.displayName = "AccordionTrigger"
 
 const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
   AccordionContentProps
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Content
-    ref={ref}
-    className={styles.content}
-    {...props}
-  >
-    <div className={cn(styles.contentInner, className)}>{children}</div>
-  </AccordionPrimitive.Content>
-))
+>(({ className, children, ...props }, ref) => {
+  const s = React.useContext(AccordionStylesContext) ?? styles
+  return (
+    <AccordionPrimitive.Content
+      ref={ref}
+      className={s.content}
+      {...props}
+    >
+      <div className={cn(s.contentInner, className)}>{children}</div>
+    </AccordionPrimitive.Content>
+  )
+})
 AccordionContent.displayName = "AccordionContent"
 
 const Accordion = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Root>,
   AccordionProps
->(({ className, classNames, ...props }, ref) => (
-  <AccordionPrimitive.Root
-    ref={ref}
-    data-testid="ipa_accordion"
-    className={cn(styles.accordion, className, classNames?.accordion)}
-    {...props}
-  />
-))
+>(({ className, styleOverrides, ...props }, ref) => {
+  const s = mergeStyles(styles, styleOverrides)
+  return (
+    <AccordionStylesContext.Provider value={s}>
+      <AccordionPrimitive.Root
+        ref={ref}
+        data-testid="ipa_accordion"
+        className={cn(s.accordion, className)}
+        {...props}
+      />
+    </AccordionStylesContext.Provider>
+  )
+})
 Accordion.displayName = "Accordion"
 
 export {

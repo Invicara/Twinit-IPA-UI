@@ -1,12 +1,13 @@
 import * as React from "react";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { cn } from "../../../lib/utils";
+import { cn, mergeStyles } from "../../../lib/utils";
 import sharedStyles from "./shared/dropdown-base.module.css";
 import styles from "./single-select.module.css";
 import { DropdownPopup, DropdownScrollableContent } from "./shared/dropdown-base";
 import { useClickOutside } from "./shared/dropdown-hooks";
 import { startTextAnimation, stopTextAnimation } from "./shared/dropdown-text-utils";
-import '../../../output.css';
+
+const defaultStyles = { ...sharedStyles, ...styles };
 
 export interface SingleSelectProps {
   // Core Props
@@ -17,7 +18,7 @@ export interface SingleSelectProps {
   disabled?: boolean;
   placeholder?: string;
   filter?: boolean;
-  
+
   // Feature Toggles & Behavior Options
   hideFooter?: boolean;
   hideRowHighlight?: boolean;
@@ -34,29 +35,12 @@ export interface SingleSelectProps {
 
   // Icons
   icons?: {
-    trigger?: React.ReactNode; 
-    footer?: React.ReactNode;  
+    trigger?: React.ReactNode;
+    footer?: React.ReactNode;
   };
-  
-  // Styling
-  classNames?: {
-    container?: string;
-    inputContainer?: string;
-    trigger?: string;
-    triggerIconContainer?: string;
-    triggerIcon?: string;
-    popup?: string;
-    scrollContent?: string;
-    item?: string;
-    itemFocused?: string;
-    itemDisabled?: string;
-    itemText?: string;
-    ellipsis?: string;
-    highlightedText?: string;
-    noResults?: string;
-    footer?: string;
-    footerIcon?: string;
-  };
+
+  // Custom style overrides
+  styleOverrides?: Record<string, string>;
 }
 
 export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
@@ -82,11 +66,12 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       popAbove,
       disableSelectionLooping = false,
       icons,
-      classNames,
+      styleOverrides,
       ...props
     },
     ref
   ) => {
+    const s = mergeStyles(defaultStyles, styleOverrides);
     const defaultPlaceholder = filter ? 'Type to search...' : 'Select an option';
     const effectivePlaceholder = placeholder || defaultPlaceholder;
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -128,7 +113,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       return (
         <>
           {before}
-          <span className={cn(styles.highlightedText, classNames?.highlightedText)}>{match}</span>
+          <span className={s.highlightedText}>{match}</span>
           {after}
         </>
       );
@@ -302,8 +287,11 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         : (isInputFocused || !selectedOption ? '' : selectedOption.label));
 
     return (
-      <div 
-        className={cn(sharedStyles.container, classNames?.container)} 
+      <div
+        className={cn(s.singleSelect)}
+        data-state={isSearchOpen ? "open" : "closed"}
+        data-disabled={disabled ? "true" : undefined}
+        data-variant={filter ? "filter" : undefined}
         ref={(node) => {
           dropdownRef.current = node;
           if (ref) {
@@ -316,7 +304,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         }} 
         {...props}
       >
-        <div className={cn(sharedStyles.container, classNames?.inputContainer)}>
+        <div className={s.container}>
           <input
             ref={searchInputRef}
             type="text"
@@ -353,40 +341,29 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             disabled={disabled}
             placeholder={effectivePlaceholder}
             readOnly={!filter}
-            className={cn(
-              sharedStyles.triggerBase,
-              styles.trigger,
-              disabled && sharedStyles.triggerDisabled,
-              filter && isSearchOpen && styles.triggerCursorText,
-              filter && !isSearchOpen && styles.triggerCursorPointer,
-              !filter && styles.triggerCursorPointer,
-              className,
-              classNames?.trigger
-            )}
+            data-disabled={disabled ? "true" : undefined}
+            className={cn(s.triggerBase, s.trigger, className)}
           />
-          <div className={cn(styles.triggerIconContainer, classNames?.triggerIconContainer)}>
+          <div className={s.triggerIconContainer}>
             {icons?.trigger ? (
               <div className={cn(
-                !disableIconAnimation && styles.triggerIconTransition,
-                !disableIconAnimation && isSearchOpen && styles.triggerIconRotate180,
-                classNames?.triggerIcon
+                !disableIconAnimation && s.triggerIconTransition,
+                s.triggerIcon
               )}>
                 {icons.trigger}
               </div>
             ) : (
               <ChevronDownIcon className={cn(
-                styles.triggerIcon,
-                !disableIconAnimation && styles.triggerIconTransition, 
-                !disableIconAnimation && isSearchOpen && styles.triggerIconRotate180,
-                classNames?.triggerIcon
+                s.triggerIcon,
+                !disableIconAnimation && s.triggerIconTransition
               )} />
             )}
           </div>
         </div>
         
         {isSearchOpen && filteredOptions.length > 0 && (
-          <DropdownPopup isOpen={true} onClose={closeSearch} className={classNames?.popup} footer={!hideFooter} popAbove={popAbove}>
-            <DropdownScrollableContent className={classNames?.scrollContent} scrollable={!disableScrolling}>
+          <DropdownPopup isOpen={true} onClose={closeSearch} footer={!hideFooter} popAbove={popAbove} styles={s}>
+            <DropdownScrollableContent scrollable={!disableScrolling} styles={s}>
               {filteredOptions.map((option, index) => (
                 <button
                   key={option.value}
@@ -416,6 +393,8 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                   }}
                   type="button"
                   disabled={option.disabled}
+                  data-disabled={option.disabled ? "true" : undefined}
+                  data-focused={!hideRowHighlight && focusedIndex === index ? "true" : undefined}
                   onClick={() => {
                     if (onChange) {
                       onChange(option.value);
@@ -456,27 +435,23 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                     }
                   }}
                   className={cn(
-                    sharedStyles.itemBase,
-                    !hideRowHighlight && focusedIndex === index && styles.itemFocused,
-                    !hideRowHighlight && !isKeyboardMode && cn(styles.itemHover, 'group'),
-                    classNames?.item,
-                    !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
-                    option.disabled && classNames?.itemDisabled
+                    s.itemBase,
+                    !hideRowHighlight && !isKeyboardMode && cn(s.itemHover, 'group'),
+                    !hideRowHighlight && focusedIndex === index && s.itemFocused,
+                    option.disabled && s.itemDisabled
                   )}
                 >
-                  <div className={styles.itemContent}>
+                  <div className={s.itemContent}>
                     <span 
-                      className={cn(styles.itemContentText, 'scrollable-text', classNames?.itemText)}
+                      className={cn(s.itemContentText, 'scrollable-text', s.itemText)}
                     >
                       {filter ? highlightMatch(option.label, searchQuery) : option.label}
                     </span>
                     {!hideLongTextEllipsis && (
                       <span className={cn(
-                        styles.itemContentEllipsisIndicator,
+                        s.itemContentEllipsisIndicator,
                         'ellipsis-indicator',
-                        !hideRowHighlight && focusedIndex === index ? styles.itemContentEllipsisIndicatorFocused : styles.itemContentEllipsisIndicatorUnfocused,
-                        !hideRowHighlight && !isKeyboardMode && styles.itemContentEllipsisIndicatorHover,
-                        classNames?.ellipsis
+                        !hideRowHighlight && !isKeyboardMode && s.itemContentEllipsisIndicatorHover
                       )}>
                         ..
                       </span>
@@ -489,42 +464,40 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         )}
         
         {isSearchOpen && filteredOptions.length === 0 && searchQuery && (
-          <DropdownPopup isOpen={true} onClose={closeSearch} footer={false} popAbove={popAbove} className={classNames?.popup}>
-            <div className={cn(styles.noResults, classNames?.noResults)}>
+          <DropdownPopup isOpen={true} onClose={closeSearch} footer={false} popAbove={popAbove} styles={s}>
+            <div className={s.noResults}>
               No options found
             </div>
             {!popAbove && !hideFooter && (
-              <div className={cn(sharedStyles.footer, 'group', classNames?.footer)} onClick={closeSearch}>
+              <div className={cn(s.footer, s.footerGroup)} onClick={closeSearch}>
                 {icons?.footer ? (
                   <div className={cn(
-                    !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
-                    classNames?.footerIcon
+                    !disableIconAnimation && s.footerIconAnimate,
+                    s.footerIcon
                   )}>
                     {icons.footer}
                   </div>
                 ) : (
                   <ChevronDownIcon className={cn(
-                    "h-5 w-5 text-neutral-5 stroke-[1.5]",
-                    !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
-                    classNames?.footerIcon
+                    s.footerIcon,
+                    !disableIconAnimation && s.footerIconAnimate
                   )} />
                 )}
               </div>
             )}
             {popAbove && !hideFooter && (
-              <div className={cn(sharedStyles.footer, 'group', classNames?.footer)} onClick={closeSearch}>
+              <div className={cn(s.footer, s.footerGroup)} onClick={closeSearch}>
                 {icons?.footer ? (
                   <div className={cn(
-                    !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
-                    classNames?.footerIcon
+                    !disableIconAnimation && s.footerIconAnimate,
+                    s.footerIcon
                   )}>
                     {icons.footer}
                   </div>
                 ) : (
                   <ChevronDownIcon className={cn(
-                    "h-5 w-5 text-neutral-5 stroke-[1.5]",
-                    !disableIconAnimation && "group-hover:rotate-180 transition-transform duration-200",
-                    classNames?.footerIcon
+                    s.footerIcon,
+                    !disableIconAnimation && s.footerIconAnimate
                   )} />
                 )}
               </div>

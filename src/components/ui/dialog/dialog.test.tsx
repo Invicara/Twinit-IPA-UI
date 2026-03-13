@@ -211,8 +211,8 @@ describe("Dialog", () => {
       </div>
     );
 
-    const classNameCases: Array<{
-      key: keyof NonNullable<DialogProps["classNames"]>;
+    const styleOverrideCases: Array<{
+      key: keyof Record<string, string>;
       className: string;
       query: () => Element | null;
     }> = [
@@ -253,12 +253,12 @@ describe("Dialog", () => {
       },
     ];
 
-    test.each(classNameCases)(
-      "applies custom classNames.%s",
+    test.each(styleOverrideCases)(
+      "applies custom styleOverrides.%s",
       ({ key, className, query }) => {
-        const classNames = { [key]: className } as DialogProps["classNames"];
+        const styleOverrides = { [key]: className };
         renderDialog({
-          classNames,
+          styleOverrides,
           footer: key === "footer" ? footerWithButtons : customFooter,
         });
 
@@ -292,10 +292,10 @@ describe("Dialog", () => {
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
-    test("supports passive dialogs with custom classNames", () => {
+    test("supports passive dialogs with custom styleOverrides", () => {
       renderDialog({
         passive: true,
-        classNames: {
+        styleOverrides: {
           content: "custom-content",
           body: "custom-body",
         },

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Eye, EyeOff } from "lucide-react"
 
-import { cn } from "../../../lib/utils"
+import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./input.module.css"
 
 export interface InputProps
@@ -15,18 +15,9 @@ export interface InputProps
   password?: boolean
   textarea?: boolean
   icon?: React.ReactNode
-  
-  classNames?: {
-    input?: string
-    label?: string
-    wrapper?: string
-    iconContainer?: string
-    icon?: string
-    inputBox?: string
-    passwordToggle?: string
-    passwordToggleIcon?: string
-    helperText?: string
-  }
+
+  /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
 }
 
 
@@ -40,12 +31,13 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
       password = false,
       textarea = false,
       icon,
-      classNames,
+      styleOverrides,
       disabled,
       ...props
     },
     ref
   ) => {
+    const s = mergeStyles(styles, styleOverrides)
     const inputId = React.useId()
     const helperId = React.useId()
     const [showPassword, setShowPassword] = React.useState(false)
@@ -55,32 +47,31 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
 
     return (
       <div
-        className={cn(styles.input, classNames?.input)}
+        className={s.input}
         data-state={state}
       >
         {label && (
           <label
-            className={cn(styles.label, classNames?.label)}
+            className={s.label}
             data-state={state}
             htmlFor={inputId}
           >
             {label}
           </label>
         )}
-        <div className={cn(styles.wrapper, classNames?.wrapper)}>
+        <div className={s.wrapper}>
           {icon != null && (
-            <div className={cn(styles.iconContainer, classNames?.iconContainer)}>
-              <span className={cn(styles.icon, classNames?.icon)}>{icon}</span>
+            <div className={s.iconContainer}>
+              <span className={s.icon}>{icon}</span>
             </div>
           )}
           <Component
             className={cn(
-              styles.inputBox,
-              textarea ? styles.variantTextarea : styles.variantInput,
-              icon != null && styles.withIcon,
-              password && styles.withPassword,
-              className,
-              classNames?.inputBox
+              s.inputBox,
+              textarea ? s.variantTextarea : s.variantInput,
+              icon != null && s.withIcon,
+              password && s.withPassword,
+              className
             )}
             data-state={state}
             data-disabled={!!disabled}
@@ -96,7 +87,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
           />
           {password && (
             <button
-              className={cn(styles.passwordToggle, classNames?.passwordToggle)}
+              className={s.passwordToggle}
               type="button"
               onClick={() => !disabled && setShowPassword(!showPassword)}
               tabIndex={-1}
@@ -104,16 +95,16 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
               disabled={disabled}
             >
               {showPassword ? (
-                <Eye className={cn(styles.passwordToggleIcon, classNames?.passwordToggleIcon)} />
+                <Eye className={s.passwordToggleIcon} />
               ) : (
-                <EyeOff className={cn(styles.passwordToggleIcon, classNames?.passwordToggleIcon)} />
+                <EyeOff className={s.passwordToggleIcon} />
               )}
             </button>     
           )}
         </div>
         {helperText && (
           <p
-            className={cn(styles.helperText, classNames?.helperText)}
+            className={s.helperText}
             data-state={state}
             id={helperId}
           >

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 
-import { cn } from "../../../lib/utils"
+import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./button.module.css"
 
 export type ButtonVariant = "default" | "danger" | "secondary" | "tertiary"
@@ -12,9 +12,8 @@ export interface ButtonProps
   variant?: ButtonVariant
   size?: ButtonSize
   asChild?: boolean
-  classNames?: {
-    button?: string
-  }
+  /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -25,11 +24,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size = "default",
       asChild = false,
       disabled = false,
-      classNames,
+      styleOverrides,
       ...props
     },
     ref
   ) => {
+    const s = mergeStyles(styles, styleOverrides)
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
@@ -38,7 +38,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         data-variant={variant}
         data-size={size}
         data-disabled={disabled}
-        className={cn(styles.button, className, classNames?.button)}
+        className={cn(s.button, className)}
         {...(asChild ? {} : { disabled })}
         {...props}
       />

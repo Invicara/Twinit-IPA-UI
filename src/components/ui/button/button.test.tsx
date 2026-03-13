@@ -85,8 +85,8 @@ describe("Button", () => {
     expect(screen.getByRole("button")).toHaveClass("custom-btn")
   })
 
-  it("applies classNames.button", () => {
-    render(<Button classNames={{ button: "custom-button" }}>Button</Button>)
+  it("applies styleOverrides.button", () => {
+    render(<Button styleOverrides={{ button: "custom-button" }}>Button</Button>)
 
     expect(screen.getByRole("button")).toHaveClass("custom-button")
   })

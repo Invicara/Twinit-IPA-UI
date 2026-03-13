@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 
-import { cn } from "../../../lib/utils"
+import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./radio-group.module.css"
 
 export interface RadioGroupProps
@@ -19,16 +19,8 @@ export interface RadioGroupProps
     disabled?: boolean
   }>
 
-  classNames?: {
-    radioGroup?: string
-    label?: string
-    group?: string
-    item?: string
-    radio?: string
-    indicator?: string
-    itemContent?: string
-    itemLabel?: string
-  }
+  /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
 }
 
 const RadioGroup = React.forwardRef<
@@ -41,12 +33,13 @@ const RadioGroup = React.forwardRef<
       options,
       label,
       horizontal = false,
-      classNames,
+      styleOverrides,
       disabled = false,
       ...props
     },
     ref
   ) => {
+    const s = mergeStyles(styles, styleOverrides)
     const groupId = React.useId()
 
     const handleItemKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -79,12 +72,12 @@ const RadioGroup = React.forwardRef<
 
     return (
       <div
-        className={cn(styles.radioGroup, classNames?.radioGroup)}
+        className={s.radioGroup}
         data-disabled={disabled}
       >
         {label && (
           <div
-            className={cn(styles.label, classNames?.label)}
+            className={s.label}
             id={groupId}
           >
             {label}
@@ -92,7 +85,7 @@ const RadioGroup = React.forwardRef<
         )}
         <RadioGroupPrimitive.Root
           ref={ref}
-          className={cn(styles.group, className, classNames?.group)}
+          className={cn(s.group, className)}
           data-orientation={horizontal ? "horizontal" : "vertical"}
           orientation={horizontal ? "horizontal" : "vertical"}
           aria-labelledby={label ? groupId : undefined}
@@ -105,7 +98,7 @@ const RadioGroup = React.forwardRef<
             return (
               <div
                 key={option.value}
-                className={cn(styles.item, classNames?.item)}
+                className={s.item}
                 data-disabled={isDisabled}
               >
                 <RadioGroupPrimitive.Item
@@ -113,19 +106,19 @@ const RadioGroup = React.forwardRef<
                   id={`${groupId}-${option.value}`}
                   disabled={isDisabled}
                   tabIndex={isDisabled ? -1 : 0}
-                  className={cn(styles.radio, classNames?.radio)}
+                  className={s.radio}
                   onKeyDownCapture={handleItemKeyDown}
                 >
                   <RadioGroupPrimitive.Indicator
-                    className={cn(styles.indicator, classNames?.indicator)}
+                    className={s.indicator}
                   />
                 </RadioGroupPrimitive.Item>
                 <div
-                  className={cn(styles.itemContent, classNames?.itemContent)}
+                  className={s.itemContent}
                 >
                   <label
                     htmlFor={`${groupId}-${option.value}`}
-                    className={cn(styles.itemLabel, classNames?.itemLabel)}
+                    className={s.itemLabel}
                   >
                     {option.label}
                   </label>

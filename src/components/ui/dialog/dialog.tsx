@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
-import { cn } from "../../../lib/utils"
+import { cn, mergeStyles } from "../../../lib/utils"
 import { Button } from "../button"
 import styles from "./dialog.module.css"
 
@@ -26,16 +26,8 @@ export interface DialogProps {
   /** Portal container (e.g. element with id "ipa-ui-modal-root" inside theme wrapper so modals inherit theme variables) */
   container?: HTMLElement | null
 
-  // Custom Classnames for Sub-components
-  classNames?: {
-    dialog?: string
-    content?: string
-    header?: string
-    title?: string
-    closeButton?: string
-    body?: string
-    footer?: string
-  }
+  /** Style overrides: object mapping slot names (dialog, content, header, title, closeButton, body, footer) to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
 }
 
 export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
@@ -54,12 +46,13 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
       disableClickOutside = false,
       disableCloseButton = false,
       disableEscapeKey = false,
-      classNames,
+      styleOverrides,
       container,
       ...props
     },
     ref
   ) => {
+    const s = mergeStyles(styles, styleOverrides)
     const portalContainer =
       container ??
       (typeof document !== 'undefined'
@@ -88,7 +81,7 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
           {!hideOverlay && (
             <DialogPrimitive.Overlay
               data-testid="ipa_dialog_overlay"
-              className={cn(styles.dialog, classNames?.dialog)}
+              className={s.dialog}
             />
           )}
 
@@ -96,9 +89,8 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
             ref={ref}
             data-size={size}
             className={cn(
-              styles.content,
-              hideOverlay && styles.contentPointerEventsAuto,
-              classNames?.content,
+              s.content,
+              hideOverlay && s.contentPointerEventsAuto,
               className
             )}
             onInteractOutside={(e) => {
@@ -110,9 +102,9 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
             {...props}
           >
             {/* Header */}
-            <div className={cn(styles.header, classNames?.header)}>
+            <div className={s.header}>
               <DialogPrimitive.Title asChild>
-                <h2 className={cn(styles.title, classNames?.title)}>
+                <h2 className={s.title}>
                   {title}
                 </h2>
               </DialogPrimitive.Title>
@@ -120,23 +112,23 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
                 <DialogPrimitive.Close asChild>
                   <button
                     type="button"
-                    className={cn(styles.closeButton, classNames?.closeButton)}
+                    className={s.closeButton}
                     aria-label="Close"
                   >
-                    <X className={styles.closeButtonIcon} strokeWidth={2} />
+                    <X className={s.closeButtonIcon} strokeWidth={2} />
                   </button>
                 </DialogPrimitive.Close>
               )}
             </div>
 
             {/* Body (Scrollable) */}
-            <div className={cn(styles.body, "custom-scrollbar", classNames?.body)}>
+            <div className={cn(s.body, "custom-scrollbar")}>
               {children}
             </div>
 
             {/* Footer (Conditional) */}
             {footerContent && (
-              <div className={cn(styles.footer, classNames?.footer)}>
+              <div className={s.footer}>
                 {footerContent}
               </div>
             )}

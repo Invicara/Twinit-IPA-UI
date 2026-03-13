@@ -97,9 +97,9 @@ describe("Accordion", () => {
     expect(screen.getByTestId("ipa_accordion")).toHaveClass("custom-accordion")
   })
 
-  it("applies classNames.accordion", () => {
+  it("applies styleOverrides.accordion", () => {
     render(
-      <Accordion type="single" classNames={{ accordion: "custom-accordion-root" }}>
+      <Accordion type="single" styleOverrides={{ accordion: "custom-accordion-root" }}>
         <AccordionItem value="item-1">
           <AccordionTrigger>Trigger</AccordionTrigger>
           <AccordionContent>Content</AccordionContent>

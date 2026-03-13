@@ -196,8 +196,10 @@ describe("MultiSelect", () => {
       const checkboxes = container.querySelectorAll(".checkboxIconWrapper");
       expect(checkboxes.length).toBeGreaterThan(0);
       
-      expect(container.querySelector(".checkboxIconWrapperChecked")).toBeInTheDocument();
-      expect(container.querySelector(".checkboxIconWrapperUnchecked")).toBeInTheDocument();
+      expect(container.querySelector('[data-checked="true"]')).toBeInTheDocument();
+      expect(container.querySelectorAll('.checkboxIconWrapper').length).toBe(defaultOptions.length);
+      const checkedCount = container.querySelectorAll('[data-checked="true"]').length;
+      expect(checkedCount).toBe(2);
     });
 
     test("does not select disabled options", async () => {
@@ -231,12 +233,12 @@ describe("MultiSelect", () => {
       // Navigate down
       await user.keyboard("{ArrowDown}");
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).toHaveClass("itemFocused");
+      expect(firstOption).toHaveAttribute("data-focused", "true");
       
       // Navigate up and down
       await user.keyboard("{ArrowDown}");
       await user.keyboard("{ArrowUp}");
-      expect(firstOption).toHaveClass("itemFocused");
+      expect(firstOption).toHaveAttribute("data-focused", "true");
       
       // Select with Enter
       await user.keyboard("{Enter}");
@@ -259,7 +261,7 @@ describe("MultiSelect", () => {
       await user.keyboard("{ArrowDown}");
       
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveClass("itemFocused");
+      expect(firstOption).not.toHaveAttribute("data-focused");
     });
   });
 
@@ -305,24 +307,24 @@ describe("MultiSelect", () => {
     });
 
     test.each([
-      ['container', { container: "custom-container" }],
+      ['multiSelect', { multiSelect: "custom-multiSelect" }],
       ['trigger', { trigger: "custom-trigger" }],
       ['badge', { badge: "custom-badge" }],
       ['popup', { popup: "custom-popup" }],
       ['header', { header: "custom-header" }],
       ['checkbox', { checkbox: "custom-checkbox" }],
-    ])('applies custom %s className', async (name, classNames) => {
+    ])('applies custom %s styleOverride', async (name, styleOverrides) => {
       const user = userEvent.setup();
       const { container } = render(
         <MultiSelect
           options={defaultOptions}
           value={["option1"]}
-          classNames={classNames}
+          styleOverrides={styleOverrides}
         />
       );
       
-      if (name === 'container') {
-        expect(container.querySelector(".custom-container")).toBeInTheDocument();
+      if (name === 'multiSelect') {
+        expect(container.querySelector(".custom-multiSelect")).toBeInTheDocument();
       } else if (name === 'trigger') {
         const trigger = container.querySelector("button");
         expect(trigger).toHaveClass("custom-trigger");
@@ -350,14 +352,14 @@ describe("MultiSelect", () => {
       const trigger = container.querySelector("button");
       await user.click(trigger!);
       
-      expect(container.querySelector(".popupTop")).toBeInTheDocument();
+      expect(container.querySelector('[data-position="bottom"]')).toBeInTheDocument();
       
       await user.keyboard("{Escape}");
       
       rerender(<MultiSelect options={defaultOptions} popAbove />);
       await user.click(trigger!);
       
-      expect(container.querySelector(".popupBottom")).toBeInTheDocument();
+      expect(container.querySelector('[data-position="top"]')).toBeInTheDocument();
     });
 
     test("shows header at bottom when popAbove is true", async () => {
@@ -369,7 +371,7 @@ describe("MultiSelect", () => {
       const trigger = screen.getByText("Option 1").closest("button");
       await user.click(trigger!);
       
-      const popup = container.querySelector(".popupBottom");
+      const popup = container.querySelector('[data-position="top"]');
       const header = screen.getByText("1 selected").parentElement;
       
       expect(popup).toBeInTheDocument();
@@ -467,7 +469,7 @@ describe("MultiSelect", () => {
         const icon = container.querySelector("svg");
         expect(icon).not.toHaveClass("triggerIconRotate180");
       } else if (propName === 'disableScrolling') {
-        expect(container.querySelector(".scrollContent")).not.toBeInTheDocument();
+        expect(container.querySelector(".scrollContent")).not.toHaveAttribute("data-scrollable", "true");
       }
       // For enableLongTextAnimation, just verify it renders without error
       expect(screen.getByText(longTextOptions[0].label)).toBeInTheDocument();
@@ -530,9 +532,9 @@ describe("MultiSelect", () => {
           popAbove
           hideFooter
           hideSelectionCount
-          classNames={{
+          styleOverrides={{
             popup: "custom-popup",
-            item: "custom-item",
+            itemBase: "custom-item",
           }}
         />
       );
@@ -540,7 +542,7 @@ describe("MultiSelect", () => {
       const trigger = container.querySelector("button");
       await user.click(trigger!);
       
-      expect(container.querySelector(".popupBottom.custom-popup")).toBeInTheDocument();
+      expect(container.querySelector('[data-position="top"].custom-popup')).toBeInTheDocument();
       
       const customItems = container.querySelectorAll(".custom-item");
       expect(customItems.length).toBeGreaterThan(0);
@@ -604,7 +606,7 @@ describe("MultiSelect", () => {
       trigger!.focus();
       await user.keyboard("{ArrowDown}");
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveClass("itemFocused");
+      expect(firstOption).not.toHaveAttribute("data-focused");
     });
 
     test("works with all hide props together", async () => {
