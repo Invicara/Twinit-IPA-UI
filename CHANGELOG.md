@@ -8,6 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [1.1.6-0] - 2026-04-16
+
+### Breaking
+- dropdown converted, styleOverrides pattern, docs refined, added standard attribs
+- all but dropdown converted, missing tests added, bug fixing, renaming things
+- first 2 comps remove tailwind, use data-state, cleanup props
+### Changed
+- 1.1.5-0
+- generated v1.1.5 changelog
+- Merge pull request #3 from Invicara/remove-tailwind-refactor
+- Merge remote-tracking branch 'origin/master' into remove-tailwind-refactor
+### Fixed
+- portal + Floating UI for dropdowns (DBM-4722)
+
+
+
 ## [v1.1.5] - 2026-03-13
 
 ### Changed
