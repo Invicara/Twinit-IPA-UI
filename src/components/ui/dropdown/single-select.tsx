@@ -3,8 +3,13 @@ import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { cn, mergeStyles } from "../../../lib/utils";
 import sharedStyles from "./shared/dropdown-base.module.css";
 import styles from "./single-select.module.css";
-import { DropdownPopup, DropdownScrollableContent } from "./shared/dropdown-base";
+import {
+  DropdownPopup,
+  DropdownScrollableContent,
+  getDropdownScrollContentMaxHeight,
+} from "./shared/dropdown-base";
 import { useClickOutside } from "./shared/dropdown-hooks";
+import { useDropdownFloating } from "./shared/use-dropdown-floating";
 import { startTextAnimation, stopTextAnimation } from "./shared/dropdown-text-utils";
 
 const defaultStyles = { ...sharedStyles, ...styles };
@@ -32,6 +37,15 @@ export interface SingleSelectProps {
   closeOnInputClick?: boolean;
   popAbove?: boolean;
   disableSelectionLooping?: boolean;
+  /** Portal root for the listbox (defaults to `#ipa-ui-modal-root` or `document.body`) */
+  portalContainer?: HTMLElement | null;
+  /** z-index for the portaled listbox (default 1200) */
+  floatingZIndex?: number;
+  /**
+   * Max option rows shown before the list scrolls. Defaults to `10`.
+   * Pass `false` for no row cap (only the viewport / floating size limit applies).
+   */
+  maxVisibleOptions?: number | false;
 
   // Icons
   icons?: {
@@ -65,6 +79,9 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       closeOnInputClick,
       popAbove,
       disableSelectionLooping = false,
+      portalContainer,
+      floatingZIndex,
+      maxVisibleOptions = 10,
       icons,
       styleOverrides,
       ...props
@@ -72,6 +89,10 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
     ref
   ) => {
     const s = mergeStyles(defaultStyles, styleOverrides);
+    const scrollContentMaxHeight = getDropdownScrollContentMaxHeight(
+      maxVisibleOptions,
+      !!disableScrolling
+    );
     const defaultPlaceholder = filter ? 'Type to search...' : 'Select an option';
     const effectivePlaceholder = placeholder || defaultPlaceholder;
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -85,16 +106,34 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
     const dropdownRef = React.useRef<HTMLDivElement>(null);
     const searchInputRef = React.useRef<HTMLInputElement | null>(null);
 
-    useClickOutside(dropdownRef, () => {
-      if (!disableCloseOnOutsideClick) {
-        setIsSearchOpen(false);
-        setSearchQuery('');
-        setIsInputFocused(false);
-      }
-    }, isSearchOpen && !disableCloseOnOutsideClick);
-
     const filteredOptions = options.filter(option =>
       option.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const floatingOpen =
+      isSearchOpen &&
+      (filteredOptions.length > 0 ||
+        (filteredOptions.length === 0 && searchQuery.length > 0));
+
+    const { refs: floatingRefs, floatingStyles, resolvedPosition, portalRoot } =
+      useDropdownFloating({
+        open: floatingOpen,
+        preferTop: !!popAbove,
+        portalContainer,
+        floatingZIndex,
+      });
+
+    useClickOutside(
+      dropdownRef,
+      () => {
+        if (!disableCloseOnOutsideClick) {
+          setIsSearchOpen(false);
+          setSearchQuery('');
+          setIsInputFocused(false);
+        }
+      },
+      isSearchOpen && !disableCloseOnOutsideClick,
+      floatingRefs.floating
     );
 
     const highlightMatch = (text: string, query: string) => {
@@ -294,6 +333,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         data-variant={filter ? "filter" : undefined}
         ref={(node) => {
           dropdownRef.current = node;
+          floatingRefs.setReference(node);
           if (ref) {
             if (typeof ref === 'function') {
               ref(node);
@@ -362,8 +402,21 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         </div>
         
         {isSearchOpen && filteredOptions.length > 0 && (
-          <DropdownPopup isOpen={true} onClose={closeSearch} footer={!hideFooter} popAbove={popAbove} styles={s}>
-            <DropdownScrollableContent scrollable={!disableScrolling} styles={s}>
+          <DropdownPopup
+            isOpen={true}
+            onClose={closeSearch}
+            footer={!hideFooter}
+            resolvedPosition={resolvedPosition}
+            setFloating={floatingRefs.setFloating}
+            floatingStyles={floatingStyles}
+            portalRoot={portalRoot}
+            styles={s}
+          >
+            <DropdownScrollableContent
+              scrollable={!disableScrolling}
+              contentMaxHeight={scrollContentMaxHeight}
+              styles={s}
+            >
               {filteredOptions.map((option, index) => (
                 <button
                   key={option.value}
@@ -464,11 +517,20 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         )}
         
         {isSearchOpen && filteredOptions.length === 0 && searchQuery && (
-          <DropdownPopup isOpen={true} onClose={closeSearch} footer={false} popAbove={popAbove} styles={s}>
+          <DropdownPopup
+            isOpen={true}
+            onClose={closeSearch}
+            footer={false}
+            resolvedPosition={resolvedPosition}
+            setFloating={floatingRefs.setFloating}
+            floatingStyles={floatingStyles}
+            portalRoot={portalRoot}
+            styles={s}
+          >
             <div className={s.noResults}>
               No options found
             </div>
-            {!popAbove && !hideFooter && (
+            {resolvedPosition === 'bottom' && !hideFooter && (
               <div className={cn(s.footer, s.footerGroup)} onClick={closeSearch}>
                 {icons?.footer ? (
                   <div className={cn(
@@ -485,7 +547,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                 )}
               </div>
             )}
-            {popAbove && !hideFooter && (
+            {resolvedPosition === 'top' && !hideFooter && (
               <div className={cn(s.footer, s.footerGroup)} onClick={closeSearch}>
                 {icons?.footer ? (
                   <div className={cn(

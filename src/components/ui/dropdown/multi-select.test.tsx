@@ -192,13 +192,14 @@ describe("MultiSelect", () => {
       await waitFor(() => {
         expect(screen.getByText("2 selected")).toBeInTheDocument();
       });
-      
-      const checkboxes = container.querySelectorAll(".checkboxIconWrapper");
+
+      const listbox = screen.getByRole("listbox");
+      const checkboxes = listbox.querySelectorAll(".checkboxIconWrapper");
       expect(checkboxes.length).toBeGreaterThan(0);
-      
-      expect(container.querySelector('[data-checked="true"]')).toBeInTheDocument();
-      expect(container.querySelectorAll('.checkboxIconWrapper').length).toBe(defaultOptions.length);
-      const checkedCount = container.querySelectorAll('[data-checked="true"]').length;
+
+      expect(listbox.querySelector('[data-checked="true"]')).toBeInTheDocument();
+      expect(listbox.querySelectorAll(".checkboxIconWrapper").length).toBe(defaultOptions.length);
+      const checkedCount = listbox.querySelectorAll('[data-checked="true"]').length;
       expect(checkedCount).toBe(2);
     });
 
@@ -334,8 +335,8 @@ describe("MultiSelect", () => {
       } else {
         const trigger = container.querySelector("button");
         await user.click(trigger!);
-        
-        const customElement = container.querySelector(".custom-" + name);
+
+        const customElement = document.querySelector(".custom-" + name);
         expect(customElement).toBeInTheDocument();
       }
     });
@@ -351,15 +352,15 @@ describe("MultiSelect", () => {
       
       const trigger = container.querySelector("button");
       await user.click(trigger!);
-      
-      expect(container.querySelector('[data-position="bottom"]')).toBeInTheDocument();
-      
+
+      expect(screen.getByRole("listbox")).toHaveAttribute("data-position", "bottom");
+
       await user.keyboard("{Escape}");
-      
+
       rerender(<MultiSelect options={defaultOptions} popAbove />);
       await user.click(trigger!);
-      
-      expect(container.querySelector('[data-position="top"]')).toBeInTheDocument();
+
+      expect(screen.getByRole("listbox")).toHaveAttribute("data-position", "top");
     });
 
     test("shows header at bottom when popAbove is true", async () => {
@@ -370,11 +371,11 @@ describe("MultiSelect", () => {
       
       const trigger = screen.getByText("Option 1").closest("button");
       await user.click(trigger!);
-      
-      const popup = container.querySelector('[data-position="top"]');
+
+      const popup = screen.getByRole("listbox");
       const header = screen.getByText("1 selected").parentElement;
-      
-      expect(popup).toBeInTheDocument();
+
+      expect(popup).toHaveAttribute("data-position", "top");
       expect(header).toBeInTheDocument();
     });
 
@@ -417,18 +418,20 @@ describe("MultiSelect", () => {
       }
       
       if (propName === 'hideFooter') {
-        expect(container.querySelector('[class*="footer"]')).not.toBeInTheDocument();
+        expect(screen.getByRole("listbox").querySelector('[class*="footer"]')).not.toBeInTheDocument();
       } else if (propName === 'hideRowHighlight') {
         // Just verify hideRowHighlight prop is accepted and component renders
         expect(container).toBeInTheDocument();
       } else if (propName === 'hideLongTextEllipsis') {
-        expect(container.querySelector(".itemContentEllipsisIndicator")).not.toBeInTheDocument();
+        expect(
+          screen.getByRole("listbox").querySelector(".itemContentEllipsisIndicator")
+        ).not.toBeInTheDocument();
       } else if (propName === 'hideRemainingBadge') {
         expect(screen.queryByText("+1")).not.toBeInTheDocument();
       } else if (propName === 'hideSelectionCount') {
         expect(screen.queryByText("1 selected")).not.toBeInTheDocument();
       } else if (propName === 'hideCheckboxes') {
-        const checkboxes = container.querySelectorAll('[class*="w-4"][class*="h-4"]');
+        const checkboxes = screen.getByRole("listbox").querySelectorAll('[class*="w-4"][class*="h-4"]');
         expect(checkboxes.length).toBe(0);
       } else if (propName === 'hideBadgeRemove') {
         const removeButton = container.querySelector('span[class*="cursor-pointer"]');
@@ -469,10 +472,22 @@ describe("MultiSelect", () => {
         const icon = container.querySelector("svg");
         expect(icon).not.toHaveClass("triggerIconRotate180");
       } else if (propName === 'disableScrolling') {
-        expect(container.querySelector(".scrollContent")).not.toHaveAttribute("data-scrollable", "true");
+        expect(screen.getByRole("listbox").querySelector(".scrollContent")).not.toHaveAttribute(
+          "data-scrollable",
+          "true"
+        );
       }
       // For enableLongTextAnimation, just verify it renders without error
       expect(screen.getByText(longTextOptions[0].label)).toBeInTheDocument();
+    });
+
+    test("maxVisibleOptions defaults to 10 rows for scroll max-height", async () => {
+      const user = userEvent.setup();
+      const { container } = render(<MultiSelect options={defaultOptions} />);
+      const trigger = container.querySelector("button");
+      await user.click(trigger!);
+      const scroll = screen.getByRole("listbox").querySelector(".scrollContent") as HTMLElement;
+      expect(scroll.style.maxHeight).toBe("350px");
     });
 
     test("disableCloseOnOutsideClick keeps dropdown open", async () => {
@@ -541,13 +556,15 @@ describe("MultiSelect", () => {
       
       const trigger = container.querySelector("button");
       await user.click(trigger!);
-      
-      expect(container.querySelector('[data-position="top"].custom-popup')).toBeInTheDocument();
-      
-      const customItems = container.querySelectorAll(".custom-item");
+
+      const listbox = screen.getByRole("listbox");
+      expect(listbox).toHaveClass("custom-popup");
+      expect(listbox).toHaveAttribute("data-position", "top");
+
+      const customItems = listbox.querySelectorAll(".custom-item");
       expect(customItems.length).toBeGreaterThan(0);
-      
-      expect(container.querySelector('[class*="footer"]')).not.toBeInTheDocument();
+
+      expect(listbox.querySelector('[class*="footer"]')).not.toBeInTheDocument();
       expect(screen.queryByText("1 selected")).not.toBeInTheDocument();
     });
 
@@ -628,13 +645,14 @@ describe("MultiSelect", () => {
       
       const trigger = screen.getByText("Option 1").closest("button");
       await user.click(trigger!);
-      
-      expect(container.querySelector('[class*="footer"]')).not.toBeInTheDocument();
+
+      const listbox = screen.getByRole("listbox");
+      expect(listbox.querySelector('[class*="footer"]')).not.toBeInTheDocument();
       expect(screen.queryByText("3 selected")).not.toBeInTheDocument();
       expect(screen.queryByText("+1")).not.toBeInTheDocument();
-      expect(container.querySelector(".itemContentEllipsisIndicator")).not.toBeInTheDocument();
-      
-      const checkboxes = container.querySelectorAll('[class*="w-4"][class*="h-4"]');
+      expect(listbox.querySelector(".itemContentEllipsisIndicator")).not.toBeInTheDocument();
+
+      const checkboxes = listbox.querySelectorAll('[class*="w-4"][class*="h-4"]');
       expect(checkboxes.length).toBe(0);
       
       const removeButtons = container.querySelectorAll('span[class*="cursor-pointer"]');

@@ -25,7 +25,7 @@ Not every component uses every attribute; only those that are relevant.
 - **Dialog**: `data-size` (sm | default | lg | xl | full); Radix sets `data-state` on overlay/content (open | closed)
 - **Accordion** (Radix): `data-state` on items/triggers (open | closed)
 - **Slider** (Radix root): `data-disabled`
-- **SingleSelect / MultiSelect**: `data-state` (open | closed) on root and on trigger (MultiSelect trigger button); `data-disabled` on root, trigger, and option buttons; `data-position` (top | bottom) on popup for popAbove; `data-variant` (filter) on SingleSelect root when filter is enabled; scroll content uses `data-scrollable` (true); option row uses `data-focused` (true) when focused; MultiSelect checkbox wrapper uses `data-checked` (true) when the option is selected
+- **SingleSelect / MultiSelect**: `data-state` (open | closed) on root and on trigger (MultiSelect trigger button); `data-disabled` on root, trigger, and option buttons; `data-position` (top | bottom) on the portaled listbox popup for the **resolved** vertical side after [Floating UI](https://floating-ui.com) flip (`popAbove` only sets preferred placement); `data-variant` (filter) on SingleSelect root when filter is enabled; scroll content uses `data-scrollable` (true); option row uses `data-focused` (true) when focused; MultiSelect checkbox wrapper uses `data-checked` (true) when the option is selected
 
 ## Usage in CSS
 

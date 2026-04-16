@@ -1,6 +1,6 @@
 # Dropdown (SingleSelect & MultiSelect)
 
-Dropdowns for choosing one option (**SingleSelect**) or multiple options (**MultiSelect**). Support filtering, keyboard navigation, custom icons, and optional “pop above” behavior. For a simple single-select without filter, you can also use the legacy **Dropdown** wrapper with `variant="single"` or `variant="filter"`.
+Dropdowns for choosing one option (**SingleSelect**) or multiple values (**MultiSelect**). The options list is rendered in a **portal** with **[Floating UI](https://floating-ui.com)** positioning (`fixed`, flip, shift, size) so it stays visible inside scroll parents and near viewport edges. Optional `popAbove` sets a **preferred** side; collision detection may still open the list on the other side. For a simple single-select without filter, you can also use the legacy **Dropdown** wrapper with `variant="single"` or `variant="filter"`.
 
 ## Import
 
@@ -41,7 +41,10 @@ const [value, setValue] = useState<string | undefined>();
 | `placeholder` | `string` | `'Select an option'` or `'Type to search...'` if `filter` | Trigger placeholder. |
 | `disabled` | `boolean` | `false` | Disable the dropdown. |
 | `filter` | `boolean` | `false` | Enable type-to-filter (search) in the list. |
-| `popAbove` | `boolean` | `false` | Open popup above the trigger. |
+| `popAbove` | `boolean` | `false` | Prefer opening the list above the trigger; may still open below if there is not enough space (flip). |
+| `portalContainer` | `HTMLElement \| null` | — | Root node for the portaled listbox (same idea as Dialog `container`). Defaults to `#ipa-ui-modal-root` if present, otherwise `document.body`, so theme CSS variables apply when that root exists. |
+| `floatingZIndex` | `number` | `1200` | `z-index` for the portaled listbox. |
+| `maxVisibleOptions` | `number \| false` | `10` | Max option rows before the list scrolls; `false` removes this cap (only viewport / floating limits apply). |
 | `hideFooter` | `boolean` | — | Hide footer area. |
 | `hideRowHighlight` | `boolean` | — | Disable row highlight on focus/hover. |
 | `disableKeyboardNavigation` | `boolean` | — | Disable arrow-key navigation. |
@@ -83,7 +86,10 @@ const [value, setValue] = useState<string[]>([]);
 | `placeholder` | `string` | `'Select multiple options'` | Trigger placeholder. |
 | `disabled` | `boolean` | `false` | Disable the dropdown. |
 | `maxDisplayBadges` | `number` | `2` | Max badges shown in trigger; rest summarized (e.g. “+2”). |
-| `popAbove` | `boolean` | `false` | Open popup above the trigger. |
+| `popAbove` | `boolean` | `false` | Prefer opening the list above the trigger; may still open below if there is not enough space (flip). |
+| `portalContainer` | `HTMLElement \| null` | — | Root node for the portaled listbox. Defaults to `#ipa-ui-modal-root` if present, otherwise `document.body`. |
+| `floatingZIndex` | `number` | `1200` | `z-index` for the portaled listbox. |
+| `maxVisibleOptions` | `number \| false` | `10` | Max option rows before the list scrolls; `false` removes this cap (only viewport / floating limits apply). |
 | `hideFooter` | `boolean` | — | Hide footer. |
 | `hideCheckboxes` | `boolean` | — | Hide checkboxes next to options. |
 | `hideBadgeRemove` | `boolean` | — | Hide remove icon on badges. |

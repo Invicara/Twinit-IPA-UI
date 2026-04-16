@@ -3,8 +3,14 @@ import { cn, mergeStyles } from "../../../lib/utils";
 import { XIcon } from "../../icons";
 import sharedStyles from "./shared/dropdown-base.module.css";
 import defaultStyles from "./multi-select.module.css";
-import { DropdownTrigger, DropdownPopup, DropdownScrollableContent } from "./shared/dropdown-base";
+import {
+  DropdownTrigger,
+  DropdownPopup,
+  DropdownScrollableContent,
+  getDropdownScrollContentMaxHeight,
+} from "./shared/dropdown-base";
 import { useClickOutside } from "./shared/dropdown-hooks";
+import { useDropdownFloating } from "./shared/use-dropdown-floating";
 import { useDropdownKeyboard } from "./shared/use-dropdown-keyboard";
 import { startTextAnimation, stopTextAnimation, truncateText } from "./shared/dropdown-text-utils";
 
@@ -39,6 +45,15 @@ export interface MultiSelectProps {
   rightAlignCheckboxes?: boolean;
   wrapBadges?: boolean;
   popAbove?: boolean;
+  /** Portal root for the listbox (defaults to `#ipa-ui-modal-root` or `document.body`) */
+  portalContainer?: HTMLElement | null;
+  /** z-index for the portaled listbox (default 1200) */
+  floatingZIndex?: number;
+  /**
+   * Max option rows shown before the list scrolls. Defaults to `10`.
+   * Pass `false` for no row cap (only the viewport / floating size limit applies).
+   */
+  maxVisibleOptions?: number | false;
 
   // Icons
   icons?: {
@@ -79,6 +94,9 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       wrapBadges,
       popAbove,
       disableSelectionLooping = false,
+      portalContainer,
+      floatingZIndex,
+      maxVisibleOptions = 10,
       icons,
       styleOverrides,
       ...props
@@ -86,6 +104,10 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     ref
   ) => {
     const s = mergeStyles(styles, styleOverrides);
+    const scrollContentMaxHeight = getDropdownScrollContentMaxHeight(
+      maxVisibleOptions,
+      !!disableScrolling
+    );
     const [isOpen, setIsOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -108,12 +130,25 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       isMultiSelect: true
     });
 
-    useClickOutside(dropdownRef, () => {
-      if (!disableCloseOnOutsideClick) {
-        setIsOpen(false);
-        resetFocus();
-      }
-    }, isOpen && !disableCloseOnOutsideClick);
+    const { refs: floatingRefs, floatingStyles, resolvedPosition, portalRoot } =
+      useDropdownFloating({
+        open: isOpen,
+        preferTop: !!popAbove,
+        portalContainer,
+        floatingZIndex,
+      });
+
+    useClickOutside(
+      dropdownRef,
+      () => {
+        if (!disableCloseOnOutsideClick) {
+          setIsOpen(false);
+          resetFocus();
+        }
+      },
+      isOpen && !disableCloseOnOutsideClick,
+      floatingRefs.floating
+    );
 
     const getSelectedOptions = () => {
       return options.filter(option => value.includes(option.value));
@@ -201,6 +236,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
         {...props}
       >
         <DropdownTrigger
+          referenceRef={floatingRefs.setReference}
           onClick={() => {
             if (isOpen && !disableCloseOnTriggerClick) {
               setIsOpen(false);
@@ -253,9 +289,18 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           </div>
         </DropdownTrigger>
         
-        <DropdownPopup isOpen={isOpen} onClose={() => setIsOpen(false)} footer={!hideFooter} popAbove={popAbove} styles={s}>
-          {/* Header - shown at top when popBelow (default), at bottom when popAbove */}
-          {!popAbove && !hideSelectionCount && (
+        <DropdownPopup
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          footer={!hideFooter}
+          resolvedPosition={resolvedPosition}
+          setFloating={floatingRefs.setFloating}
+          floatingStyles={floatingStyles}
+          portalRoot={portalRoot}
+          styles={s}
+        >
+          {/* Header - shown at top when below, at bottom when above (after flip) */}
+          {resolvedPosition === 'bottom' && !hideSelectionCount && (
             <div className={s.header}>
               <span className={s.headerText}>
                 {value.length} selected
@@ -264,7 +309,11 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           )}
 
           {/* Scrollable Content */}
-          <DropdownScrollableContent scrollable={!disableScrolling} styles={s}>
+          <DropdownScrollableContent
+            scrollable={!disableScrolling}
+            contentMaxHeight={scrollContentMaxHeight}
+            styles={s}
+          >
             {options.map((option, index) => (
               <button
                 key={option.value}
@@ -381,8 +430,8 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
             ))}
           </DropdownScrollableContent>
           
-          {/* Header - shown at bottom when popAbove */}
-          {popAbove && !hideSelectionCount && (
+          {/* Header - shown at bottom when above */}
+          {resolvedPosition === 'top' && !hideSelectionCount && (
             <div className={s.header}>
               <span className={s.headerText}>
                 {value.length} selected

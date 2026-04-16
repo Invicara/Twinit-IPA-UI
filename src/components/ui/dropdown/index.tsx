@@ -22,6 +22,9 @@ interface UnifiedDropdownProps {
   variant?: 'single' | 'multiselect' | 'filter';
   placeholder?: string;
   maxDisplayBadges?: number;
+  portalContainer?: HTMLElement | null;
+  floatingZIndex?: number;
+  maxVisibleOptions?: number | false;
 }
 
 export const Dropdown = React.forwardRef<HTMLDivElement, UnifiedDropdownProps>(

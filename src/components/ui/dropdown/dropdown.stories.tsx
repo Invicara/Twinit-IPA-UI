@@ -10,6 +10,9 @@ const meta: Meta<typeof SingleSelect> = {
   parameters: {
     layout: 'centered',
   },
+  args: {
+    maxVisibleOptions: 10,
+  },
   argTypes: {
     placeholder: {
       control: { type: 'text' },
@@ -45,7 +48,16 @@ const meta: Meta<typeof SingleSelect> = {
     },
     popAbove: {
       control: { type: 'boolean' },
-      description: 'Open dropdown above the trigger instead of below',
+      description: 'Prefer opening the list above the trigger (Floating UI may still flip below if needed)',
+    },
+    maxVisibleOptions: {
+      control: 'select',
+      options: [false, 3, 5, 10, 15, 20],
+      description:
+        'Max option rows before the list scrolls. **Unlimited (false)** = only viewport height applies.',
+      table: {
+        type: { summary: 'number | false' },
+      },
     },
     className: {
       control: { type: 'text' },
@@ -106,6 +118,8 @@ export const Default: Story = {
           hideLongTextEllipsis={args.hideLongTextEllipsis}
           hideLongTextTooltip={args.hideLongTextTooltip}
           popAbove={args.popAbove}
+          disableScrolling={args.disableScrolling}
+          maxVisibleOptions={args.maxVisibleOptions}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -138,7 +152,7 @@ export const Filter: Story = {
     hideLongTextTooltip: false,
     disableKeyboardNavigation: true,
     disableIconAnimation: true,
-    disableScrolling: true,
+    disableScrolling: false,
     enableLongTextAnimation: true
   },
   render: (args) => {
@@ -157,6 +171,8 @@ export const Filter: Story = {
           hideLongTextEllipsis={args.hideLongTextEllipsis}
           hideLongTextTooltip={args.hideLongTextTooltip}
           popAbove={args.popAbove}
+          disableScrolling={args.disableScrolling}
+          maxVisibleOptions={args.maxVisibleOptions}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -180,6 +196,7 @@ export const Multiselect: Story = {
     hideRemainingBadge: false,
     rightAlignCheckboxes: false,
     wrapBadges: false,
+    maxVisibleOptions: 5,
   },
   render: (args) => {
     const [value, setValue] = useState<string[]>([]);
@@ -196,11 +213,13 @@ export const Multiselect: Story = {
           hideLongTextEllipsis={args.hideLongTextEllipsis}
           hideLongTextTooltip={args.hideLongTextTooltip}
           popAbove={args.popAbove}
+          disableScrolling={args.disableScrolling}
           maxDisplayBadges={args.maxDisplayBadges}
           hideSelectionCount={args.hideSelectionCount}
           hideRemainingBadge={args.hideRemainingBadge}
           rightAlignCheckboxes={args.rightAlignCheckboxes}
           wrapBadges={args.wrapBadges}
+          maxVisibleOptions={args.maxVisibleOptions}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -211,6 +230,50 @@ export const Multiselect: Story = {
 
 const customMultiselectIcons = {
   trigger: <ArrowDownIcon className={customStyles.triggerIconCustom} />,
+};
+
+/** Short panel with `overflow: hidden` — list should not be clipped (portaled + flip). */
+export const InsideOverflowHidden: Story = {
+  args: {
+    maxVisibleOptions: 5,
+    hideFooter: false
+  },
+
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          'The trigger sits in a short container with `overflow: hidden`. The list is portaled and positioned with Floating UI so it remains visible.',
+      },
+    },
+  },
+
+  render: (args) => {
+    const [value, setValue] = useState<string>('');
+    return (
+      <div
+        style={{
+          overflow: 'hidden',
+          height: 100,
+          width: 320,
+          border: '1px solid var(--neutral-4, #ccc)',
+          padding: 8,
+          display: 'flex',
+          alignItems: 'flex-end',
+        }}
+      >
+        <SingleSelect
+          options={defaultOptions}
+          value={value}
+          onChange={setValue}
+          placeholder="Open in tight space"
+          hideFooter={args.hideFooter}
+          maxVisibleOptions={args.maxVisibleOptions}
+        />
+      </div>
+    );
+  },
 };
 
 export const CustomMultiselect: Story = {
@@ -260,6 +323,8 @@ export const CustomMultiselect: Story = {
           hideRemainingBadge={args.hideRemainingBadge}
           rightAlignCheckboxes={args.rightAlignCheckboxes}
           wrapBadges={args.wrapBadges}
+          disableScrolling={args.disableScrolling}
+          maxVisibleOptions={args.maxVisibleOptions}
           value={value}
           onChange={(val) => setValue(val)}
           icons={customMultiselectIcons}

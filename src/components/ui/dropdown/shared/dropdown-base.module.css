@@ -61,29 +61,19 @@
   transform: rotate(180deg);
 }
 
-/* Popup – position via data-position="top" | "bottom" */
+/* Popup – positioned with Floating UI (fixed + portal); width/max-height from inline styles */
 .popup {
-  position: absolute;
-  z-index: 50;
-  width: 284px;
   overflow: hidden;
   border-radius: 4px;
   background-color: var(--neutral-0);
   box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--neutral-2);
-  max-height: 200px;
   display: flex;
   flex-direction: column;
-}
-
-.popup[data-position="bottom"] {
-  top: 100%;
-  margin-top: 4px;
+  box-sizing: border-box;
 }
 
 .popup[data-position="top"] {
-  bottom: 100%;
-  margin-bottom: 4px;
   flex-direction: column-reverse;
 }
 
@@ -94,6 +84,7 @@
 
 .scrollContent[data-scrollable="true"] {
   overflow-y: auto;
+  min-height: 0;
 }
 
 .footer {
@@ -115,16 +106,20 @@
   color: var(--neutral-5);
 }
 
-/* Base item row (option row) – disabled state via data-disabled */
+/* Base item row (option row) – disabled state via data-disabled.
+   Height must match DROPDOWN_OPTION_ROW_HEIGHT_PX in dropdown-base.tsx (35px). */
 .itemBase {
   position: relative;
   display: flex;
   width: 100%;
+  flex-shrink: 0;
   cursor: pointer;
   user-select: none;
   align-items: center;
   padding: 8px 12px;
   font-size: 14px;
+  line-height: 19px;
+  height: 35px;
   color: var(--neutral-6);
   outline: none;
   border: none;
