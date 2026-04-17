@@ -2,59 +2,62 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, MoreHorizontal } from "lucide-react"
 
-import { cn } from "../../../lib/utils"
+import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./breadcrumb.module.css"
 
-function Breadcrumb({ ...props }: React.ComponentProps<"nav">) {
-  return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
+const BreadcrumbStylesContext = React.createContext<Record<string, string> | null>(null)
+
+export interface BreadcrumbProps extends React.ComponentProps<"nav"> {
+  /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
 }
 
+const Breadcrumb = React.forwardRef<HTMLNavElement, BreadcrumbProps>(
+  ({ className, styleOverrides, ...props }, ref) => {
+    const s = mergeStyles(styles, styleOverrides)
+    return (
+      <BreadcrumbStylesContext.Provider value={s}>
+        <nav
+          ref={ref}
+          aria-label="breadcrumb"
+          data-testid="ipa_breadcrumb"
+          className={cn(s.breadcrumb, className)}
+          {...props}
+        />
+      </BreadcrumbStylesContext.Provider>
+    )
+  }
+)
+Breadcrumb.displayName = "Breadcrumb"
+
 function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
-  return (
-    <ol
-      data-slot="breadcrumb-list"
-      className={cn(styles.list, className)}
-      {...props}
-    />
-  )
+  const s = React.useContext(BreadcrumbStylesContext) ?? styles
+  return <ol className={cn(s.list, className)} {...props} />
 }
 
 function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
-  return (
-    <li
-      data-slot="breadcrumb-item"
-      className={cn(styles.item, className)}
-      {...props}
-    />
-  )
+  const s = React.useContext(BreadcrumbStylesContext) ?? styles
+  return <li className={cn(s.item, className)} {...props} />
 }
 
 function BreadcrumbLink({
   asChild,
   className,
   ...props
-}: React.ComponentProps<"a"> & {
-  asChild?: boolean
-}) {
+}: React.ComponentProps<"a"> & { asChild?: boolean }) {
+  const s = React.useContext(BreadcrumbStylesContext) ?? styles
   const Comp = asChild ? Slot : "a"
-
-  return (
-    <Comp
-      data-slot="breadcrumb-link"
-      className={cn(styles.link, className)}
-      {...props}
-    />
-  )
+  return <Comp className={cn(s.link, className)} {...props} />
 }
 
 function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
+  const s = React.useContext(BreadcrumbStylesContext) ?? styles
   return (
     <span
-      data-slot="breadcrumb-page"
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn(styles.page, className)}
+      className={cn(s.page, className)}
       {...props}
     />
   )
@@ -65,12 +68,12 @@ function BreadcrumbSeparator({
   className,
   ...props
 }: React.ComponentProps<"li">) {
+  const s = React.useContext(BreadcrumbStylesContext) ?? styles
   return (
     <li
-      data-slot="breadcrumb-separator"
       role="presentation"
       aria-hidden="true"
-      className={cn(styles.separator, className)}
+      className={cn(s.separator, className)}
       {...props}
     >
       {children ?? <ChevronRight />}
@@ -78,20 +81,17 @@ function BreadcrumbSeparator({
   )
 }
 
-function BreadcrumbEllipsis({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
+function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<"span">) {
+  const s = React.useContext(BreadcrumbStylesContext) ?? styles
   return (
     <span
-      data-slot="breadcrumb-ellipsis"
       role="presentation"
       aria-hidden="true"
-      className={cn(styles.ellipsis, className)}
+      className={cn(s.ellipsis, className)}
       {...props}
     >
-      <MoreHorizontal className={styles.ellipsisIcon} />
-      <span className="sr-only">More</span>
+      <MoreHorizontal className={s.ellipsisIcon} />
+      <span className={s.srOnly}>More</span>
     </span>
   )
 }

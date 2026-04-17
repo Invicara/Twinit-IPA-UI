@@ -1,81 +1,91 @@
-import React from "react";
-import { StoryFn, Meta } from "@storybook/react";
-import Button from "./button";
-import { Loader2 } from "lucide-react";
-import { capitalizeFirstLetter } from "../../../lib/utils";
+import React from "react"
+import { StoryFn, Meta } from "@storybook/react"
+import { Pencil } from "lucide-react"
+import { Button } from "./button"
 
 export default {
   title: "ui/Button",
   component: Button,
   argTypes: {
     variant: {
-      options: ['default', 'secondary', 'tertiary', 'danger'],
-      control: { type: 'radio' },
+      options: ["default", "secondary", "tertiary", "danger"],
+      control: { type: "radio" },
     },
     size: {
-      options: ['default', 'sm', 'icon'],
-      control: { type: 'radio' },
+      options: ["default", "sm", "icon"],
+      control: { type: "radio" },
     },
     disabled: {
-      control: { type: 'boolean' },
+      control: { type: "boolean" },
     },
-    children: {
-      options: ['text', 'icon'],
-      control: {type: 'check'}
-    }
   },
   parameters: {
-    layout: 'centered',
-  }
-} as Meta<typeof Button>;
+    layout: "centered",
+  },
+} as Meta<typeof Button>
 
-const Template: StoryFn<typeof Button> = (args) => {
+const Template: StoryFn<React.ComponentProps<typeof Button>> = (args) => (
+  <Button {...args} />
+)
 
-  console.log("storybook args", args)
-
-  let children = (args.children || "") as string;
-
-  let text;
-  let icon;
-  
-  if(children.includes("text")) {
-    text = capitalizeFirstLetter(args.variant);
-  }
-  if(children.includes("icon")) {
-    icon = <Loader2 className="animate-spin" />
-  }
-
-  return <Button {...args}>{text}{icon}</Button>
-};
-
-export const Default = Template.bind({});
-
+export const Default = Template.bind({})
 Default.args = {
   variant: "default",
-  children: "text",
-  size: "default"
-};
+  size: "default",
+  children: "Default",
+}
 
-export const Secondary = Template.bind({});
-
+export const Secondary = Template.bind({})
 Secondary.args = {
   variant: "secondary",
-  children: "text",
-  size: "default"
-};
+  size: "default",
+  children: "Secondary",
+}
 
-export const Tertiary = Template.bind({});
-
+export const Tertiary = Template.bind({})
 Tertiary.args = {
   variant: "tertiary",
-  children: "text",
-  size: "default"
-};
+  size: "default",
+  children: "Tertiary",
+}
 
-export const Danger = Template.bind({});
-
+export const Danger = Template.bind({})
 Danger.args = {
   variant: "danger",
-  children: "text",
-  size: "default"
-};
+  size: "default",
+  children: "Danger",
+}
+
+export const Small = Template.bind({})
+Small.args = {
+  variant: "default",
+  size: "sm",
+  children: "Small",
+}
+
+export const Icon = Template.bind({})
+Icon.args = {
+  variant: "default",
+  size: "icon",
+  children: <Pencil />,
+}
+
+export const WithIcon = Template.bind({})
+WithIcon.args = {
+  variant: "default",
+  size: "default",
+  children: (
+    <>
+      <Pencil />
+      With icon
+    </>
+  ),
+}
+
+export const Disabled = Template.bind({})
+Disabled.args = {
+  variant: "default",
+  size: "default",
+  disabled: true,
+  children: "Disabled",
+}

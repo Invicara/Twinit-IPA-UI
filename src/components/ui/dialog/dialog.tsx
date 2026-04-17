@@ -1,19 +1,34 @@
-import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
-import { cn } from "../../../lib/utils";
-import Button from "../button/button";
-import '../../../output.css';
-import { DialogProps } from "./dialog.types";
-import styles from "./dialog.module.css";
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { X } from "lucide-react"
+import { cn, mergeStyles } from "../../../lib/utils"
+import { Button } from "../button"
+import styles from "./dialog.module.css"
 
-const sizeClasses = {
-  sm: styles.sizeSm,
-  default: styles.sizeDefault,
-  lg: styles.sizeLg,
-  xl: styles.sizeXl,
-  full: styles.sizeFull
-} as const;
+export interface DialogProps {
+  // Core Props
+  className?: string
+  size?: "sm" | "default" | "lg" | "xl" | "full"
+  title: string
+  children: React.ReactNode
+  footer?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+
+  // Feature Toggles
+  hideOverlay?: boolean;           // Non-modal mode - no dark background overlay
+  acknowledgment?: boolean;        // Auto-generate "OK" button footer
+  passive?: boolean;               // Hide footer entirely
+  disableClickOutside?: boolean;   // Prevent closing by clicking outside dialog
+  disableCloseButton?: boolean;    // Hide the X close button in header
+  disableEscapeKey?: boolean;      // Prevent closing with Escape key
+
+  /** Portal container (e.g. element with id "ipa-ui-modal-root" inside theme wrapper so modals inherit theme variables) */
+  container?: HTMLElement | null
+
+  /** Style overrides: object mapping slot names (dialog, content, header, title, closeButton, body, footer) to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
+}
 
 export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
   (
@@ -31,12 +46,13 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
       disableClickOutside = false,
       disableCloseButton = false,
       disableEscapeKey = false,
-      classNames,
+      styleOverrides,
       container,
       ...props
     },
     ref
   ) => {
+    const s = mergeStyles(styles, styleOverrides)
     const portalContainer =
       container ??
       (typeof document !== 'undefined'
@@ -63,21 +79,18 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
         <DialogPrimitive.Portal container={portalContainer}>
           {/* Conditional overlay for modal/non-modal */}
           {!hideOverlay && (
-            <DialogPrimitive.Overlay 
-              className={cn(
-                styles.overlay,
-                classNames?.overlay 
-              )}
+            <DialogPrimitive.Overlay
+              data-testid="ipa_dialog_overlay"
+              className={s.dialog}
             />
           )}
 
           <DialogPrimitive.Content
             ref={ref}
+            data-size={size}
             className={cn(
-              styles.content,
-              sizeClasses[size],
-              hideOverlay && styles.contentPointerEventsAuto,
-              classNames?.content,
+              s.content,
+              hideOverlay && s.contentPointerEventsAuto,
               className
             )}
             onInteractOutside={(e) => {
@@ -89,9 +102,9 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
             {...props}
           >
             {/* Header */}
-            <div className={cn(styles.header, classNames?.header)}>
+            <div className={s.header}>
               <DialogPrimitive.Title asChild>
-                <h2 className={cn(styles.title, classNames?.title)}>
+                <h2 className={s.title}>
                   {title}
                 </h2>
               </DialogPrimitive.Title>
@@ -99,23 +112,23 @@ export const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
                 <DialogPrimitive.Close asChild>
                   <button
                     type="button"
-                    className={cn(styles.closeButton, classNames?.closeButton)}
+                    className={s.closeButton}
                     aria-label="Close"
                   >
-                    <X className={styles.closeButtonIcon} strokeWidth={2} />
+                    <X className={s.closeButtonIcon} strokeWidth={2} />
                   </button>
                 </DialogPrimitive.Close>
               )}
             </div>
 
             {/* Body (Scrollable) */}
-            <div className={cn(styles.body, "custom-scrollbar", classNames?.body)}>
+            <div className={cn(s.body, "custom-scrollbar")}>
               {children}
             </div>
 
             {/* Footer (Conditional) */}
             {footerContent && (
-              <div className={cn(styles.footer, classNames?.footer)}>
+              <div className={s.footer}>
                 {footerContent}
               </div>
             )}

@@ -1,38 +1,41 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { RadioGroup } from './radio-group'
+import React from "react";
+import { StoryFn, Meta } from "@storybook/react";
+import { RadioGroup } from "./radio-group";
 
-const meta: Meta<typeof RadioGroup> = {
-  title: 'UI/RadioGroup',
+export default {
+  title: "ui/RadioGroup",
   component: RadioGroup,
-  parameters: {
-    layout: 'centered',
-  },
   argTypes: {
-    orientation: {
-      control: 'select',
-      options: ['vertical', 'horizontal'],
+    horizontal: {
+      control: { type: "boolean" },
+      description: "Layout options in a row",
     },
     label: {
-      control: 'text',
+      control: { type: "text" },
     },
     disabled: {
-      control: 'boolean',
+      control: { type: "boolean" },
     },
   },
-}
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
-  args: {
-    label: 'Choose Option',
-    options: [
-      { value: 'option1', label: 'Option 1' },
-      { value: 'option2', label: 'Option 2' },
-      { value: 'option3', label: 'Option 3' },
-    ],
-    defaultValue: 'option1',
-    disabled: false,
+  parameters: {
+    layout: "centered",
   },
-}
+} as Meta<typeof RadioGroup>;
+
+const Template: StoryFn<typeof RadioGroup> = (args) => (
+  <div style={{ width: 280, display: "flex", justifyContent: "center" }}>
+    <RadioGroup {...args} />
+  </div>
+);
+
+export const Default = Template.bind({});
+Default.args = {
+  label: "Choose Option",
+  options: [
+    { value: "option1", label: "Option 1" },
+    { value: "option2", label: "Option 2" },
+    { value: "option3", label: "Option 3" },
+  ],
+  defaultValue: "option1",
+  disabled: false,
+};

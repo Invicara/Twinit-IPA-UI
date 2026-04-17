@@ -2,12 +2,16 @@ import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 import { SingleSelect, MultiSelect } from './index';
 import { ArrowDownIcon } from '@radix-ui/react-icons';
+import customStyles from './dropdown.custom-styles.module.css';
 
 const meta: Meta<typeof SingleSelect> = {
   title: 'UI/Dropdown',
   component: SingleSelect,
   parameters: {
     layout: 'centered',
+  },
+  args: {
+    maxVisibleOptions: 10,
   },
   argTypes: {
     placeholder: {
@@ -44,7 +48,16 @@ const meta: Meta<typeof SingleSelect> = {
     },
     popAbove: {
       control: { type: 'boolean' },
-      description: 'Open dropdown above the trigger instead of below',
+      description: 'Prefer opening the list above the trigger (Floating UI may still flip below if needed)',
+    },
+    maxVisibleOptions: {
+      control: 'select',
+      options: [false, 3, 5, 10, 15, 20],
+      description:
+        'Max option rows before the list scrolls. **Unlimited (false)** = only viewport height applies.',
+      table: {
+        type: { summary: 'number | false' },
+      },
     },
     className: {
       control: { type: 'text' },
@@ -54,9 +67,9 @@ const meta: Meta<typeof SingleSelect> = {
       control: false,
       description: 'Custom icon components (not editable in controls)',
     },
-    classNames: {
+    styleOverrides: {
       control: false,
-      description: 'Custom class names for sub-components (not editable in controls)',
+      description: 'CSS module with same selector names as default (base + component); import your override file last so it wins',
     },
   },
 };
@@ -82,7 +95,7 @@ export const Default: Story = {
     options: defaultOptions,
     placeholder: 'Select an option',
     hideFooter: true,
-    filter: true,
+    filter: false,
     disabled: false,
     hideRowHighlight: false,
     hideLongTextEllipsis: true,
@@ -92,7 +105,7 @@ export const Default: Story = {
   render: (args) => {
     const [value, setValue] = useState<string>('');
     return (
-      <div className="min-h-[240px] flex items-start">
+      <div style={{ minHeight: 240, display: 'flex', alignItems: 'flex-start' }}>
         <SingleSelect
           options={args.options}
           placeholder={args.placeholder}
@@ -105,6 +118,8 @@ export const Default: Story = {
           hideLongTextEllipsis={args.hideLongTextEllipsis}
           hideLongTextTooltip={args.hideLongTextTooltip}
           popAbove={args.popAbove}
+          disableScrolling={args.disableScrolling}
+          maxVisibleOptions={args.maxVisibleOptions}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -137,13 +152,13 @@ export const Filter: Story = {
     hideLongTextTooltip: false,
     disableKeyboardNavigation: true,
     disableIconAnimation: true,
-    disableScrolling: true,
+    disableScrolling: false,
     enableLongTextAnimation: true
   },
   render: (args) => {
     const [value, setValue] = useState<string>('');
     return (
-      <div className="min-h-[240px] flex items-start">
+      <div style={{ minHeight: 240, display: 'flex', alignItems: 'flex-start' }}>
         <SingleSelect
           options={args.options}
           placeholder={args.placeholder}
@@ -156,6 +171,8 @@ export const Filter: Story = {
           hideLongTextEllipsis={args.hideLongTextEllipsis}
           hideLongTextTooltip={args.hideLongTextTooltip}
           popAbove={args.popAbove}
+          disableScrolling={args.disableScrolling}
+          maxVisibleOptions={args.maxVisibleOptions}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -179,11 +196,12 @@ export const Multiselect: Story = {
     hideRemainingBadge: false,
     rightAlignCheckboxes: false,
     wrapBadges: false,
+    maxVisibleOptions: 5,
   },
   render: (args) => {
     const [value, setValue] = useState<string[]>([]);
     return (
-      <div className="min-h-[240px] flex items-start">
+      <div style={{ minHeight: 240, display: 'flex', alignItems: 'flex-start' }}>
         <MultiSelect
           options={args.options}
           placeholder={args.placeholder}
@@ -195,11 +213,13 @@ export const Multiselect: Story = {
           hideLongTextEllipsis={args.hideLongTextEllipsis}
           hideLongTextTooltip={args.hideLongTextTooltip}
           popAbove={args.popAbove}
+          disableScrolling={args.disableScrolling}
           maxDisplayBadges={args.maxDisplayBadges}
           hideSelectionCount={args.hideSelectionCount}
           hideRemainingBadge={args.hideRemainingBadge}
           rightAlignCheckboxes={args.rightAlignCheckboxes}
           wrapBadges={args.wrapBadges}
+          maxVisibleOptions={args.maxVisibleOptions}
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -209,30 +229,59 @@ export const Multiselect: Story = {
 };
 
 const customMultiselectIcons = {
-  trigger: <ArrowDownIcon className="h-4 w-4 stroke-orange-500 stroke-1"/>
+  trigger: <ArrowDownIcon className={customStyles.triggerIconCustom} />,
 };
 
-const customMultiselectClassNames = {
-  container: 'font-mono',
-  trigger: 'rounded-none w-[360px] focus:border-orange-500 focus:border-[2px] focus-visible:border-orange-500 focus-visible:outline-none cursor-crosshair min-h-[44px] hover:border-orange-400',
-  triggerIcon: 'text-orange-500 stroke-[2.5]',
-  badge: 'rounded-none bg-orange-100 text-orange-700',
-  badgeText: 'font-bold',
-  badgeRemove: 'rounded-none hover:bg-orange-300',
-  badgeRemoveIcon: 'text-orange-600 stroke-[2]',
-  remainingBadge: 'rounded-none bg-orange-100 text-orange-700',
-  popup: 'shadow-none rounded-none w-[200px] border-2 border-orange-500 text-orange-600',
-  scrollContent: 'cursor-copy',
-  header: 'bg-orange-50 border-b-2 border-orange-200 text-orange-200',
-  item: 'font-arial cursor-crosshair text-orange-700',
-  checkbox: 'w-3 h-3 rounded-full border-2 border-orange-500 bg-white',
-  checkboxChecked: 'bg-orange-500 border-orange-600',
-  checkIcon: 'hidden',
+/** Short panel with `overflow: hidden` — list should not be clipped (portaled + flip). */
+export const InsideOverflowHidden: Story = {
+  args: {
+    maxVisibleOptions: 5,
+    hideFooter: false
+  },
+
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          'The trigger sits in a short container with `overflow: hidden`. The list is portaled and positioned with Floating UI so it remains visible.',
+      },
+    },
+  },
+
+  render: (args) => {
+    const [value, setValue] = useState<string>('');
+    return (
+      <div
+        style={{
+          overflow: 'hidden',
+          height: 100,
+          width: 320,
+          border: '1px solid var(--neutral-4, #ccc)',
+          padding: 8,
+          display: 'flex',
+          alignItems: 'flex-end',
+        }}
+      >
+        <SingleSelect
+          options={defaultOptions}
+          value={value}
+          onChange={setValue}
+          placeholder="Open in tight space"
+          hideFooter={args.hideFooter}
+          maxVisibleOptions={args.maxVisibleOptions}
+        />
+      </div>
+    );
+  },
 };
 
 export const CustomMultiselect: Story = {
   parameters: {
     docs: {
+      description: {
+        story: 'Uses `styleOverrides` with a CSS module that has the same selector names as the default (base + component). **Important:** In your app, import your override CSS file last so overrides win over defaults. See dropdown docs.',
+      },
       source: {
         type: 'code',
       },
@@ -257,7 +306,7 @@ export const CustomMultiselect: Story = {
     const [value, setValue] = useState<string[]>(['option2', 'option5']);
     
     return (
-      <div className="pt-64">
+      <div style={{ paddingTop: 256 }}>
         <MultiSelect
           options={args.options}
           placeholder={args.placeholder}
@@ -274,10 +323,12 @@ export const CustomMultiselect: Story = {
           hideRemainingBadge={args.hideRemainingBadge}
           rightAlignCheckboxes={args.rightAlignCheckboxes}
           wrapBadges={args.wrapBadges}
+          disableScrolling={args.disableScrolling}
+          maxVisibleOptions={args.maxVisibleOptions}
           value={value}
           onChange={(val) => setValue(val)}
           icons={customMultiselectIcons}
-          classNames={customMultiselectClassNames}
+          styleOverrides={customStyles}
         />
       </div>
     );

@@ -1,13 +1,20 @@
 import * as React from "react";
-import { cn } from "../../../lib/utils";
+import { cn, mergeStyles } from "../../../lib/utils";
 import { XIcon } from "../../icons";
 import sharedStyles from "./shared/dropdown-base.module.css";
-import styles from "./multi-select.module.css";
-import { DropdownTrigger, DropdownPopup, DropdownScrollableContent } from "./shared/dropdown-base";
+import defaultStyles from "./multi-select.module.css";
+import {
+  DropdownTrigger,
+  DropdownPopup,
+  DropdownScrollableContent,
+  getDropdownScrollContentMaxHeight,
+} from "./shared/dropdown-base";
 import { useClickOutside } from "./shared/dropdown-hooks";
+import { useDropdownFloating } from "./shared/use-dropdown-floating";
 import { useDropdownKeyboard } from "./shared/use-dropdown-keyboard";
 import { startTextAnimation, stopTextAnimation, truncateText } from "./shared/dropdown-text-utils";
-import '../../../output.css';
+
+const styles = { ...sharedStyles, ...defaultStyles };
 
 export interface MultiSelectProps {
   // Core Props
@@ -18,7 +25,7 @@ export interface MultiSelectProps {
   disabled?: boolean;
   placeholder?: string;
   maxDisplayBadges?: number;
-  
+
   // Feature Toggles & Behavior Options
   hideFooter?: boolean;
   hideRowHighlight?: boolean;
@@ -38,6 +45,15 @@ export interface MultiSelectProps {
   rightAlignCheckboxes?: boolean;
   wrapBadges?: boolean;
   popAbove?: boolean;
+  /** Portal root for the listbox (defaults to `#ipa-ui-modal-root` or `document.body`) */
+  portalContainer?: HTMLElement | null;
+  /** z-index for the portaled listbox (default 1200) */
+  floatingZIndex?: number;
+  /**
+   * Max option rows shown before the list scrolls. Defaults to `10`.
+   * Pass `false` for no row cap (only the viewport / floating size limit applies).
+   */
+  maxVisibleOptions?: number | false;
 
   // Icons
   icons?: {
@@ -45,32 +61,9 @@ export interface MultiSelectProps {
     badgeClose?: React.ReactNode;
     check?: React.ReactNode;
   };
-  
-  // Styling
-  classNames?: {
-    container?: string;
-    trigger?: string;
-    popup?: string;
-    scrollContent?: string;
-    item?: string;
-    itemFocused?: string;
-    itemDisabled?: string;
-    itemText?: string;
-    ellipsis?: string;
-    footer?: string;
-    triggerContent?: string;
-    triggerIcon?: string;
-    badge?: string;
-    badgeText?: string;
-    badgeRemove?: string;
-    badgeRemoveIcon?: string;
-    remainingBadge?: string;
-    placeholder?: string;
-    header?: string;
-    checkbox?: string;
-    checkboxChecked?: string;
-    checkIcon?: string;
-  };
+
+  // Custom style overrides
+  styleOverrides?: Record<string, string>;
 }
 
 export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
@@ -101,12 +94,20 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       wrapBadges,
       popAbove,
       disableSelectionLooping = false,
+      portalContainer,
+      floatingZIndex,
+      maxVisibleOptions = 10,
       icons,
-      classNames,
+      styleOverrides,
       ...props
     },
     ref
   ) => {
+    const s = mergeStyles(styles, styleOverrides);
+    const scrollContentMaxHeight = getDropdownScrollContentMaxHeight(
+      maxVisibleOptions,
+      !!disableScrolling
+    );
     const [isOpen, setIsOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -129,12 +130,25 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       isMultiSelect: true
     });
 
-    useClickOutside(dropdownRef, () => {
-      if (!disableCloseOnOutsideClick) {
-        setIsOpen(false);
-        resetFocus();
-      }
-    }, isOpen && !disableCloseOnOutsideClick);
+    const { refs: floatingRefs, floatingStyles, resolvedPosition, portalRoot } =
+      useDropdownFloating({
+        open: isOpen,
+        preferTop: !!popAbove,
+        portalContainer,
+        floatingZIndex,
+      });
+
+    useClickOutside(
+      dropdownRef,
+      () => {
+        if (!disableCloseOnOutsideClick) {
+          setIsOpen(false);
+          resetFocus();
+        }
+      },
+      isOpen && !disableCloseOnOutsideClick,
+      floatingRefs.floating
+    );
 
     const getSelectedOptions = () => {
       return options.filter(option => value.includes(option.value));
@@ -205,8 +219,10 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     };
 
     return (
-      <div 
-        className={cn(sharedStyles.container, classNames?.container)} 
+      <div
+        className={cn(s.multiSelect)}
+        data-state={isOpen ? "open" : "closed"}
+        data-disabled={disabled ? "true" : undefined}
         ref={(node) => {
           dropdownRef.current = node;
           if (ref) {
@@ -220,6 +236,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
         {...props}
       >
         <DropdownTrigger
+          referenceRef={floatingRefs.setReference}
           onClick={() => {
             if (isOpen && !disableCloseOnTriggerClick) {
               setIsOpen(false);
@@ -230,81 +247,87 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           onKeyDown={triggerKeyDown}
           disabled={disabled}
           isOpen={isOpen}
-          className={cn(styles.trigger, className, classNames?.trigger)}
+          className={cn(s.trigger, className)}
           customIcon={icons?.trigger}
-          iconClassName={classNames?.triggerIcon}
+          iconClassName={s.triggerIcon}
           enableIconAnimation={!disableIconAnimation}
+          styles={s}
         >
           <div className={cn(
-            styles.triggerContent,
-            wrapBadges ? styles.triggerContentWrap : styles.triggerContentNoWrap,
-            classNames?.triggerContent
+            s.triggerContent,
+            wrapBadges
+              ? s.triggerContentWrap
+              : s.triggerContentNoWrap
           )}>
             {visibleBadges.map((option) => (
               <div
                 key={option.value}
-                className={cn(
-                  styles.badge,
-                  classNames?.badge
-                )}
+                className={s.badge}
               >
-                <span className={cn(styles.badgeText, classNames?.badgeText)}>{truncateText(option.label)}</span>
+                <span className={s.badgeText}>{truncateText(option.label)}</span>
                 {!hideBadgeRemove && (
                   <span
                     onClick={(e) => {
                       e.stopPropagation();
                       handleRemoveBadge(option.value);
                     }}
-                    className={cn(
-                      styles.badgeRemove,
-                      classNames?.badgeRemove
-                    )}
+                    className={s.badgeRemove}
                   >
-                    {icons?.badgeClose || <XIcon className={cn("text-brand-8", classNames?.badgeRemoveIcon)} />}
+                    {icons?.badgeClose || <XIcon className={s.badgeRemoveIcon} />}
                   </span>
                 )}
               </div>
             ))}
             {!hideRemainingBadge && remainingCount > 0 && (
-              <div className={cn(
-                styles.remainingBadge,
-                classNames?.remainingBadge
-              )}>
+              <div className={s.remainingBadge}>
                 +{remainingCount}
               </div>
             )}
             {value.length === 0 && (
-              <span className={cn(styles.placeholder, classNames?.placeholder)}>{placeholder}</span>
+              <span className={s.placeholder}>{placeholder}</span>
             )}
           </div>
         </DropdownTrigger>
         
-        <DropdownPopup isOpen={isOpen} onClose={() => setIsOpen(false)} className={classNames?.popup} footer={!hideFooter} popAbove={popAbove}>
-          {/* Header - shown at top when popBelow (default), at bottom when popAbove */}
-          {!popAbove && !hideSelectionCount && (
-            <div className={cn(styles.header, classNames?.header)}>
-              <span className={styles.headerText}>
+        <DropdownPopup
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          footer={!hideFooter}
+          resolvedPosition={resolvedPosition}
+          setFloating={floatingRefs.setFloating}
+          floatingStyles={floatingStyles}
+          portalRoot={portalRoot}
+          styles={s}
+        >
+          {/* Header - shown at top when below, at bottom when above (after flip) */}
+          {resolvedPosition === 'bottom' && !hideSelectionCount && (
+            <div className={s.header}>
+              <span className={s.headerText}>
                 {value.length} selected
               </span>
             </div>
           )}
-          
+
           {/* Scrollable Content */}
-          <DropdownScrollableContent className={classNames?.scrollContent} scrollable={!disableScrolling}>
+          <DropdownScrollableContent
+            scrollable={!disableScrolling}
+            contentMaxHeight={scrollContentMaxHeight}
+            styles={s}
+          >
             {options.map((option, index) => (
               <button
                 key={option.value}
                 type="button"
                 disabled={option.disabled}
+                data-disabled={option.disabled ? "true" : undefined}
                 onClick={() => handleMultiSelect(option.value)}
+                data-focused={!hideRowHighlight && focusedIndex === index ? "true" : undefined}
                 className={cn(
-                  sharedStyles.itemBase,
-                  !hideRowHighlight && focusedIndex === index && styles.itemFocused,
-                  !hideRowHighlight && !isKeyboardMode && cn(styles.itemHover, 'group'),
-                  classNames?.item,
-                  !hideRowHighlight && focusedIndex === index && classNames?.itemFocused,
-                  option.disabled && classNames?.itemDisabled,
-                  rightAlignCheckboxes && styles.itemRightAlign
+                  s.itemBase,
+                  !hideRowHighlight && !isKeyboardMode && cn(s.itemHover, 'group'),
+                  !hideRowHighlight && focusedIndex === index && s.itemFocused,
+                  option.disabled && s.itemDisabled,
+                  rightAlignCheckboxes && s.itemRightAlign
                 )}
                 ref={(el) => {
                   setItemRef(el, index);
@@ -358,18 +381,12 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
               >
                 {!hideCheckboxes && (
                   <div className={cn(
-                    styles.checkbox,
-                    rightAlignCheckboxes && styles.checkboxRightAlign
+                    s.checkbox,
+                    rightAlignCheckboxes && s.checkboxRightAlign
                   )}>
                     <div
-                      className={cn(
-                        styles.checkboxIconWrapper,
-                        value.includes(option.value) 
-                          ? styles.checkboxIconWrapperChecked 
-                          : styles.checkboxIconWrapperUnchecked,
-                        classNames?.checkbox,
-                        value.includes(option.value) && classNames?.checkboxChecked
-                      )}
+                      className={s.checkboxIconWrapper}
+                      data-checked={value.includes(option.value) ? "true" : undefined}
                     >
                       {value.includes(option.value) && (
                         icons?.check || (
@@ -378,7 +395,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                             height="12" 
                             viewBox="0 0 12 12" 
                             fill="none" 
-                            className={cn(styles.checkboxIcon, classNames?.checkIcon)}
+                            className={s.checkboxIcon}
                           >
                             <path 
                               d="M2 6.5L4.5 9L10 3.5" 
@@ -393,19 +410,17 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     </div>
                   </div>
                 )}
-                <div className={styles.itemContent}>
+                <div className={s.itemContent}>
                   <span 
-                    className={cn(styles.itemContentText, 'scrollable-text', classNames?.itemText)}
+                    className={cn(s.itemContentText, 'scrollable-text', s.itemText)}
                   >
                     {option.label}
                   </span>
                   {!hideLongTextEllipsis && (
                     <span className={cn(
-                      styles.itemContentEllipsisIndicator,
+                      s.itemContentEllipsisIndicator,
                       'ellipsis-indicator',
-                      !hideRowHighlight && focusedIndex === index ? styles.itemContentEllipsisIndicatorFocused : styles.itemContentEllipsisIndicatorUnfocused,
-                      !hideRowHighlight && !isKeyboardMode && styles.itemContentEllipsisIndicatorHover,
-                      classNames?.ellipsis
+                      !hideRowHighlight && !isKeyboardMode && s.itemContentEllipsisIndicatorHover
                     )}>
                       ..
                     </span>
@@ -415,10 +430,10 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
             ))}
           </DropdownScrollableContent>
           
-          {/* Header - shown at bottom when popAbove */}
-          {popAbove && !hideSelectionCount && (
-            <div className={cn(styles.header, classNames?.header)}>
-              <span className={styles.headerText}>
+          {/* Header - shown at bottom when above */}
+          {resolvedPosition === 'top' && !hideSelectionCount && (
+            <div className={s.header}>
+              <span className={s.headerText}>
                 {value.length} selected
               </span>
             </div>

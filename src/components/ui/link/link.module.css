@@ -1,21 +1,82 @@
-@reference "../../../styles/globals.css";
-
-.base {
-  @apply font-sans text-[14px] font-normal leading-[18px] transition-colors focus-visible:outline-none;
+.link {
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  transition: color 0.15s ease;
 }
 
-.variantDefault {
-  @apply text-brand-8 hover:text-brand-6 active:text-brand-9 focus:text-brand-6 flex items-center gap-[4px];
+.link::selection {
+  background: transparent;
+  color: inherit;
 }
 
-.variantInline {
-  @apply text-brand-8 hover:text-brand-6 active:text-brand-9 focus:text-brand-6 underline hover:no-underline underline-offset-2;
+.link:focus-visible {
+  outline: none;
 }
 
-.disabled {
-  @apply text-neutral-5 cursor-not-allowed pointer-events-none;
+.link[data-variant="default"] {
+  color: var(--brand-8);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.link[data-variant="default"]:not([data-disabled="true"]):hover {
+  color: var(--brand-6);
+}
+
+.link[data-variant="default"]:not([data-disabled="true"]):focus-visible {
+  color: var(--brand-6);
+}
+
+.link[data-variant="default"]:not([data-disabled="true"]):active {
+  color: var(--brand-9);
+}
+
+.link[data-variant="inline"] {
+  color: var(--brand-8);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link[data-variant="inline"]:not([data-disabled="true"]):hover {
+  color: var(--brand-6);
+  text-decoration: none;
+}
+
+.link[data-variant="inline"][data-disabled="true"]:hover {
+  text-decoration: underline;
+}
+
+.link[data-variant="inline"].withIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.link[data-variant="inline"]:not([data-disabled="true"]):focus-visible {
+  color: var(--brand-6);
+}
+
+.link[data-variant="inline"]:not([data-disabled="true"]):active {
+  color: var(--brand-9);
+}
+
+.link[data-disabled="true"] {
+  color: var(--neutral-5);
+  cursor: not-allowed;
 }
 
 .icon {
-  @apply h-[14px] w-[14px];
+  display: flex;
+  align-items: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.icon svg {
+  width: 14px;
+  height: 14px;
 }

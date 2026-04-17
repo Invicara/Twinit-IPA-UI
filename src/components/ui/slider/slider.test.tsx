@@ -25,7 +25,7 @@ describe('Slider', () => {
         label="Select Range"
         minLabel="0"
         maxLabel="100"
-        variant="range"
+        range
         defaultValue={[25, 75]}
       />
     )
@@ -56,7 +56,7 @@ describe('Slider', () => {
     render(
       <Slider
         label="Select Range"
-        variant="range"
+        range
         onValueChange={handleValueChange}
         defaultValue={[25, 75]}
       />
@@ -133,21 +133,13 @@ describe('Slider', () => {
         defaultValue={[50]}
       />
     )
-    
-    const sliderContainer = screen.getByText('Select Amount').closest('div')
-    expect(sliderContainer).toHaveClass('custom-class')
+    const slider = screen.getByTestId('ipa_slider')
+    expect(slider).toHaveClass('custom-class')
   })
 
-  it('renders with testIdPrefix', () => {
-    render(
-      <Slider
-        label="Select Amount"
-        testIdPrefix="test-slider"
-        defaultValue={[50]}
-      />
-    )
-    
-    const slider = screen.getByTestId('test-slider')
+  it('renders with data-testid', () => {
+    render(<Slider label="Select Amount" defaultValue={[50]} />)
+    const slider = screen.getByTestId('ipa_slider')
     expect(slider).toBeInTheDocument()
   })
 })

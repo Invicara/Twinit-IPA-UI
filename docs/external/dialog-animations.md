@@ -47,13 +47,13 @@ For the `Dialog` component we specifically want:
 
 The dialog's styling is split into:
 
-- **Base layout & appearance** – defined in the CSS module using `@apply` (for BEM-style classes such as `overlay`, `content`, `header`, `footer`, etc.).
+- **Base layout & appearance** – defined in the CSS module using `@apply` (for BEM-style classes such as `dialog`, `content`, `header`, `footer`, etc.).
 - **Open/close animations** – implemented as custom keyframes (`ipa-dialog-*`) wired to Radix's `data-state` attribute using standard CSS attribute selectors.
 
 #### 1. Base styles (CSS module)
 
 ```css
-.overlay {
+.dialog {
   @apply fixed inset-0 z-50 bg-neutral-10/75;
 }
 
@@ -105,11 +105,11 @@ Key points:
 #### 3. Attribute selectors wired to Radix `data-state`
 
 ```css
-.overlay[data-state="open"] {
+.dialog[data-state="open"] {
   animation: ipa-dialog-overlay-in 150ms ease-out forwards;
 }
 
-.overlay[data-state="closed"] {
+.dialog[data-state="closed"] {
   animation: ipa-dialog-overlay-out 150ms ease-in forwards;
 }
 
@@ -131,25 +131,14 @@ The CSS module reacts to those attributes and plays the correct keyframes.
 
 #### 4. JSX stays clean and library-friendly
 
-In `dialog.tsx`, we only apply **CSS module classes** and optional overrides via `classNames`:
+In `dialog.tsx`, we only apply **CSS module classes** merged with optional overrides via `styleOverrides` (using `mergeStyles(styles, styleOverrides)` to get `s`, then `s.dialog`, `s.content`, etc.):
 
 ```tsx
-<DialogPrimitive.Overlay
-  className={cn(
-    styles.overlay,
-    classNames?.overlay
-  )}
-/>;
+<DialogPrimitive.Overlay className={s.dialog} />;
 
 <DialogPrimitive.Content
   ref={ref}
-  className={cn(
-    styles.content,
-    sizeClasses[size],
-    hideOverlay && styles.contentPointerEventsAuto,
-    classNames?.content,
-    className
-  )}
+  className={cn(s.content, hideOverlay && s.contentPointerEventsAuto, className)}
   onInteractOutside={(e) => {
     if (disableClickOutside) e.preventDefault();
   }}
@@ -165,7 +154,7 @@ In `dialog.tsx`, we only apply **CSS module classes** and optional overrides via
 There are **no Tailwind animation utilities** in the JSX. Consuming apps only see:
 
 - The CSS module class names (e.g. `dialog_module__content__abc123`).
-- Any extra classes provided via `classNames` or `className`.
+- Any extra classes provided via `styleOverrides` or `className`.
 
 ---
 

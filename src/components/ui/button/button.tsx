@@ -1,62 +1,50 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { cva } from "class-variance-authority"
- 
-import { cn } from "../../../lib/utils"
 
-import '../../../output.css'
-import { ButtonProps } from "./button.types"
+import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./button.module.css"
- 
-const buttonVariants = cva(
-  styles.base,
-  {
-    variants: {
-      variant: {
-        default: styles.variantDefault,
-        danger: styles.variantDanger,
-        secondary: styles.variantSecondary,
-        tertiary: styles.variantTertiary,
-      },
-      size: {
-        default: styles.sizeDefault,
-        sm: styles.sizeSm,
-        icon: styles.sizeIcon,
-      },
-    },
-    compoundVariants: [
-      {
-        variant: "tertiary",
-        size: "default",
-        class: styles.variantTertiarySizeDefault,
-      },
-      {
-        variant: "tertiary",
-        size: "sm",
-        class: styles.variantTertiarySizeSm,
-      },
-    ],
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
- 
+
+export type ButtonVariant = "default" | "danger" | "secondary" | "tertiary"
+export type ButtonSize = "default" | "sm" | "icon"
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant
+  size?: ButtonSize
+  asChild?: boolean
+  /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
+  styleOverrides?: Record<string, string>
+}
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, testIdPrefix, asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = "default",
+      size = "default",
+      asChild = false,
+      disabled = false,
+      styleOverrides,
+      ...props
+    },
+    ref
+  ) => {
+    const s = mergeStyles(styles, styleOverrides)
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-      data-testid={`${testIdPrefix}`}
-      className={cn(buttonVariants({ variant, size, className }))}
-      ref={ref}
-      {...props}
+        ref={ref}
+        data-testid="ipa_button"
+        data-variant={variant}
+        data-size={size}
+        data-disabled={disabled}
+        className={cn(s.button, className)}
+        {...(asChild ? {} : { disabled })}
+        {...props}
       />
     )
   }
 )
 Button.displayName = "Button"
- 
-export { Button, buttonVariants }
-export default Button;
+
+export { Button }
