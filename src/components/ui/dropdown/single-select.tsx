@@ -6,14 +6,19 @@ import styles from "./single-select.module.css";
 import {
   DropdownPopup,
   DropdownScrollableContent,
+  DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS,
   getDropdownScrollContentMaxHeight,
+  getPopupMaxHeightPx,
 } from "./shared/dropdown-base";
 import { useClickOutside } from "./shared/dropdown-hooks";
+import { moveFocusAfterCloseFromElement } from "./shared/dropdown-focus-utils";
 import { useDropdownFloating } from "./shared/use-dropdown-floating";
+import { useSuppressDropdownKeyDefaults } from "./shared/use-dropdown-keyboard";
 import { startTextAnimation, stopTextAnimation } from "./shared/dropdown-text-utils";
 
 const defaultStyles = { ...sharedStyles, ...styles };
 
+// Props: docs/dropdown.md — "SingleSelect props (main)"
 export interface SingleSelectProps {
   // Core Props
   className?: string;
@@ -33,18 +38,12 @@ export interface SingleSelectProps {
   disableIconAnimation?: boolean;
   enableLongTextAnimation?: boolean;
   disableScrolling?: boolean;
-  disableCloseOnOutsideClick?: boolean;
-  closeOnInputClick?: boolean;
+  disableClickOutside?: boolean;
   popAbove?: boolean;
   disableSelectionLooping?: boolean;
-  /** Portal root for the listbox (defaults to `#ipa-ui-modal-root` or `document.body`) */
+  openOnFocus?: boolean;
   portalContainer?: HTMLElement | null;
-  /** z-index for the portaled listbox (default 1200) */
   floatingZIndex?: number;
-  /**
-   * Max option rows shown before the list scrolls. Defaults to `10`.
-   * Pass `false` for no row cap (only the viewport / floating size limit applies).
-   */
   maxVisibleOptions?: number | false;
 
   // Icons
@@ -75,13 +74,13 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       disableIconAnimation,
       enableLongTextAnimation = false,
       disableScrolling,
-      disableCloseOnOutsideClick,
-      closeOnInputClick,
+      disableClickOutside,
       popAbove,
       disableSelectionLooping = false,
+      openOnFocus,
       portalContainer,
       floatingZIndex,
-      maxVisibleOptions = 10,
+      maxVisibleOptions = DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS,
       icons,
       styleOverrides,
       ...props
@@ -89,20 +88,36 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
     ref
   ) => {
     const s = mergeStyles(defaultStyles, styleOverrides);
+    const disableKbNav =
+      disableKeyboardNavigation === true ||
+      String(disableKeyboardNavigation) === "true";
+    const disableClickOutsideActive =
+      disableClickOutside === true || String(disableClickOutside) === "true";
+    const openOnFocusEnabled =
+      openOnFocus === true || String(openOnFocus) === "true";
     const scrollContentMaxHeight = getDropdownScrollContentMaxHeight(
       maxVisibleOptions,
       !!disableScrolling
+    );
+    const maxPopupHeightPx = getPopupMaxHeightPx(
+      scrollContentMaxHeight,
+      !hideFooter
     );
     const defaultPlaceholder = filter ? 'Type to search...' : 'Select an option';
     const effectivePlaceholder = placeholder || defaultPlaceholder;
     const [searchQuery, setSearchQuery] = React.useState('');
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+    useSuppressDropdownKeyDefaults(disableKbNav && isSearchOpen);
     const [isInputFocused, setIsInputFocused] = React.useState(false);
     const [focusedIndex, setFocusedIndex] = React.useState(-1);
     const [isKeyboardMode, setIsKeyboardMode] = React.useState(false);
+    /** Until controlled `value` catches up after a pick, show this label in filter mode. */
+    const [filterSelectionDisplay, setFilterSelectionDisplay] = React.useState<
+      string | null
+    >(null);
     const itemRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
     const lastMousePosition = React.useRef({ x: 0, y: 0 });
-    
+
     const dropdownRef = React.useRef<HTMLDivElement>(null);
     const searchInputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -121,34 +136,39 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
         preferTop: !!popAbove,
         portalContainer,
         floatingZIndex,
+        maxPopupHeightPx,
       });
 
     useClickOutside(
       dropdownRef,
       () => {
-        if (!disableCloseOnOutsideClick) {
-          setIsSearchOpen(false);
-          setSearchQuery('');
-          setIsInputFocused(false);
+        if (disableClickOutsideActive) return;
+        setIsSearchOpen(false);
+        setIsInputFocused(false);
+        if (filter) {
+          const opt = options.find((o) => o.value === value);
+          setSearchQuery(opt ? opt.label : "");
+        } else {
+          setSearchQuery("");
         }
       },
-      isSearchOpen && !disableCloseOnOutsideClick,
+      isSearchOpen,
       floatingRefs.floating
     );
 
     const highlightMatch = (text: string, query: string) => {
       if (!query.trim()) return text;
-      
+
       const lowerText = text.toLowerCase();
       const lowerQuery = query.toLowerCase();
       const index = lowerText.indexOf(lowerQuery);
-      
+
       if (index === -1) return text;
-      
+
       const before = text.substring(0, index);
       const match = text.substring(index, index + query.length);
       const after = text.substring(index + query.length);
-      
+
       return (
         <>
           {before}
@@ -159,34 +179,81 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
     };
 
     React.useEffect(() => {
-      if (searchQuery && !isSearchOpen) {
-        setIsSearchOpen(true);
-      }
-      if (searchQuery !== '') {
-        setFocusedIndex(-1);
-        itemRefs.current = new Array(filteredOptions.length);
-      }
-    }, [searchQuery, isSearchOpen, filteredOptions.length]);
+      itemRefs.current = new Array(filteredOptions.length);
+    }, [filteredOptions.length]);
 
     React.useEffect(() => {
-      if (isSearchOpen && focusedIndex >= 0 && focusedIndex < itemRefs.current.length) {
-        const focusedItem = itemRefs.current[focusedIndex];
-        if (focusedItem) {
-          focusedItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        }
+      if (
+        !filter ||
+        !openOnFocusEnabled ||
+        !searchQuery.trim() ||
+        isSearchOpen ||
+        !isInputFocused
+      ) {
+        return;
       }
-    }, [focusedIndex, isSearchOpen]);
+      setIsSearchOpen(true);
+    }, [
+      filter,
+      openOnFocusEnabled,
+      searchQuery,
+      isSearchOpen,
+      isInputFocused,
+    ]);
+
+    const rowHighlightIndex = React.useMemo(() => {
+      if (
+        !disableKbNav &&
+        filter &&
+        isSearchOpen &&
+        searchQuery.trim() !== "" &&
+        focusedIndex < 0 &&
+        filteredOptions.length > 0
+      ) {
+        return 0;
+      }
+      return focusedIndex;
+    }, [
+      disableKbNav,
+      filter,
+      isSearchOpen,
+      searchQuery,
+      focusedIndex,
+      filteredOptions.length,
+    ]);
+
+    React.useLayoutEffect(() => {
+      if (
+        !isKeyboardMode ||
+        !isSearchOpen ||
+        focusedIndex < 0 ||
+        focusedIndex >= itemRefs.current.length
+      ) {
+        return;
+      }
+      const focusedItem = itemRefs.current[focusedIndex];
+      if (focusedItem) {
+        focusedItem.scrollIntoView({ block: "center", inline: "nearest" });
+      }
+    }, [focusedIndex, isSearchOpen, isKeyboardMode]);
+
+    React.useEffect(() => {
+      if (!filter || filterSelectionDisplay == null) return;
+      const opt = options.find((o) => o.value === value);
+      if (opt && opt.label === filterSelectionDisplay) {
+        setFilterSelectionDisplay(null);
+      }
+    }, [filter, value, options, filterSelectionDisplay]);
 
     // Track actual mouse movement to re-enable hover
     React.useEffect(() => {
       const handleMouseMove = (e: MouseEvent) => {
-        const moved = 
+        const moved =
           Math.abs(e.clientX - lastMousePosition.current.x) > 2 ||
           Math.abs(e.clientY - lastMousePosition.current.y) > 2;
-        
+
         if (moved) {
           setIsKeyboardMode(false);
-          setFocusedIndex(-1); // Clear keyboard focus when mouse moves
           lastMousePosition.current = { x: e.clientX, y: e.clientY };
         }
       };
@@ -199,121 +266,273 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
       }
     }, [isSearchOpen]);
 
-    const closeSearch = React.useCallback(() => {
-      setIsSearchOpen(false);
-      setSearchQuery('');
-      setIsInputFocused(false);
-      setFocusedIndex(-1);
-      searchInputRef.current?.blur();
-    }, []);
+    const closeSearch = React.useCallback(
+      (opts?: { filterQuerySeed?: string }) => {
+        setIsSearchOpen(false);
+        // Do not set isInputFocused false here: the filter input often keeps DOM
+        // focus while the list closes (Enter/Escape). focus() then no-ops and skips
+        // onFocus — wrong empty-query display. Blur still clears via onBlur.
+        setFocusedIndex(-1);
+        if (filter) {
+          if (opts?.filterQuerySeed !== undefined) {
+            setSearchQuery(opts.filterQuerySeed);
+          } else {
+            const opt = options.find((o) => o.value === value);
+            setSearchQuery(opt ? opt.label : "");
+          }
+        } else {
+          setSearchQuery("");
+        }
+      },
+      [filter, options, value]
+    );
+
+    const handleChevronClick = React.useCallback(
+      (e: React.MouseEvent<HTMLElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (disabled) return;
+        if (isSearchOpen) {
+          closeSearch();
+        } else {
+          setIsSearchOpen(true);
+          setFocusedIndex(-1);
+          requestAnimationFrame(() => {
+            searchInputRef.current?.focus();
+          });
+        }
+      },
+      [disabled, isSearchOpen, closeSearch]
+    );
+
+    const handleChevronKeyDown = React.useCallback(
+      (e: React.KeyboardEvent<HTMLElement>) => {
+        if (disabled) return;
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        if (isSearchOpen) {
+          closeSearch();
+        } else {
+          setIsSearchOpen(true);
+          setFocusedIndex(-1);
+          requestAnimationFrame(() => {
+            searchInputRef.current?.focus();
+          });
+        }
+      },
+      [disabled, isSearchOpen, closeSearch]
+    );
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (disableKeyboardNavigation) return;
-      
-      // Set keyboard mode on any key press
-      setIsKeyboardMode(true);
-
-      // Always allow Escape to close when dropdown is open (even with no results)
-      if (e.key === 'Escape' && isSearchOpen) {
-        e.preventDefault();
-        closeSearch();
-        return;
+      const isPrintableChar =
+        e.key.length === 1 && e.key !== " " && !e.ctrlKey && !e.metaKey;
+      if (!isPrintableChar && !disableKbNav) {
+        setIsKeyboardMode(true);
       }
 
-      if (e.key === 'Enter' && !isSearchOpen && filteredOptions.length > 0) {
-        e.preventDefault();
-        setIsSearchOpen(true);
-        setFocusedIndex(0);
-        return;
-      }
-
-      if (e.key === 'Tab') {
-        // If dropdown is open: select first item if none highlighted, then close and move focus
+      if (e.key === "Escape") {
         if (isSearchOpen) {
           e.preventDefault();
-          if (filteredOptions.length > 0) {
-            const indexToSelect = focusedIndex >= 0 && focusedIndex < filteredOptions.length ? focusedIndex : 0;
-            const optionToSelect = filteredOptions[indexToSelect];
-            if (onChange) onChange(optionToSelect.value);
-          }
           closeSearch();
           requestAnimationFrame(() => {
-            const focusableElements = Array.from(
-              document.querySelectorAll<HTMLElement>(
-                'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-              )
-            ).filter(el => {
-              const style = window.getComputedStyle(el);
-              return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-            });
-            const currentIndex = focusableElements.findIndex(el => el === searchInputRef.current);
-            const nextIndex = e.shiftKey ? currentIndex - 1 : currentIndex + 1;
-            if (nextIndex >= 0 && nextIndex < focusableElements.length) {
-              focusableElements[nextIndex]?.focus();
-            }
+            searchInputRef.current?.focus();
           });
           return;
         }
-        // Dropdown closed: open and highlight first item if there are options
-        if (filteredOptions.length > 0) {
-          e.preventDefault();
-          setIsSearchOpen(true);
-          setFocusedIndex(0);
+        if (
+          filter &&
+          searchQuery.trim() === "" &&
+          value !== undefined &&
+          value !== ""
+        ) {
+          const opt = options.find((o) => o.value === value);
+          if (opt) {
+            e.preventDefault();
+            setSearchQuery(opt.label);
+          }
         }
         return;
+      }
+
+      if (e.key === "Tab") {
+        if (isSearchOpen) {
+          e.preventDefault();
+          const origin = searchInputRef.current;
+          closeSearch();
+          moveFocusAfterCloseFromElement(origin, e);
+        }
+        return;
+      }
+
+      if (
+        filter &&
+        !isSearchOpen &&
+        searchQuery.trim() === "" &&
+        (e.key === "Enter" || e.key === " ")
+      ) {
+        e.preventDefault();
+        onChange?.("");
+        setFilterSelectionDisplay(null);
+        setFocusedIndex(-1);
+        return;
+      }
+
+      const openFromClosed = (
+        keyEvent: React.KeyboardEvent,
+        vertical: "down" | "up"
+      ) => {
+        if (filteredOptions.length === 0) return false;
+        keyEvent.preventDefault();
+        setIsSearchOpen(true);
+        if (disableKbNav) {
+          setFocusedIndex(-1);
+          return true;
+        }
+        const sel = filteredOptions.findIndex((o) => o.value === value);
+        if (vertical === "up") {
+          setFocusedIndex(sel >= 0 ? sel : filteredOptions.length - 1);
+        } else {
+          setFocusedIndex(sel >= 0 ? sel : 0);
+        }
+        return true;
+      };
+
+      if (!isSearchOpen && filteredOptions.length > 0) {
+        if (e.key === "Enter" || e.key === " ") {
+          openFromClosed(e, "down");
+          return;
+        }
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          if (disableKbNav) {
+            e.preventDefault();
+            return;
+          }
+          openFromClosed(e, e.key === "ArrowDown" ? "down" : "up");
+          return;
+        }
       }
 
       if (!isSearchOpen || filteredOptions.length === 0) return;
 
+      if (
+        e.key === " " &&
+        filter &&
+        searchQuery.trim() !== "" &&
+        focusedIndex < 0
+      ) {
+        return;
+      }
+
       switch (e.key) {
-        case 'ArrowDown':
+        case "ArrowDown":
+          if (disableKbNav) {
+            if (isSearchOpen && filteredOptions.length > 0) {
+              e.preventDefault();
+            }
+            return;
+          }
           e.preventDefault();
           if (disableSelectionLooping) {
             setFocusedIndex((prev) => {
-              if (prev < 0) return 0; // Initialize if no item is focused
+              if (prev < 0) return 0;
               return prev < filteredOptions.length - 1 ? prev + 1 : prev;
             });
           } else {
             setFocusedIndex((prev) => {
-              if (prev < 0) return 0; // Initialize if no item is focused
+              if (prev < 0) return 0;
               return prev < filteredOptions.length - 1 ? prev + 1 : 0;
             });
           }
           break;
-        case 'ArrowUp':
+        case "ArrowUp":
+          if (disableKbNav) {
+            if (isSearchOpen && filteredOptions.length > 0) {
+              e.preventDefault();
+            }
+            return;
+          }
           e.preventDefault();
           if (disableSelectionLooping) {
             setFocusedIndex((prev) => {
-              if (prev < 0) return 0; // Initialize if no item is focused
+              if (prev < 0) return 0;
               return prev > 0 ? prev - 1 : 0;
             });
           } else {
             setFocusedIndex((prev) => {
-              if (prev < 0) return filteredOptions.length - 1; // Initialize to last item if no item is focused
+              if (prev < 0) return filteredOptions.length - 1;
               return prev > 0 ? prev - 1 : filteredOptions.length - 1;
             });
           }
           break;
-        case 'Enter':
+        case "Enter":
           e.preventDefault();
-          if (filteredOptions.length > 0) {
-            const indexToSelect = focusedIndex >= 0 && focusedIndex < filteredOptions.length ? focusedIndex : 0;
-            const selectedOption = filteredOptions[indexToSelect];
-            if (onChange) onChange(selectedOption.value);
-          }
-          closeSearch();
-          break;
-        case ' ':
-          // Spacebar selects item but doesn't dismiss dropdown (only for non-filter mode)
-          if (!filter) {
-            e.preventDefault();
+          if (disableKbNav) break;
+          if (filter && searchQuery.trim() === "") {
             if (focusedIndex >= 0 && focusedIndex < filteredOptions.length) {
-              const selectedOption = filteredOptions[focusedIndex];
-              if (onChange) onChange(selectedOption.value);
-              // Keep dropdown open and maintain focus on the selected item
+              const picked = filteredOptions[focusedIndex];
+              onChange?.(picked.value);
+              setFilterSelectionDisplay(picked.label);
+              closeSearch({ filterQuerySeed: picked.label });
+            } else {
+              onChange?.("");
+              setFilterSelectionDisplay(null);
+              closeSearch({ filterQuerySeed: "" });
             }
+            requestAnimationFrame(() => {
+              searchInputRef.current?.focus();
+            });
+            break;
           }
-          // If filter mode, allow spacebar to type spaces
+          if (filteredOptions.length > 0) {
+            const indexToSelect =
+              focusedIndex >= 0 && focusedIndex < filteredOptions.length
+                ? focusedIndex
+                : Math.max(0, rowHighlightIndex);
+            const picked = filteredOptions[indexToSelect];
+            if (onChange) onChange(picked.value);
+            if (filter) setFilterSelectionDisplay(picked.label);
+            closeSearch(filter ? { filterQuerySeed: picked.label } : undefined);
+          } else {
+            closeSearch();
+          }
+          requestAnimationFrame(() => {
+            searchInputRef.current?.focus();
+          });
+          break;
+        case " ":
+          e.preventDefault();
+          if (disableKbNav) break;
+          if (filter && searchQuery.trim() === "") {
+            if (focusedIndex >= 0 && focusedIndex < filteredOptions.length) {
+              const picked = filteredOptions[focusedIndex];
+              onChange?.(picked.value);
+              setFilterSelectionDisplay(picked.label);
+              closeSearch({ filterQuerySeed: picked.label });
+            } else {
+              onChange?.("");
+              setFilterSelectionDisplay(null);
+              closeSearch({ filterQuerySeed: "" });
+            }
+            requestAnimationFrame(() => {
+              searchInputRef.current?.focus();
+            });
+            break;
+          }
+          if (filteredOptions.length > 0) {
+            const indexToSelect =
+              focusedIndex >= 0 && focusedIndex < filteredOptions.length
+                ? focusedIndex
+                : Math.max(0, rowHighlightIndex);
+            const picked = filteredOptions[indexToSelect];
+            if (onChange) onChange(picked.value);
+            if (filter) setFilterSelectionDisplay(picked.label);
+            closeSearch(filter ? { filterQuerySeed: picked.label } : undefined);
+          } else {
+            closeSearch();
+          }
+          requestAnimationFrame(() => {
+            searchInputRef.current?.focus();
+          });
           break;
       }
     };
@@ -321,9 +540,13 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
     const selectedOption = options.find(opt => opt.value === value);
     const displayValue = !filter
       ? (selectedOption ? selectedOption.label : '')
-      : (searchQuery !== '' 
-        ? searchQuery 
-        : (isInputFocused || !selectedOption ? '' : selectedOption.label));
+      : searchQuery !== ""
+        ? searchQuery
+        : isInputFocused
+          ? ""
+          : filterSelectionDisplay != null
+            ? filterSelectionDisplay
+            : (selectedOption?.label ?? "");
 
     return (
       <div
@@ -341,7 +564,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
               ref.current = node;
             }
           }
-        }} 
+        }}
         {...props}
       >
         <div className={s.container}>
@@ -351,31 +574,67 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             value={displayValue}
             onChange={(e) => {
               if (!filter) return;
-              setSearchQuery(e.target.value);
+              const next = e.target.value;
+              setSearchQuery(next);
+              if (next === "") {
+                setFilterSelectionDisplay(null);
+                setFocusedIndex(-1);
+                setIsKeyboardMode(false);
+              }
               if (!isSearchOpen) {
                 setIsSearchOpen(true);
               }
-              setFocusedIndex(-1);
             }}
-            onFocus={() => {
+            onFocus={(ev) => {
               setIsInputFocused(true);
-              if (!closeOnInputClick || !isSearchOpen) {
-                setIsSearchOpen(true);
-              }
-              if (!filter) {
-                setSearchQuery('');
-              } else if (selectedOption) {
-                setSearchQuery('');
-              }
               setFocusedIndex(-1);
+              if (!filter) {
+                setSearchQuery("");
+                if (
+                  openOnFocusEnabled &&
+                  !disabled &&
+                  filteredOptions.length > 0 &&
+                  !isSearchOpen
+                ) {
+                  try {
+                    if (ev.currentTarget.matches(":focus-visible")) {
+                      setIsSearchOpen(true);
+                    }
+                  } catch {
+                    setIsSearchOpen(true);
+                  }
+                }
+                return;
+              }
+              if (
+                searchQuery.trim() === "" &&
+                value !== undefined &&
+                value !== ""
+              ) {
+                const opt = options.find((o) => o.value === value);
+                if (opt) {
+                  setSearchQuery(opt.label);
+                }
+              }
             }}
             onClick={() => {
-              if (closeOnInputClick && isSearchOpen) {
-                setIsSearchOpen(false);
+              if (!isSearchOpen) {
+                setIsSearchOpen(true);
               }
             }}
             onBlur={() => {
               setIsInputFocused(false);
+              if (
+                filter &&
+                searchQuery.trim() === "" &&
+                value !== undefined &&
+                value !== ""
+              ) {
+                const opt = options.find((o) => o.value === value);
+                if (opt) {
+                  setSearchQuery(opt.label);
+                }
+              }
             }}
             onKeyDown={handleKeyDown}
             disabled={disabled}
@@ -384,27 +643,39 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             data-disabled={disabled ? "true" : undefined}
             className={cn(s.triggerBase, s.trigger, className)}
           />
-          <div className={s.triggerIconContainer}>
+          <span
+            role="button"
+            tabIndex={-1}
+            aria-label={isSearchOpen ? "Close options" : "Open options"}
+            aria-disabled={disabled ? "true" : undefined}
+            className={s.triggerIconButton}
+            onClick={handleChevronClick}
+            onKeyDown={handleChevronKeyDown}
+          >
             {icons?.trigger ? (
-              <div className={cn(
-                !disableIconAnimation && s.triggerIconTransition,
-                s.triggerIcon
-              )}>
+              <div
+                className={cn(
+                  !disableIconAnimation && s.triggerIconTransition,
+                  s.triggerIcon
+                )}
+              >
                 {icons.trigger}
               </div>
             ) : (
-              <ChevronDownIcon className={cn(
-                s.triggerIcon,
-                !disableIconAnimation && s.triggerIconTransition
-              )} />
+              <ChevronDownIcon
+                className={cn(
+                  s.triggerIcon,
+                  !disableIconAnimation && s.triggerIconTransition
+                )}
+              />
             )}
-          </div>
+          </span>
         </div>
-        
+
         {isSearchOpen && filteredOptions.length > 0 && (
           <DropdownPopup
             isOpen={true}
-            onClose={closeSearch}
+            onClose={() => closeSearch()}
             footer={!hideFooter}
             resolvedPosition={resolvedPosition}
             setFloating={floatingRefs.setFloating}
@@ -415,6 +686,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             <DropdownScrollableContent
               scrollable={!disableScrolling}
               contentMaxHeight={scrollContentMaxHeight}
+              blockArrowKeys={disableKbNav}
               styles={s}
             >
               {filteredOptions.map((option, index) => (
@@ -447,23 +719,31 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                   type="button"
                   disabled={option.disabled}
                   data-disabled={option.disabled ? "true" : undefined}
-                  data-focused={!hideRowHighlight && focusedIndex === index ? "true" : undefined}
+                  data-focused={
+                    !hideRowHighlight && rowHighlightIndex === index
+                      ? "true"
+                      : undefined
+                  }
                   onClick={() => {
                     if (onChange) {
                       onChange(option.value);
                     }
-                    setSearchQuery('');
+                    if (filter) {
+                      setFilterSelectionDisplay(option.label);
+                      setSearchQuery(option.label);
+                    } else {
+                      setSearchQuery("");
+                    }
                     setIsSearchOpen(false);
                     setIsInputFocused(false);
                     setFocusedIndex(-1);
-                    if (searchInputRef.current) {
-                      searchInputRef.current.blur();
-                    }
+                    requestAnimationFrame(() => {
+                      searchInputRef.current?.focus();
+                    });
                   }}
                   onMouseEnter={(e) => {
-                    if (!isKeyboardMode) {
-                      setFocusedIndex(index);
-                    }
+                    setIsKeyboardMode(false);
+                    setFocusedIndex(index);
                     if (enableLongTextAnimation) {
                       const textElement = e.currentTarget.querySelector('.scrollable-text') as HTMLElement;
                       const ellipsisElement = e.currentTarget.querySelector('.ellipsis-indicator') as HTMLElement;
@@ -489,23 +769,26 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
                   }}
                   className={cn(
                     s.itemBase,
-                    !hideRowHighlight && !isKeyboardMode && cn(s.itemHover, 'group'),
-                    !hideRowHighlight && focusedIndex === index && s.itemFocused,
+                    !hideRowHighlight && !isKeyboardMode && s.itemHover,
+                    !hideRowHighlight &&
+                    rowHighlightIndex === index &&
+                    s.itemFocused,
                     option.disabled && s.itemDisabled
                   )}
                 >
                   <div className={s.itemContent}>
-                    <span 
+                    <span
                       className={cn(s.itemContentText, 'scrollable-text', s.itemText)}
                     >
                       {filter ? highlightMatch(option.label, searchQuery) : option.label}
                     </span>
                     {!hideLongTextEllipsis && (
-                      <span className={cn(
-                        s.itemContentEllipsisIndicator,
-                        'ellipsis-indicator',
-                        !hideRowHighlight && !isKeyboardMode && s.itemContentEllipsisIndicatorHover
-                      )}>
+                      <span
+                        className={cn(
+                          s.itemContentEllipsisIndicator,
+                          'ellipsis-indicator'
+                        )}
+                      >
                         ..
                       </span>
                     )}
@@ -515,11 +798,11 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
             </DropdownScrollableContent>
           </DropdownPopup>
         )}
-        
+
         {isSearchOpen && filteredOptions.length === 0 && searchQuery && (
           <DropdownPopup
             isOpen={true}
-            onClose={closeSearch}
+            onClose={() => closeSearch()}
             footer={false}
             resolvedPosition={resolvedPosition}
             setFloating={floatingRefs.setFloating}
@@ -531,7 +814,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
               No options found
             </div>
             {resolvedPosition === 'bottom' && !hideFooter && (
-              <div className={cn(s.footer, s.footerGroup)} onClick={closeSearch}>
+              <div className={cn(s.footer, s.footerGroup)} onClick={() => closeSearch()}>
                 {icons?.footer ? (
                   <div className={cn(
                     !disableIconAnimation && s.footerIconAnimate,
@@ -548,7 +831,7 @@ export const SingleSelect = React.forwardRef<HTMLDivElement, SingleSelectProps>(
               </div>
             )}
             {resolvedPosition === 'top' && !hideFooter && (
-              <div className={cn(s.footer, s.footerGroup)} onClick={closeSearch}>
+              <div className={cn(s.footer, s.footerGroup)} onClick={() => closeSearch()}>
                 {icons?.footer ? (
                   <div className={cn(
                     !disableIconAnimation && s.footerIconAnimate,

@@ -16,10 +16,10 @@ import { XIcon } from '@dtplatform/ipa-ui';
 
 ```tsx
 <XIcon />
-<XIcon className="w-5 h-5 text-neutral-50" />
+<XIcon className={styles.iconLg} />
 ```
 
-**Props:** Accepts `className` (and any SVG attributes passed through to the root `<svg>`). Size is 16×16 by default; override with `className` (e.g. Tailwind `w-5 h-5`). Color follows `currentColor` so it inherits text color.
+**Props:** Accepts `className` (and any SVG attributes passed through to the root `<svg>`). Size is 16×16 by default; override with `className` (e.g. your own CSS module or global utility classes). Color follows `currentColor` so it inherits text color.
 
 ---
 

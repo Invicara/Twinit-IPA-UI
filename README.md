@@ -53,6 +53,7 @@ Implementation guides for each component are in the [`docs/`](docs/) folder:
 | [Link](docs/link.md) | `docs/link.md` |
 | [RadioGroup](docs/radio-group.md) | `docs/radio-group.md` |
 | [Slider](docs/slider.md) | `docs/slider.md` |
+| [Table](docs/table.md) | `docs/table.md` |
 | [Icons (XIcon)](docs/icons.md) | `docs/icons.md` |
 
 **For contributors:** see [docs/external/](docs/external/). **For internal team:** release flow, publishing, and implementation details are in [docs/internal/](docs/internal/).
@@ -77,7 +78,7 @@ Simple components use **Class Variance Authority (CVA)** for variant-based styli
 **Customization:**
 - Use `variant` prop for style variants (e.g., `default`, `danger`, `secondary`, `tertiary`)
 - Use `size` prop for size variants (e.g., `default`, `sm`, `icon`)
-- Use `className` prop to add additional Tailwind classes that merge with the base styles
+- Use `className` prop to add additional CSS classes (merged with base styles via `clsx`)
 
 ### 2. Complex Components (styleOverrides)
 

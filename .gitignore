@@ -31,5 +31,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Generated CSS (if it's auto-generated from tailwind-dev script)
+# Generated global CSS (from npm run build:css / watch:css)
 src/output.css

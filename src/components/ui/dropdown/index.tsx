@@ -5,6 +5,8 @@ import { MultiSelect } from './multi-select';
 // Export individual components
 export { SingleSelect, MultiSelect };
 
+export { DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS } from './shared/dropdown-base';
+
 // Export types
 export type { SingleSelectProps } from './single-select';
 export type { MultiSelectProps } from './multi-select';
@@ -25,6 +27,7 @@ interface UnifiedDropdownProps {
   portalContainer?: HTMLElement | null;
   floatingZIndex?: number;
   maxVisibleOptions?: number | false;
+  openOnFocus?: boolean;
 }
 
 export const Dropdown = React.forwardRef<HTMLDivElement, UnifiedDropdownProps>(

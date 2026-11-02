@@ -5,8 +5,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-11-02
+
+First stable 2.x release. It contains everything listed under [2.0.0-0] and [2.0.0-1] below (including the breaking Dropdown prop changes and the Tailwind removal), plus the fixes from the release-candidate QA round.
+
+### Fixed
+
+- **Dropdown**: navigation keys are now disabled when keyboard navigation is turned off, in both single- and multi-select (IPAUI-69, IPAUI-70).
+- **Table filters**: typed dates in the filter menu are parsed, and date-only ISO strings are read as local midnight rather than UTC.
+- **Table filters**: single-date filtering works; numeric range input accepts negative numbers and a single value (converted to a range), and the label reads "to".
+- **Table filters**: role filter is case-insensitive, its counts update when pagination settings change, and an unparsable filter returns an empty table instead of erroring.
+- **Table filters**: "Full-Time" checkbox filter matches full-time rows; label search tolerance tuned for the filter menu, faceted filter and advanced-sort column search.
+- **Table sorting**: a third click on a column header clears the sort.
+- **Table**: loading skeleton is stable and visually consistent across columns, selection, pagination and filters.
+- **Popover**: content opening above its trigger is no longer truncated.
+- **Link**: only the inline variant is underlined.
+- **Storybook**: column-visibility controls reset correctly, the broken pie filter story was replaced with a year toggle, and textarea controls work around a Storybook special-character bug.
+
+### Changed
+
+- Node 22.23.4 pinned for Cloudflare Pages Storybook builds.
+- Publishing docs corrected: release branch per release type, and the two flags `npm publish` needs.
 
 
+## [2.0.0-1] - 2026-09-11
+
+### Security
+
+- Resolved all outstanding dependency advisories (25 `npm audit` findings: 14 high, 8 moderate, 3 low), all in `devDependencies`. The production dependency tree was and remains clean, and the published package ships only `dist/`.
+- **@rollup/plugin-terser** `^0.4.4` -> `^1.0.0`, pulling patched `serialize-javascript` 7.1.1 (GHSA-5c6j-r48x-rmvq, GHSA-qj8w-gfj5-8c6v).
+- Added a scoped `overrides` entry pinning `uuid` to `^11.1.1` under `@storybook/addon-actions` (GHSA-w5hq-g745-h8pq), avoiding the Storybook downgrade npm suggested.
+- Transitive patches for `postcss`, `lodash`, `ws`, `svgo`, `js-yaml`, `nanoid`, `qs`, `yaml`, `brace-expansion`, `form-data`, `flatted`, `fast-uri`, `browserslist`, `picomatch`, `colord` and the Babel toolchain.
+
+
+## [2.0.0-0] - 2026-09-11
+
+### Breaking
+
+- **Dropdown**: prop changes - `disableClickOutside`, `disableIconAnimation`, `enableLongTextAnimation`, `openOnFocus`; keybindings updated.
+- **Storybook controls**: expanded controls & argTypes across components (unstable API surface).
+- Tailwind fully removed from the build; Node 20 requirement dropped, resulting artifacts fixed.
+
+### Added
+
+- **Table**: new component built on TanStack Table - sorting, advanced multi-sort with drag & drop, column drag/resize/ordering, row selection, pagination, loading skeleton.
+- **Table**: filter set - checkbox, faceted, date, rating and slider filters, plus a filter menu and reset control.
+- **Table**: server mode with OData query building and URL search-param parsing/state sync.
+- **Table**: composable feature hooks (`withSorting`, `withFiltering`, `withPagination`, `withSelection`, `withResizing`, `withColumnOrder`, client/server mode) and control hooks.
+- New components: **Badge**, **Calendar** / date picker, **Command**, **Dropdown Menu**, **Popover**, **Separator**.
+- Docs for the table and calendar components, plus internal component-source notes.
+- `release:public` script that publishes squashed release snapshots to the public repo.
+
+### Changed
+
+- Removed Tailwind CSS, DaisyUI, and `tailwind-merge` from the build. Global styles are plain CSS compiled with PostCSS (`postcss-preset-env`, `autoprefixer`). Use `npm run build:css` / `npm run watch:css` instead of Tailwind CLI.
+- `cn()` now uses `clsx` only (no Tailwind-aware class deduplication).
+- **Storybook**: pin `storybook` and all `@storybook/*` devDependencies to **8.6.18** so addons match core (removes version-mismatch warnings).
+- **Dropdown**: portaled list popup `max-height` is capped to the scroll row cap plus footer (not the full viewport), so the open list matches the intended compact height after Floating UI `size()`.
+- **Dropdown**: default `maxVisibleOptions` is now **8** (was 10).
+
+### Removed
+
+- `tailwind.config.js`, `@tailwindcss/*`, `tailwindcss`, `daisyui`, `tailwindcss-animate`, `tailwind-merge`.
 
 
 ## [1.1.6-0] - 2026-04-16
@@ -162,5 +222,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project uses Storybook for component documentation and development
 - Testing framework: Jest with React Testing Library
 - Build tool: Rollup
-- Styling: Tailwind CSS with DaisyUI
+- Styling: CSS modules + design tokens in `globals.css`, built with PostCSS (no Tailwind)
 - Component library: Radix UI primitives

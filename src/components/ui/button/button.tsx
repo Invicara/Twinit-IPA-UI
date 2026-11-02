@@ -12,6 +12,7 @@ export interface ButtonProps
   variant?: ButtonVariant
   size?: ButtonSize
   asChild?: boolean
+  children?: React.ReactNode       // can be a string or a React node
   /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
   styleOverrides?: Record<string, string>
 }

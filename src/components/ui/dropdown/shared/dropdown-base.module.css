@@ -61,7 +61,7 @@
   transform: rotate(180deg);
 }
 
-/* Popup – positioned with Floating UI (fixed + portal); width/max-height from inline styles */
+/* Popup – positioned with Floating UI (fixed + portal); width + max-height from inline styles (max-height capped to list + footer when row cap applies) */
 .popup {
   overflow: hidden;
   border-radius: 4px;

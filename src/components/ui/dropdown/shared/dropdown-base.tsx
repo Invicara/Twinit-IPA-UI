@@ -7,6 +7,27 @@ import type { CSSProperties, ReactNode } from 'react';
 /** Approximate one option row height (itemBase vertical padding + line box). */
 export const DROPDOWN_OPTION_ROW_HEIGHT_PX = 35;
 
+/** Default max option rows before the list scrolls (SingleSelect / MultiSelect). */
+export const DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS = 8;
+
+/** Footer strip under the list (padding + chevron). Used to cap portaled popup height. */
+export const DROPDOWN_FOOTER_HEIGHT_PX = 28;
+
+/**
+ * Max height for the whole portaled popup (list + optional footer) when the list uses
+ * a row cap. Keeps Floating UI `size()` from using full viewport height, which was
+ * stretching the flex layout after the portal change.
+ */
+export function getPopupMaxHeightPx(
+  scrollContentMaxHeight: string | undefined,
+  showFooter: boolean
+): number | undefined {
+  if (!scrollContentMaxHeight) return undefined;
+  const n = Number.parseFloat(scrollContentMaxHeight);
+  if (!Number.isFinite(n) || n <= 0) return undefined;
+  return Math.round(n + (showFooter ? DROPDOWN_FOOTER_HEIGHT_PX : 0));
+}
+
 /**
  * Max height for the scroll region from a cap on visible option rows; `false` = viewport only.
  * Accepts numeric strings (e.g. Storybook select controls) and coerces them to numbers.
@@ -23,14 +44,14 @@ export function getDropdownScrollContentMaxHeight(
 
   let n: number;
   if (maxVisibleOptions === undefined || maxVisibleOptions === null) {
-    n = 10;
+    n = DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS;
   } else if (typeof maxVisibleOptions === 'number') {
     n = maxVisibleOptions;
   } else if (typeof maxVisibleOptions === 'string') {
     const parsed = Number(maxVisibleOptions.trim());
-    n = Number.isFinite(parsed) ? parsed : 10;
+    n = Number.isFinite(parsed) ? parsed : DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS;
   } else {
-    n = 10;
+    n = DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS;
   }
 
   if (!Number.isFinite(n) || n <= 0) return undefined;
@@ -39,6 +60,7 @@ export function getDropdownScrollContentMaxHeight(
 
 export function DropdownTrigger({
   onClick,
+  onFocus,
   disabled,
   children,
   isOpen = false,
@@ -52,6 +74,7 @@ export function DropdownTrigger({
   styles: s
 }: {
   onClick: () => void;
+  onFocus?: React.FocusEventHandler<HTMLButtonElement>;
   disabled?: boolean;
   children: ReactNode;
   isOpen?: boolean;
@@ -74,6 +97,7 @@ export function DropdownTrigger({
       type="button"
       ref={referenceRef}
       onClick={onClick}
+      onFocus={onFocus}
       onKeyDown={onKeyDown}
       disabled={disabled}
       data-disabled={disabled ? "true" : undefined}
@@ -138,6 +162,7 @@ export function DropdownPopup({
   const popup = (
     <div
       role="listbox"
+      data-ipa-ui-dropdown-floating="true"
       data-position={isTop ? 'top' : 'bottom'}
       ref={setFloating}
       style={floatingStyles}
@@ -161,6 +186,7 @@ export function DropdownScrollableContent({
   className,
   scrollable = true,
   contentMaxHeight,
+  blockArrowKeys = false,
   styles: s
 }: {
   children: ReactNode;
@@ -168,12 +194,31 @@ export function DropdownScrollableContent({
   scrollable?: boolean;
   /** Caps list height before scrolling (e.g. from maxVisibleOptions). */
   contentMaxHeight?: string;
+  /** Ignore ArrowUp/ArrowDown so this scroller does not move. */
+  blockArrowKeys?: boolean;
   styles: Record<string, string>;
 }) {
+  const scrollerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!blockArrowKeys || !scroller) return;
+    const block = (event: KeyboardEvent) => {
+      if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    scroller.addEventListener("keydown", block, true);
+    return () => scroller.removeEventListener("keydown", block, true);
+  }, [blockArrowKeys]);
+
   return (
     <div
+      ref={scrollerRef}
       className={cn(s.scrollContent, scrollable && 'custom-scrollbar', className)}
       data-scrollable={scrollable ? "true" : undefined}
+      data-block-arrow-keys={blockArrowKeys ? "true" : undefined}
+      tabIndex={blockArrowKeys ? -1 : undefined}
       style={contentMaxHeight ? { maxHeight: contentMaxHeight } : undefined}
     >
       {children}

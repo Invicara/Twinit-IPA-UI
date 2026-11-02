@@ -39,7 +39,8 @@
   position: fixed;
   left: 50%;
   top: 50%;
-  z-index: 50;
+  /* Above .dialog so the panel always stacks on top (equal z-index ties on DOM order when overlay mounts mid-session). */
+  z-index: 51;
   display: grid;
   width: 100%;
   gap: 0;

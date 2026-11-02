@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MultiSelect } from "./multi-select";
 
@@ -230,39 +230,119 @@ describe("MultiSelect", () => {
       await waitFor(() => {
         expect(screen.getByText("0 selected")).toBeInTheDocument();
       });
-      
-      // Navigate down
-      await user.keyboard("{ArrowDown}");
+
+      // Enter opens with active option on first row (W3C); first ArrowDown moves to Option 2
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).toHaveAttribute("data-focused", "true");
-      
-      // Navigate up and down
+      await waitFor(() => {
+        expect(firstOption).toHaveAttribute("data-focused", "true");
+      });
+
       await user.keyboard("{ArrowDown}");
+      const secondOption = screen.getByText("Option 2").closest("button");
+      expect(secondOption).toHaveAttribute("data-focused", "true");
+
       await user.keyboard("{ArrowUp}");
       expect(firstOption).toHaveAttribute("data-focused", "true");
       
-      // Select with Enter
+      // Select with Enter (W3C: commits focused option and closes the list)
       await user.keyboard("{Enter}");
       expect(onChange).toHaveBeenCalledWith(["option1"]);
-      
-      // Close with Escape
-      await user.keyboard("{Escape}");
       await waitFor(() => {
         expect(screen.queryByText("0 selected")).not.toBeInTheDocument();
       });
     });
 
-    test("respects disableKeyboardNavigation prop", async () => {
+    test("Space toggles selection without closing the list", async () => {
       const user = userEvent.setup();
-      render(<MultiSelect options={defaultOptions} disableKeyboardNavigation />);
-      
+      const Controlled = () => {
+        const [val, setVal] = React.useState<string[]>([]);
+        return (
+          <MultiSelect
+            options={defaultOptions}
+            onChange={setVal}
+            value={val}
+          />
+        );
+      };
+      render(<Controlled />);
+
       const trigger = screen.getByText("Select multiple options").closest("button");
       trigger!.focus();
       await user.keyboard("{Enter}");
+      await waitFor(() => {
+        expect(screen.getByText("0 selected")).toBeInTheDocument();
+      });
+
+      // user.keyboard Space on <button> can activate a native click; keyDown matches real keyboard handling
+      fireEvent.keyDown(trigger!, { key: " ", code: "Space", bubbles: true });
+      await waitFor(() => {
+        expect(screen.getByText(/1\s+selected/)).toBeInTheDocument();
+      });
+      expect(screen.getByRole("listbox")).toBeInTheDocument();
+    });
+
+    test("respects disableKeyboardNavigation prop", async () => {
+      const user = userEvent.setup();
+      render(<MultiSelect options={defaultOptions} disableKeyboardNavigation />);
+
+      const trigger = screen.getByText("Select multiple options").closest("button");
+      trigger!.focus();
       await user.keyboard("{ArrowDown}");
-      
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+
+      await user.keyboard("{Enter}");
+      await waitFor(() => {
+        expect(screen.getByText("0 selected")).toBeInTheDocument();
+      });
+
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveAttribute("data-focused");
+      expect(firstOption).not.toHaveAttribute("data-focused", "true");
+
+      await user.keyboard("{ArrowDown}");
+      const secondOption = screen.getByText("Option 2").closest("button");
+      expect(firstOption).not.toHaveAttribute("data-focused", "true");
+      expect(secondOption).not.toHaveAttribute("data-focused", "true");
+    });
+
+    test("disableKeyboardNavigation ignores Enter on a highlighted option", async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(
+        <MultiSelect
+          options={defaultOptions}
+          disableKeyboardNavigation
+          onChange={onChange}
+        />
+      );
+
+      await user.click(screen.getByText("Select multiple options"));
+      await user.hover(screen.getByText("Option 2"));
+      await user.keyboard("{Enter}");
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole("listbox")).toBeInTheDocument();
+    });
+
+    test("disableKeyboardNavigation cancels arrow keys on the list scrollbar", async () => {
+      const user = userEvent.setup();
+      render(
+        <MultiSelect options={defaultOptions} disableKeyboardNavigation maxVisibleOptions={2} />
+      );
+
+      await user.click(screen.getByText("Select multiple options"));
+      const scroller = document.querySelector("[data-block-arrow-keys='true']");
+      expect(scroller).toBeTruthy();
+      scroller!.scrollTop = 40;
+
+      const event = new KeyboardEvent("keydown", {
+        key: "ArrowDown",
+        bubbles: true,
+        cancelable: true,
+      });
+      scroller!.dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(scroller!.scrollTop).toBe(40);
     });
   });
 
@@ -481,20 +561,20 @@ describe("MultiSelect", () => {
       expect(screen.getByText(longTextOptions[0].label)).toBeInTheDocument();
     });
 
-    test("maxVisibleOptions defaults to 10 rows for scroll max-height", async () => {
+    test("maxVisibleOptions defaults to 8 rows for scroll max-height", async () => {
       const user = userEvent.setup();
       const { container } = render(<MultiSelect options={defaultOptions} />);
       const trigger = container.querySelector("button");
       await user.click(trigger!);
       const scroll = screen.getByRole("listbox").querySelector(".scrollContent") as HTMLElement;
-      expect(scroll.style.maxHeight).toBe("350px");
+      expect(scroll.style.maxHeight).toBe("280px");
     });
 
-    test("disableCloseOnOutsideClick keeps dropdown open", async () => {
+    test("disableClickOutside keeps dropdown open", async () => {
       const user = userEvent.setup();
       render(
         <>
-          <MultiSelect options={defaultOptions} disableCloseOnOutsideClick />
+          <MultiSelect options={defaultOptions} disableClickOutside />
           <div data-testid="outside">Outside</div>
         </>
       );
@@ -612,7 +692,7 @@ describe("MultiSelect", () => {
           disableIconAnimation
           enableLongTextAnimation
           disableScrolling
-          disableCloseOnOutsideClick
+          disableClickOutside
           disableCloseOnTriggerClick
         />
       );

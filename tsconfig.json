@@ -18,8 +18,10 @@
     "plugins": [{"name": "typescript-plugin-css-modules"}],
     "baseUrl": ".",
     "paths": {
-      "src/*": ["./src/*"]
+      "src/*": ["./src/*"],
+      "@storybook/argTypes": [".storybook/argTypes/index.ts"],
+      "@storybook/argTypes/*": [".storybook/argTypes/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", ".storybook"]
 }

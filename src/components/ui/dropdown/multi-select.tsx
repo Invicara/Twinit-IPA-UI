@@ -7,15 +7,19 @@ import {
   DropdownTrigger,
   DropdownPopup,
   DropdownScrollableContent,
+  DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS,
   getDropdownScrollContentMaxHeight,
+  getPopupMaxHeightPx,
 } from "./shared/dropdown-base";
 import { useClickOutside } from "./shared/dropdown-hooks";
 import { useDropdownFloating } from "./shared/use-dropdown-floating";
+import { moveFocusAfterCloseFromElement } from "./shared/dropdown-focus-utils";
 import { useDropdownKeyboard } from "./shared/use-dropdown-keyboard";
 import { startTextAnimation, stopTextAnimation, truncateText } from "./shared/dropdown-text-utils";
 
 const styles = { ...sharedStyles, ...defaultStyles };
 
+// Props: docs/dropdown.md — "MultiSelect props (main)"
 export interface MultiSelectProps {
   // Core Props
   className?: string;
@@ -40,19 +44,14 @@ export interface MultiSelectProps {
   enableLongTextAnimation?: boolean;
   disableScrolling?: boolean;
   disableSelectionLooping?: boolean;
-  disableCloseOnOutsideClick?: boolean;
+  disableClickOutside?: boolean;
   disableCloseOnTriggerClick?: boolean;
   rightAlignCheckboxes?: boolean;
   wrapBadges?: boolean;
   popAbove?: boolean;
-  /** Portal root for the listbox (defaults to `#ipa-ui-modal-root` or `document.body`) */
+  openOnFocus?: boolean;
   portalContainer?: HTMLElement | null;
-  /** z-index for the portaled listbox (default 1200) */
   floatingZIndex?: number;
-  /**
-   * Max option rows shown before the list scrolls. Defaults to `10`.
-   * Pass `false` for no row cap (only the viewport / floating size limit applies).
-   */
   maxVisibleOptions?: number | false;
 
   // Icons
@@ -88,15 +87,16 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       disableIconAnimation,
       enableLongTextAnimation = false,
       disableScrolling,
-      disableCloseOnOutsideClick,
+      disableClickOutside,
       disableCloseOnTriggerClick,
       rightAlignCheckboxes,
       wrapBadges,
       popAbove,
       disableSelectionLooping = false,
+      openOnFocus,
       portalContainer,
       floatingZIndex,
-      maxVisibleOptions = 10,
+      maxVisibleOptions = DROPDOWN_DEFAULT_MAX_VISIBLE_OPTIONS,
       icons,
       styleOverrides,
       ...props
@@ -104,9 +104,20 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     ref
   ) => {
     const s = mergeStyles(styles, styleOverrides);
+    const disableKbNav =
+      disableKeyboardNavigation === true ||
+      String(disableKeyboardNavigation) === "true";
+    const disableClickOutsideActive =
+      disableClickOutside === true || String(disableClickOutside) === "true";
+    const openOnFocusEnabled =
+      openOnFocus === true || String(openOnFocus) === "true";
     const scrollContentMaxHeight = getDropdownScrollContentMaxHeight(
       maxVisibleOptions,
       !!disableScrolling
+    );
+    const maxPopupHeightPx = getPopupMaxHeightPx(
+      scrollContentMaxHeight,
+      !hideFooter
     );
     const [isOpen, setIsOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -117,17 +128,17 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       handleKeyDown,
       handleMouseEnter,
       setItemRef,
-      resetFocus
+      resetFocus,
+      focusOptionAt,
     } = useDropdownKeyboard({
       isOpen,
       options,
-      onSelect: (value) => {
-        handleMultiSelect(value);
-        // Don't reset focus - keep the current item highlighted for continued keyboard navigation
+      onSelect: (optionValue) => {
+        handleMultiSelect(optionValue);
       },
       onClose: () => setIsOpen(false),
       disableSelectionLooping,
-      isMultiSelect: true
+      disableArrowNavigation: disableKbNav,
     });
 
     const { refs: floatingRefs, floatingStyles, resolvedPosition, portalRoot } =
@@ -136,17 +147,17 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
         preferTop: !!popAbove,
         portalContainer,
         floatingZIndex,
+        maxPopupHeightPx,
       });
 
     useClickOutside(
       dropdownRef,
       () => {
-        if (!disableCloseOnOutsideClick) {
-          setIsOpen(false);
-          resetFocus();
-        }
+        if (disableClickOutsideActive) return;
+        setIsOpen(false);
+        resetFocus();
       },
-      isOpen && !disableCloseOnOutsideClick,
+      isOpen,
       floatingRefs.floating
     );
 
@@ -174,46 +185,96 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       onChange(value.filter(v => v !== optionValue));
     };
 
+    const handleTriggerFocus = React.useCallback(
+      (ev: React.FocusEvent<HTMLButtonElement>) => {
+        if (
+          !openOnFocusEnabled ||
+          disabled ||
+          options.length === 0 ||
+          isOpen
+        ) {
+          return;
+        }
+        try {
+          if (ev.currentTarget.matches(":focus-visible")) {
+            setIsOpen(true);
+          }
+        } catch {
+          setIsOpen(true);
+        }
+      },
+      [openOnFocusEnabled, disabled, options.length, isOpen]
+    );
+
     const { visibleBadges, remainingCount } = getDisplayBadges();
 
     const triggerKeyDown = (e: React.KeyboardEvent) => {
-      if (disableKeyboardNavigation) return;
-      
+      if (
+        (e.key === 'ArrowDown' || e.key === 'ArrowUp') &&
+        !isOpen &&
+        options.length > 0
+      ) {
+        e.preventDefault();
+        if (disableKbNav) return;
+        const goDown = e.key === 'ArrowDown';
+        const firstSelected = options.findIndex((o) => value.includes(o.value));
+        setIsOpen(true);
+        if (!disableKbNav) {
+          requestAnimationFrame(() => {
+            if (goDown) {
+              focusOptionAt(firstSelected >= 0 ? firstSelected : 0);
+            } else {
+              focusOptionAt(
+                firstSelected >= 0 ? firstSelected : options.length - 1
+              );
+            }
+          });
+        }
+        return;
+      }
+
       if (e.key === 'Enter') {
         e.preventDefault();
-        if (!isOpen) {
+        if (!isOpen && options.length > 0) {
+          const firstSelected = options.findIndex((o) => value.includes(o.value));
           setIsOpen(true);
-        } else {
+          if (!disableKbNav) {
+            requestAnimationFrame(() => {
+              focusOptionAt(firstSelected >= 0 ? firstSelected : 0);
+            });
+          }
+        } else if (isOpen) {
           handleKeyDown(e);
         }
-      } else if (e.key === ' ') {
-        // Spacebar: open dropdown if closed, or select item if open
+        return;
+      }
+
+      if (e.key === ' ') {
         e.preventDefault();
-        if (!isOpen) {
+        if (!isOpen && options.length > 0) {
+          const firstSelected = options.findIndex((o) => value.includes(o.value));
           setIsOpen(true);
-          // Highlight first item when opening with spacebar - use requestAnimationFrame to ensure state updates
-          requestAnimationFrame(() => {
-            handleKeyDown({ ...e, key: 'Tab' } as React.KeyboardEvent);
-          });
-        } else {
+          if (!disableKbNav) {
+            requestAnimationFrame(() => {
+              focusOptionAt(firstSelected >= 0 ? firstSelected : 0);
+            });
+          }
+        } else if (isOpen) {
           handleKeyDown(e);
         }
-      } else if (e.key === 'Tab' && options.length > 0) {
-        // If dropdown is already open and an item is highlighted, close dropdown and move to next element
-        if (isOpen && focusedIndex >= 0) {
-          setIsOpen(false);
-          resetFocus();
-          // Don't prevent default - allow Tab to move focus to next element
-          return;
-        }
-        // Otherwise, open dropdown and highlight first item
+        return;
+      }
+
+      if (e.key === 'Tab' && isOpen) {
         e.preventDefault();
-        if (!isOpen) {
-          setIsOpen(true);
-        }
-        // The hook will handle setting focusedIndex to 0
-        handleKeyDown(e);
-      } else if (isOpen) {
+        const origin = document.activeElement as HTMLElement | null;
+        setIsOpen(false);
+        resetFocus();
+        moveFocusAfterCloseFromElement(origin, e);
+        return;
+      }
+
+      if (isOpen) {
         handleKeyDown(e);
       }
     };
@@ -232,11 +293,12 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
               ref.current = node;
             }
           }
-        }} 
+        }}
         {...props}
       >
         <DropdownTrigger
           referenceRef={floatingRefs.setReference}
+          onFocus={handleTriggerFocus}
           onClick={() => {
             if (isOpen && !disableCloseOnTriggerClick) {
               setIsOpen(false);
@@ -288,7 +350,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
             )}
           </div>
         </DropdownTrigger>
-        
+
         <DropdownPopup
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
@@ -312,6 +374,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           <DropdownScrollableContent
             scrollable={!disableScrolling}
             contentMaxHeight={scrollContentMaxHeight}
+            blockArrowKeys={disableKbNav}
             styles={s}
           >
             {options.map((option, index) => (
@@ -324,7 +387,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 data-focused={!hideRowHighlight && focusedIndex === index ? "true" : undefined}
                 className={cn(
                   s.itemBase,
-                  !hideRowHighlight && !isKeyboardMode && cn(s.itemHover, 'group'),
+                  !hideRowHighlight && !isKeyboardMode && s.itemHover,
                   !hideRowHighlight && focusedIndex === index && s.itemFocused,
                   option.disabled && s.itemDisabled,
                   rightAlignCheckboxes && s.itemRightAlign
@@ -390,18 +453,18 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     >
                       {value.includes(option.value) && (
                         icons?.check || (
-                          <svg 
-                            width="12" 
-                            height="12" 
-                            viewBox="0 0 12 12" 
-                            fill="none" 
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
                             className={s.checkboxIcon}
                           >
-                            <path 
-                              d="M2 6.5L4.5 9L10 3.5" 
-                              stroke="currentColor" 
-                              strokeWidth="2.5" 
-                              strokeLinecap="round" 
+                            <path
+                              d="M2 6.5L4.5 9L10 3.5"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
                               strokeLinejoin="round"
                             />
                           </svg>
@@ -411,17 +474,18 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                   </div>
                 )}
                 <div className={s.itemContent}>
-                  <span 
+                  <span
                     className={cn(s.itemContentText, 'scrollable-text', s.itemText)}
                   >
                     {option.label}
                   </span>
                   {!hideLongTextEllipsis && (
-                    <span className={cn(
-                      s.itemContentEllipsisIndicator,
-                      'ellipsis-indicator',
-                      !hideRowHighlight && !isKeyboardMode && s.itemContentEllipsisIndicatorHover
-                    )}>
+                    <span
+                      className={cn(
+                        s.itemContentEllipsisIndicator,
+                        'ellipsis-indicator'
+                      )}
+                    >
                       ..
                     </span>
                   )}
@@ -429,7 +493,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
               </button>
             ))}
           </DropdownScrollableContent>
-          
+
           {/* Header - shown at bottom when above */}
           {resolvedPosition === 'top' && !hideSelectionCount && (
             <div className={s.header}>

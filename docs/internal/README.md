@@ -9,5 +9,7 @@ This folder is for **internal team** only. It covers release flow, publishing, a
 
 | Doc | Description |
 |-----|-------------|
+| [component-sources.md](component-sources.md) | Radix-first / shadcn-second policy for new primitives (Calendar, Command, etc.). |
+| [table-plan.md](table-plan.md) | tablecn gap analysis, phases, and upstream sync for Table. |
 | [git-flow.md](git-flow.md) | Branching and release process: NEXT-RELEASE, STAGING, master, feature branches, release candidates, hotfixes. |
 | [publishing.md](publishing.md) | How to publish the package to GitHub Packages and sync to the public repo’s **releases** branch. |

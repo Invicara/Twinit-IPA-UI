@@ -1,0 +1,1537 @@
+.root {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tableContainer {
+  overflow: hidden;
+  border: 1px solid var(--neutral-3);
+  border-radius: 4px;
+  background-color: var(--neutral-0);
+}
+
+.headerRow {
+  background-color: var(--neutral-05);
+}
+
+.resizableTableRoot {
+  table-layout: fixed;
+}
+
+.headCellResizable {
+  overflow: visible;
+}
+
+.headerCellContent {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.headerCellContentDraggable {
+  cursor: default;
+}
+
+.headerCellDraggableZone {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  --column-drag-zone-padding: 4px;
+  --column-drag-zone-padding-left: 6px;
+  --column-drag-handle-size: 16px;
+  --column-drag-handle-inset: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: var(--column-drag-zone-padding-left);
+  padding-right: calc(var(--column-drag-zone-padding) + var(--column-drag-handle-size) + var(--column-drag-handle-inset));
+  margin-top: -4px;
+  margin-bottom: -4px;
+  margin-left: calc(-1 * var(--column-drag-zone-padding-left));
+  margin-right: calc(-1 * (var(--column-drag-zone-padding) + var(--column-drag-handle-size) + var(--column-drag-handle-inset)));
+}
+
+.headerCellDraggableZone:hover {
+  background-color: var(--neutral-1);
+}
+
+.headerCellDraggableZone .columnHeaderSortable,
+.headerCellDraggableZone .columnHeaderTrigger {
+  padding: 0;
+  margin: 0;
+}
+
+.headerCellDraggableZone:hover .columnHeaderSortable,
+.headerCellDraggableZone:hover .columnHeaderTrigger {
+  background-color: transparent;
+}
+
+.headerCellDragging {
+  background-color: var(--neutral-1);
+}
+
+.columnDragHandle {
+  position: absolute;
+  right: var(--column-drag-handle-inset, 2px);
+  top: 50%;
+  display: inline-flex;
+  width: var(--column-drag-handle-size, 16px);
+  height: var(--column-drag-handle-size, 16px);
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--neutral-5);
+  cursor: grab;
+  padding: 0;
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 1;
+}
+
+.headerCellDraggableZone:hover .columnDragHandle {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.columnDragHandle:active {
+  cursor: grabbing;
+}
+
+.columnDragHandle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.columnResizeHandle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 100%;
+  transform: translateX(50%);
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  opacity: 0;
+  z-index: 2;
+  background-color: transparent;
+  transition: opacity 0.15s ease;
+}
+
+.columnResizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background-color: var(--neutral-4);
+  transition: background-color 0.15s ease;
+}
+
+.headCellResizable:hover .columnResizeHandle,
+.columnResizeHandle[data-resizing="true"] {
+  opacity: 1;
+}
+
+.columnResizeHandle[data-resizing="true"]::after {
+  background-color: var(--brand-8);
+}
+
+.footer {
+  width: 100%;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.paginationStart {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.selectionSummary {
+  font-size: 14px;
+  color: var(--neutral-6);
+  white-space: nowrap;
+}
+
+.paginationControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.pageSize {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--neutral-8);
+}
+
+.pageSize .pageSizeSelect {
+  width: 52px;
+  min-width: 52px;
+  max-width: 52px;
+  height: 32px;
+  min-height: 32px;
+  padding: 4px 24px 4px 8px;
+}
+
+.pageSize .pageSizeSelectIconButton {
+  width: 24px;
+  height: 32px;
+}
+
+/* Match the disabled page buttons: white field, light grey border and glyph. */
+.pageSize .pageSizeSelect:disabled,
+.pageSize .pageSizeSelect[data-disabled="true"] {
+  background-color: var(--neutral-0);
+  border-color: var(--neutral-3);
+  color: var(--neutral-4);
+  -webkit-text-fill-color: var(--neutral-4);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.pageSize:has(.pageSizeSelect:disabled) .pageSizeSelectIconButton,
+.pageSize:has(.pageSizeSelect[data-disabled="true"]) .pageSizeSelectIconButton,
+.pageSize:has(.pageSizeSelect:disabled) .pageSizeSelectIconButton svg,
+.pageSize:has(.pageSizeSelect[data-disabled="true"]) .pageSizeSelectIconButton svg {
+  cursor: not-allowed;
+  opacity: 1;
+  color: var(--neutral-4);
+  pointer-events: auto;
+}
+
+.pageSizeItemHover:hover {
+  background-color: var(--neutral-1) !important;
+}
+
+.pageSizeItemFocused,
+.pageSizeItemFocused[data-focused="true"],
+.pageSizeItemBase[data-focused="true"] {
+  background-color: var(--neutral-1) !important;
+}
+
+.pageSizeItemFocused[data-focused="true"] [class*="itemContentEllipsisIndicator"],
+.pageSizeItemHover:hover [class*="itemContentEllipsisIndicator"],
+.pageSizeItemBase[data-focused="true"] [class*="itemContentEllipsisIndicator"] {
+  background-color: var(--neutral-1) !important;
+}
+
+.pageIndicator {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--neutral-8);
+  white-space: nowrap;
+}
+
+.pageButtons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pageButtonHiddenLg {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .pageButtonHiddenLg {
+    display: inline-flex;
+  }
+}
+
+.toolbar {
+  container-type: inline-size;
+  container-name: table-toolbar;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: stretch;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.toolbarRow {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.toolbarSearchRow {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+/* Keep end actions (Sort, etc.) on the last wrap line = flush with the table top. */
+.toolbarRowWithEnd {
+  align-items: flex-end;
+}
+
+.toolbarStart {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.toolbarEnd {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.globalFilter {
+  width: 200px;
+  flex: 0 0 200px;
+  max-width: 200px;
+}
+
+.actionBar {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.compactDangerButton {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.emptyCell {
+  height: 96px;
+  text-align: center;
+  color: var(--neutral-6);
+}
+
+.cellAlignCenter {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.tableContainerFetching {
+  position: relative;
+}
+
+.tableContainerFetching::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: color-mix(in srgb, var(--neutral-0) 55%, transparent);
+  pointer-events: none;
+}
+
+.tableFetchingBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.tableFetchingBarIndeterminate {
+  display: block;
+  height: 100%;
+  width: 40%;
+  background-color: var(--primary-6, var(--neutral-7));
+  animation: ipaTableFetchSlide 1.1s ease-in-out infinite;
+}
+
+@keyframes ipaTableFetchSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+.skeletonBody {
+  cursor: progress;
+}
+
+.skeletonRow {
+  height: 44px;
+}
+
+.skeletonBody .skeletonRow:hover {
+  background-color: transparent;
+}
+
+.skeletonCell {
+  vertical-align: middle;
+}
+
+.skeletonBone {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: 12px;
+  width: 72%;
+  border-radius: 4px;
+  background-color: var(--neutral-2);
+  contain: paint;
+}
+
+/* Transform-only shimmer. background-position repaints the table every frame and will exhaust the tab if loading is held open. */
+.skeletonBone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      var(--neutral-1) 45%,
+      transparent 100%);
+  transform: translateX(-100%);
+  animation: ipaTableSkeletonPulse 1.2s ease-in-out infinite;
+}
+
+.skeletonRow:nth-child(even) .skeletonBone {
+  width: 58%;
+}
+
+.skeletonRow:nth-child(3n) .skeletonBone {
+  width: 64%;
+}
+
+@keyframes ipaTableSkeletonPulse {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonBone::after,
+  .tableFetchingBarIndeterminate {
+    animation: none;
+  }
+}
+
+.columnHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  cursor: default;
+}
+
+.columnHeaderSortable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
+.columnHeaderSortable:hover {
+  background-color: var(--neutral-1);
+}
+
+.columnHeaderSortable:disabled,
+.columnHeaderSortable[data-disabled="true"],
+.columnHeaderTrigger:disabled,
+.columnHeaderTrigger[data-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.columnHeaderSortable:disabled:hover,
+.columnHeaderSortable[data-disabled="true"]:hover,
+.columnHeaderTrigger:disabled:hover,
+.columnHeaderTrigger[data-disabled="true"]:hover {
+  background-color: transparent;
+}
+
+.columnHeaderSortable:focus-visible {
+  outline: 2px solid var(--brand-8);
+  outline-offset: 2px;
+}
+
+.columnHeaderTrigger {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+}
+
+.columnHeaderTrigger:hover,
+.columnHeaderTrigger[data-state="open"] {
+  background-color: var(--neutral-1);
+}
+
+.columnHeaderTrigger:focus-visible {
+  outline: 2px solid var(--brand-8);
+  outline-offset: 2px;
+}
+
+.columnHeaderMenu {
+  min-width: 112px;
+}
+
+.columnHeaderIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--neutral-5);
+}
+
+.columnHeaderIconActive {
+  color: var(--brand-8);
+}
+
+.columnHeaderLabel {
+  white-space: nowrap;
+}
+
+.filterTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  border: 1px solid var(--neutral-4);
+  background: var(--neutral-0);
+  color: var(--neutral-7);
+  font-weight: 500;
+}
+
+.filterTrigger[data-variant="secondary"],
+.filterTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.filterTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.filterTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  border: 1px solid var(--neutral-4) !important;
+  background: var(--neutral-0) !important;
+  color: var(--neutral-7) !important;
+  box-shadow: none !important;
+}
+
+.filterTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.filterTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  background: var(--neutral-1) !important;
+  border-color: var(--neutral-5) !important;
+  color: var(--neutral-7) !important;
+}
+
+.filterTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  background: var(--neutral-2) !important;
+  border-color: var(--neutral-5) !important;
+  color: var(--neutral-7) !important;
+}
+
+.filterTriggerActive[data-variant="secondary"],
+.filterTriggerActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.filterTriggerActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.filterTriggerActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  border-color: var(--brand-8) !important;
+  color: var(--brand-8) !important;
+}
+
+.filterTriggerActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.filterTriggerActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  background: var(--brand-1) !important;
+  border-color: var(--brand-8) !important;
+  color: var(--brand-8) !important;
+}
+
+.filterTriggerActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  background: var(--brand-2) !important;
+  border-color: var(--brand-8) !important;
+  color: var(--brand-8) !important;
+}
+
+.filterTriggerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+  color: inherit;
+}
+
+.filterTriggerIcon svg {
+  display: block;
+}
+
+.filterTriggerClear {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  box-sizing: border-box;
+}
+
+.filterTriggerClear svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.filterTriggerActive .filterTriggerClear:hover,
+.filterTriggerActive .filterTriggerClear:focus-visible {
+  background: var(--alert-7);
+  border-color: var(--alert-7);
+  color: var(--neutral-0) !important;
+  outline: none;
+}
+
+.filterTriggerActive .filterTriggerClear:hover svg,
+.filterTriggerActive .filterTriggerClear:focus-visible svg {
+  color: var(--neutral-0) !important;
+}
+
+.filterTriggerSeparator,
+.filterTriggerSeparator[data-orientation="vertical"] {
+  height: 16px;
+  min-height: 16px;
+  align-self: center;
+  background-color: var(--brand-8) !important;
+}
+
+.filterTriggerBadges {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.filterTriggerValue {
+  font-weight: 400;
+  color: inherit;
+  white-space: nowrap;
+}
+
+.filterTriggerBadge[data-variant="secondary"] {
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-weight: 400;
+  background-color: var(--brand-1);
+  color: var(--brand-8);
+}
+
+.filterCheckbox {
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--neutral-5);
+  background-color: var(--neutral-0);
+  color: var(--neutral-0);
+}
+
+.filterTriggerActive .filterCheckbox {
+  border-color: var(--brand-8);
+}
+
+.filterCheckbox[data-state="checked"] {
+  background-color: var(--brand-8);
+  border-color: var(--brand-8);
+}
+
+.filterCheckbox svg {
+  width: 12px;
+  height: 12px;
+}
+
+.ratingStars {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  line-height: 1;
+}
+
+.ratingStar {
+  color: var(--brand-8);
+  opacity: 0.28;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ratingStarFilled {
+  opacity: 1;
+}
+
+.ratingStarButton {
+  display: inline-flex;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.filterTrigger .ratingStar {
+  color: var(--neutral-4);
+  opacity: 1;
+}
+
+.filterTriggerActive .ratingStar {
+  color: var(--brand-8);
+  opacity: 0.28;
+}
+
+.filterTrigger .ratingStarFilled,
+.filterTriggerActive .ratingStarFilled {
+  color: var(--brand-8);
+  opacity: 1;
+}
+
+.filterPopoverContent {
+  position: relative;
+  width: 200px;
+  padding: 0;
+}
+
+/* Search menus size to the space on the side they open, so the field stays on screen. */
+.searchPopover {
+  display: flex;
+  flex-direction: column;
+  max-height: var(--radix-popper-available-height);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.searchPopover [data-testid="ipa_command"] {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.searchPopover [cmdk-input-wrapper] {
+  flex-shrink: 0;
+}
+
+.searchPopover [data-testid="ipa_command_list"] {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.searchPopover .filterResetFooter {
+  flex-shrink: 0;
+}
+
+.filterPopoverContentWide {
+  position: relative;
+  width: 280px;
+  min-width: 280px;
+  padding: 12px 12px 6px;
+  overflow: hidden;
+}
+
+.filterPopoverContentWide .filterResetFooter {
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.filterPopoverContentCalendar {
+  position: relative;
+  width: fit-content;
+  min-width: auto;
+  padding: 4px 0 0;
+  overflow: hidden;
+}
+
+.popoverClose {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--neutral-5);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.popoverClose:hover,
+.popoverClose:focus-visible {
+  color: var(--neutral-7);
+  background: var(--neutral-2);
+  outline: none;
+}
+
+.popoverWithClose [cmdk-input-wrapper] {
+  padding-right: 28px;
+}
+
+.filterFieldLabel {
+  margin: 0 0 8px;
+  padding-right: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-9);
+}
+
+.filterResetFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 4px 8px 4px;
+}
+
+.commandListHover [data-testid="ipa_command_item"][data-selected="true"] {
+  background-color: transparent !important;
+  color: var(--neutral-9) !important;
+}
+
+.commandListHover [data-testid="ipa_command_item"]:hover {
+  background-color: var(--neutral-1) !important;
+  color: var(--neutral-9) !important;
+}
+
+.filterResetButton[data-variant="secondary"],
+.filterResetButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.filterResetButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.filterResetButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--alert-7) !important;
+  background: var(--neutral-0) !important;
+  color: var(--alert-7) !important;
+  box-shadow: none !important;
+  outline-color: var(--alert-7) !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+}
+
+.filterResetButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.filterResetButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  background: var(--alert-1) !important;
+  border-color: var(--alert-7) !important;
+  color: var(--alert-7) !important;
+}
+
+.filterResetButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  background: var(--alert-2) !important;
+  border-color: var(--alert-7) !important;
+  color: var(--alert-7) !important;
+}
+
+.filterNumberRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.filterSlider {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 16px;
+}
+
+.filterNumberInput {
+  width: 96px;
+}
+
+.filterUnit {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 0 4px 4px 0;
+  background: var(--neutral-1);
+  font-size: 12px;
+  color: var(--neutral-6);
+}
+
+.filterNumberWrap {
+  position: relative;
+}
+
+.filterNumberWrapWithUnit .filterNumberInput {
+  padding-right: 36px;
+}
+
+.filterMenuList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterChipList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterMenuTriggerWrap {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.filterMenuTrigger {
+  width: auto;
+  min-width: 32px;
+  padding-left: 12px;
+  padding-right: 12px;
+  justify-content: center;
+}
+
+.filterMenuTriggerLabel {
+  display: inline;
+}
+
+@container table-toolbar (max-width: 600px) {
+  .filterMenuTrigger {
+    width: 32px;
+    padding: 0;
+  }
+
+  .filterMenuTriggerLabel {
+    display: none;
+  }
+}
+
+.filterMenuForm {
+  position: relative;
+  padding: 12px;
+}
+
+.filterMenuForm .filterResetFooter {
+  margin: 8px -4px -4px 0;
+  padding: 0;
+}
+
+.filterMenuForm .filterTextInputWide {
+  width: 100%;
+}
+
+.filterMenuActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.filterChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.filterChipRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.filterCommandPopover {
+  position: relative;
+  width: 240px;
+  padding: 0;
+}
+
+.filterTextInput {
+  width: 120px;
+  flex: 0 0 auto;
+}
+
+.filterTextInput [data-testid="ipa_input"][data-state="default"],
+.globalFilter [data-testid="ipa_input"][data-state="default"] {
+  border-color: var(--neutral-4) !important;
+}
+
+.filterTextInput [data-testid="ipa_input"][data-state="default"]:hover,
+.globalFilter [data-testid="ipa_input"][data-state="default"]:hover {
+  border-color: var(--neutral-5) !important;
+}
+
+.filterTextInput [data-testid="ipa_input"][data-state="default"]:focus,
+.filterTextInput [data-testid="ipa_input"][data-state="default"]:focus-visible,
+.globalFilter [data-testid="ipa_input"][data-state="default"]:focus,
+.globalFilter [data-testid="ipa_input"][data-state="default"]:focus-visible {
+  border-color: var(--neutral-5) !important;
+}
+
+.filterInputFilled [data-testid="ipa_input"][data-state="default"],
+.filterInputFilled [data-testid="ipa_input"][data-state="default"]:hover,
+.filterInputFilled [data-testid="ipa_input"][data-state="default"]:focus,
+.filterInputFilled [data-testid="ipa_input"][data-state="default"]:focus-visible {
+  border-color: var(--brand-8) !important;
+}
+
+.globalFilter [data-testid="ipa_input_clear"],
+.filterTextInput [data-testid="ipa_input_clear"] {
+  color: var(--brand-8);
+}
+
+.globalFilter [data-testid="ipa_input_clear"]:hover,
+.filterTextInput [data-testid="ipa_input_clear"]:hover {
+  color: var(--brand-7);
+}
+
+.filterTextInputWide {
+  width: 160px;
+}
+
+.checkSlot {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--brand-8);
+  border-radius: 2px;
+  background-color: var(--neutral-0);
+  color: var(--neutral-0);
+}
+
+.checkSlotChecked {
+  background-color: var(--brand-8);
+}
+
+.itemCount {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--neutral-6);
+}
+
+.toolbarActionWrap {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.toolbarActionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  border: 1px solid var(--neutral-4);
+  background: var(--neutral-0);
+  color: var(--neutral-7);
+  font-weight: 500;
+}
+
+.toolbarActionButton[data-variant="secondary"],
+.toolbarActionButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.toolbarActionButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.toolbarActionButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  border: 1px solid var(--neutral-4) !important;
+  background: var(--neutral-0) !important;
+  color: var(--neutral-7) !important;
+  box-shadow: none !important;
+  outline-color: var(--neutral-5) !important;
+}
+
+.toolbarActionButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.toolbarActionButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  border-color: var(--neutral-5) !important;
+  background: var(--neutral-1) !important;
+  color: var(--neutral-7) !important;
+}
+
+.toolbarActionButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  border-color: var(--neutral-5) !important;
+  background: var(--neutral-2) !important;
+  color: var(--neutral-7) !important;
+}
+
+.toolbarActionButtonActive[data-variant="secondary"],
+.toolbarActionButtonActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.toolbarActionButtonActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.toolbarActionButtonActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  border-color: var(--brand-8) !important;
+  color: var(--brand-8) !important;
+}
+
+.toolbarActionButtonActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.toolbarActionButtonActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  background: var(--brand-1) !important;
+  border-color: var(--brand-8) !important;
+  color: var(--brand-8) !important;
+}
+
+.toolbarActionButtonActive[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  background: var(--brand-2) !important;
+  border-color: var(--brand-8) !important;
+  color: var(--brand-8) !important;
+}
+
+.toolbarActionIcon {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.sortCountBadge,
+.sortCountBadge[data-variant="outline"],
+.sortCountBadge[data-variant="secondary"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  min-width: 18px;
+  padding: 0 5px !important;
+  border: none !important;
+  border-radius: 3px !important;
+  background-color: var(--brand-1) !important;
+  color: var(--brand-8) !important;
+  font-size: 10px !important;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.sortListPopover {
+  position: relative;
+  display: flex;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: min(100vw - 24px, 360px) !important;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px !important;
+  border-radius: 8px;
+  border: 1px solid var(--neutral-3);
+  background: var(--neutral-0);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+.sortListPopover .sortFieldTrigger[data-variant="secondary"],
+.sortListPopover .sortFieldTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortFieldTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.sortListPopover .sortFieldTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active,
+.sortListPopover .sortFieldTrigger[data-variant="secondary"][data-state="open"] {
+  width: 148px;
+  min-width: 0;
+  max-width: 148px;
+  flex: 0 0 148px;
+  border: 1px solid var(--neutral-3) !important;
+  background: var(--neutral-0) !important;
+  color: var(--neutral-9) !important;
+  font-weight: 400;
+  box-shadow: none !important;
+  outline-color: var(--neutral-4) !important;
+}
+
+.sortListPopover .sortFieldTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortFieldTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.sortListPopover .sortFieldTrigger[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active,
+.sortListPopover .sortFieldTrigger[data-variant="secondary"][data-state="open"] {
+  border-color: var(--neutral-3) !important;
+  background: var(--neutral-1) !important;
+  color: var(--neutral-9) !important;
+}
+
+.sortListPopover .sortIconButton[data-variant="secondary"],
+.sortListPopover .sortIconButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortIconButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.sortListPopover .sortIconButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  border: 1px solid var(--neutral-3) !important;
+  background: var(--neutral-0) !important;
+  color: var(--neutral-6) !important;
+  box-shadow: none !important;
+  outline-color: var(--neutral-4) !important;
+}
+
+.sortListPopover .sortRemoveButton[data-variant="secondary"],
+.sortListPopover .sortRemoveButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortRemoveButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.sortListPopover .sortRemoveButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  border: 1px solid var(--alert-7) !important;
+  background: var(--neutral-0) !important;
+  color: var(--alert-7) !important;
+  box-shadow: none !important;
+  outline-color: var(--alert-7) !important;
+}
+
+.sortListPopover .sortRemoveButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortRemoveButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  background: var(--alert-1) !important;
+  border-color: var(--alert-7) !important;
+  color: var(--alert-7) !important;
+}
+
+.sortListPopover .sortRemoveButton[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  background: var(--alert-2) !important;
+  border-color: var(--alert-7) !important;
+  color: var(--alert-7) !important;
+}
+
+.sortListPopover .sortDragHandle[data-variant="secondary"],
+.sortListPopover .sortDragHandle[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortDragHandle[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.sortListPopover .sortDragHandle[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  border: none !important;
+  background: var(--neutral-2) !important;
+  color: var(--neutral-6) !important;
+  box-shadow: none !important;
+}
+
+.sortListPopover .sortDragHandle[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortDragHandle[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.sortListPopover .sortDragHandle[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  background: var(--neutral-3) !important;
+  color: var(--neutral-7) !important;
+}
+
+.sortListPopover .sortAddButton[data-variant="default"],
+.sortListPopover .sortAddButton[data-variant="default"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortAddButton[data-variant="default"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.sortListPopover .sortAddButton[data-variant="default"]:not(:disabled):not([data-disabled="true"]):active {
+  background-color: var(--neutral-9) !important;
+  color: var(--neutral-0) !important;
+  box-shadow: none !important;
+  outline-color: var(--neutral-7) !important;
+}
+
+.sortListPopover .sortAddButton[data-variant="default"]:not(:disabled):not([data-disabled="true"]):hover,
+.sortListPopover .sortAddButton[data-variant="default"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  background-color: var(--neutral-8) !important;
+}
+
+.sortListPopover .sortAddButton[data-variant="default"]:not(:disabled):not([data-disabled="true"]):active {
+  background-color: var(--neutral-9) !important;
+  color: var(--neutral-0) !important;
+}
+
+.sortListPopover .sortResetButton {
+  margin: 2px 0 0 auto;
+}
+
+.sortDirectionSelect {
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+  flex-shrink: 0;
+}
+
+.sortDirectionSelect>*,
+.sortDirectionSelect>*>* {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.sortListPopover .sortDirectionSelect input {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 4px 28px 4px 8px !important;
+  border-color: var(--neutral-3) !important;
+  border-radius: 6px !important;
+  background: var(--neutral-0) !important;
+  color: var(--neutral-9) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-size: 13px !important;
+}
+
+.sortListPopover .sortDirectionSelect input:hover,
+.sortListPopover .sortDirectionSelect input:focus,
+.sortListPopover .sortDirectionSelect input:focus-visible,
+.sortListPopover .sortDirectionSelect>*[data-state="open"] input {
+  border-color: var(--neutral-3) !important;
+  background: var(--neutral-1) !important;
+  color: var(--neutral-9) !important;
+}
+
+.sortListPopover .sortDirectionSelect [class*="triggerIconButton"] {
+  width: 28px !important;
+  height: 32px !important;
+}
+
+.sortDirectionItemHover:hover {
+  background-color: var(--neutral-1) !important;
+}
+
+.sortDirectionItemFocused,
+.sortDirectionItemFocused[data-focused="true"],
+.sortDirectionItemBase[data-focused="true"] {
+  background-color: var(--neutral-1) !important;
+}
+
+.sortDirectionItemFocused[data-focused="true"] [class*="itemContentEllipsisIndicator"],
+.sortDirectionItemHover:hover [class*="itemContentEllipsisIndicator"],
+.sortDirectionItemBase[data-focused="true"] [class*="itemContentEllipsisIndicator"] {
+  background-color: var(--neutral-1) !important;
+}
+
+.sortListHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 20px;
+}
+
+.sortListTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--neutral-9);
+}
+
+.sortListDescription {
+  margin: 0;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--neutral-6);
+}
+
+.sortListDescriptionSrOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sortListItems {
+  display: flex;
+  max-height: 300px;
+  flex-direction: column;
+  gap: 8px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+}
+
+.sortListItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  position: relative;
+  background: var(--neutral-0);
+  border-radius: 6px;
+  will-change: transform;
+}
+
+.sortListItemDragging {
+  z-index: 2;
+  opacity: 1;
+}
+
+.sortFieldTrigger {
+  display: inline-flex;
+  width: 148px;
+  min-width: 0;
+  max-width: 148px;
+  height: 32px;
+  flex-shrink: 1;
+  justify-content: space-between;
+  border: 1px solid var(--neutral-3);
+  border-radius: 6px;
+  background: var(--neutral-0);
+  color: var(--neutral-9);
+  font-weight: 400;
+  box-shadow: none;
+}
+
+.sortFieldTriggerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sortFieldTriggerIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--neutral-5);
+  opacity: 0.7;
+}
+
+.sortFieldPopover {
+  width: var(--radix-popover-trigger-width, 148px);
+  min-width: 148px;
+  padding: 0;
+  border: 1px solid var(--neutral-3);
+  border-radius: 8px;
+  background: var(--neutral-0);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.sortFieldPopover [data-testid="ipa_command_item"][data-selected="true"] {
+  background-color: transparent !important;
+  color: var(--neutral-9) !important;
+}
+
+.sortFieldPopover [data-testid="ipa_command_item"]:hover {
+  background-color: var(--neutral-1) !important;
+  color: var(--neutral-9) !important;
+}
+
+.sortFieldItem {
+  justify-content: space-between;
+}
+
+.sortFieldItem .menuItemCheck,
+.sortFieldPopover [data-testid="ipa_command_item"][data-selected="true"] .menuItemCheck {
+  color: var(--brand-8);
+}
+
+.sortIconButton {
+  width: 32px;
+  min-width: 32px;
+  max-width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid var(--neutral-3);
+  border-radius: 6px;
+  background: var(--neutral-0);
+  color: var(--neutral-6);
+  box-shadow: none;
+}
+
+.sortIconButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sortDragHandle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.sortDragHandle:hover,
+.sortDragHandle:focus-visible {
+  background: var(--neutral-3);
+}
+
+.sortDragHandle:active {
+  cursor: grabbing;
+  background: var(--neutral-3);
+}
+
+.sortListActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.viewOptionsPopover {
+  position: relative;
+  width: 176px;
+  padding: 0;
+}
+
+.viewOptionsItem {
+  justify-content: space-between;
+}
+
+.viewOptionsItemLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewOptionsItemCheck,
+.menuItemCheck {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--brand-8);
+}
+
+.viewOptionsEye {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--neutral-5);
+}
+
+.viewOptionsEyeHidden {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--brand-8);
+}
+
+.filterMenuItem {
+  justify-content: space-between;
+}
+
+.filterMenuItemLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

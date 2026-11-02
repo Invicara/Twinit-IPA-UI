@@ -70,7 +70,7 @@ const id = useId();
 
 ## Styling
 
-The checkbox uses internal CSS modules. Use `className` to adjust size or appearance. The component uses a `peer` class so sibling elements can style based on checked state (e.g. Tailwind `peer-checked:`).
+The checkbox uses internal CSS modules. Use `className` to adjust size or appearance. Style checked or indeterminate states via `data-state` on the root (see [data attributes](data-attributes.md)).
 
 ## Accessibility
 

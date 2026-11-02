@@ -1,0 +1,90 @@
+.tableWrapper {
+  width: 100%;
+  overflow: auto;
+}
+
+.tableRoot {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--neutral-9);
+}
+
+.header {
+  border-bottom: 1px solid var(--neutral-3);
+}
+
+.headerRow {
+  background-color: var(--neutral-05);
+}
+
+.bodyRow {
+  border-bottom: 1px solid var(--neutral-2);
+  transition: background-color 0.15s ease;
+}
+
+.bodyRow:hover {
+  background-color: var(--neutral-05);
+}
+
+.bodyRow[data-state="selected"] {
+  background-color: var(--brand-1);
+}
+
+.headCell {
+  height: 40px;
+  padding: 0 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--neutral-8);
+  white-space: nowrap;
+}
+
+.headCell.selectionCell,
+.bodyCell.selectionCell {
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  box-sizing: border-box;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.selectionCellInner {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.headCell.selectionCell .selectionCellInner {
+  min-height: 40px;
+}
+
+.bodyCell.selectionCell .selectionCellInner {
+  min-height: 36px;
+}
+
+.bodyCell {
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+.footer {
+  border-top: 1px solid var(--neutral-3);
+  background-color: var(--neutral-05);
+}
+
+.caption {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--neutral-6);
+}
+
+.emptyCell {
+  height: 96px;
+  text-align: center;
+  color: var(--neutral-6);
+}

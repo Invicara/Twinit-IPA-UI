@@ -1,11 +1,11 @@
 # Button
 
-Primary action component with multiple variants and sizes. Supports `asChild` so you can render a link or custom component while keeping button styling.
+Primary action control with variants and sizes. Supports `asChild` to style a link or other single child as a button.
 
 ## Import
 
 ```tsx
-import { Button, buttonVariants } from '@dtplatform/ipa-ui';
+import { Button } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
@@ -16,23 +16,18 @@ import { Button, buttonVariants } from '@dtplatform/ipa-ui';
 <Button variant="danger">Delete</Button>
 ```
 
-## API
+## Props
 
-**Button** accepts standard button HTML attributes plus:
+Also accepts standard [`<button>` HTML attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button) (e.g. `onClick`, `type`, `aria-label`).
 
-| Prop       | Type                                      | Default     | Description |
-|-----------|-------------------------------------------|-------------|-------------|
-| `variant` | `'default'` \| `'danger'` \| `'secondary'` \| `'tertiary'` | `'default'` | Visual style. |
-| `size`    | `'default'` \| `'sm'` \| `'icon'`         | `'default'` | Size. Use `icon` for icon-only buttons. |
-| `asChild` | `boolean`                                | `false`     | When `true`, render the single child as the root (e.g. `<a>`) with button styles. |
-| `testIdPrefix` | `string`                            | —           | Sets `data-testid` on the element for tests. |
-
-**buttonVariants** – CVA helper if you need to apply button styles to another element:
-
-```tsx
-import { buttonVariants } from '@dtplatform/ipa-ui';
-<a className={buttonVariants({ variant: 'secondary', size: 'sm' })} href="/">Back</a>
-```
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'default'` \| `'secondary'` \| `'tertiary'` \| `'danger'` | `'default'` | Visual style. |
+| `size` | `'default'` \| `'sm'` \| `'icon'` | `'default'` | Dimensions; use `icon` for icon-only buttons. |
+| `disabled` | `boolean` | `false` | Blocks clicks and shows disabled styling. |
+| `asChild` | `boolean` | `false` | Apply button styles to the single child (e.g. a link). |
+| `children` | `string \| ReactNode` | — | Label or content (string or React node). |
+| `styleOverrides` | `Record<string, string>` | — | Extra classes per slot key (`button`), merged with defaults. |
 
 ## Examples
 
@@ -58,10 +53,14 @@ import { buttonVariants } from '@dtplatform/ipa-ui';
 <Button disabled>Save</Button>
 ```
 
-## Styling
+**Style overrides**
 
-Styles are applied via internal CSS modules. Variants map to design tokens (e.g. brand colors). Override with `className` if needed.
+```tsx
+import styles from './button.overrides.module.css';
+
+<Button styleOverrides={styles}>Custom</Button>
+```
 
 ## Accessibility
 
-Use native `<button>` for actions; use `asChild` with `<a>` for navigation. Provide `aria-label` for icon-only buttons.
+Use `<button>` for actions; use `asChild` with `<a>` for navigation. Set `aria-label` on icon-only buttons.

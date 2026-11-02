@@ -1,0 +1,70 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--neutral-4);
+  border-radius: 4px;
+  background: var(--neutral-0);
+  color: var(--neutral-7);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  box-sizing: border-box;
+}
+
+.toggle:hover {
+  background: var(--neutral-1);
+  border-color: var(--neutral-5);
+}
+
+.segments {
+  display: inline-flex;
+  align-items: stretch;
+  height: 22px;
+  border: 1px solid var(--neutral-4);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--neutral-0);
+}
+
+.segment {
+  margin: 0;
+  min-width: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--neutral-4);
+  background: var(--neutral-0);
+  color: var(--neutral-7);
+  font: inherit;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.segment:last-child {
+  border-right: 0;
+}
+
+.segment:hover {
+  background: var(--neutral-1);
+}
+
+.segmentSelected,
+.segmentSelected:hover {
+  background: var(--brand-8);
+  color: var(--neutral-0);
+}
+
+.segment:focus-visible {
+  outline: 2px solid var(--brand-8);
+  outline-offset: -2px;
+  position: relative;
+  z-index: 1;
+}
+
+.suffix {
+  color: var(--neutral-7);
+  white-space: nowrap;
+}

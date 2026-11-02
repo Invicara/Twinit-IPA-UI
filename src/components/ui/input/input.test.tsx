@@ -13,6 +13,13 @@ describe("Input", () => {
     expect(screen.getByPlaceholderText("test input")).toBeInTheDocument();
   });
 
+  test("applies fitContent layout on the outer wrapper", () => {
+    const { container } = render(<Input fitContent placeholder="compact" />);
+
+    expect(container.firstChild).toHaveAttribute("data-fit-content", "true");
+    expect(container.firstChild).toHaveClass(styles.inputFitContent);
+  });
+
   test("renders with label", () => {
     render(<Input label="Test Label" />);
 
@@ -49,6 +56,20 @@ describe("Input", () => {
 
     await user.tab();
     expect(onBlur).toHaveBeenCalled();
+  });
+
+  test("applies data-size for default size", () => {
+    render(<Input />);
+    const input = screen.getByTestId("ipa_input");
+    expect(input).toHaveAttribute("data-size", "default");
+  });
+
+  test("applies data-size for sm and lg sizes", () => {
+    const { rerender } = render(<Input size="sm" />);
+    expect(screen.getByTestId("ipa_input")).toHaveAttribute("data-size", "sm");
+
+    rerender(<Input size="lg" />);
+    expect(screen.getByTestId("ipa_input")).toHaveAttribute("data-size", "lg");
   });
 
   test("applies correct dimensions (base and variant classes)", () => {
@@ -142,6 +163,12 @@ describe("Input", () => {
   describe("Password mode", () => {
     test("renders password input with type='password' by default", () => {
       render(<Input password />);
+      const input = screen.getByTestId("ipa_input");
+      expect(input).toHaveAttribute("type", "password");
+    });
+
+    test("password mode keeps type=password when type=text is also passed", () => {
+      render(<Input password type="text" />);
       const input = screen.getByTestId("ipa_input");
       expect(input).toHaveAttribute("type", "password");
     });
@@ -247,6 +274,95 @@ describe("Input", () => {
       expect(input).toHaveAttribute("type", "password");
       await user.click(toggleButton);
       expect(input).toHaveAttribute("type", "text");
+    });
+  });
+
+  describe("Clearable mode", () => {
+    test("does not show clear button when empty", () => {
+      render(<Input clearable placeholder="Search" />);
+
+      expect(screen.queryByTestId("ipa_input_clear")).not.toBeInTheDocument();
+    });
+
+    test("shows clear button when the field has a value", () => {
+      render(<Input clearable defaultValue="hello" />);
+
+      expect(screen.getByTestId("ipa_input_clear")).toBeInTheDocument();
+      expect(screen.getByLabelText("Clear input").querySelector("svg")).toBeInTheDocument();
+    });
+
+    test("clears an uncontrolled input when X is clicked", async () => {
+      const user = userEvent.setup();
+      render(<Input clearable defaultValue="hello" />);
+
+      const input = screen.getByTestId("ipa_input");
+      await user.click(screen.getByLabelText("Clear input"));
+
+      expect(input).toHaveValue("");
+      expect(screen.queryByTestId("ipa_input_clear")).not.toBeInTheDocument();
+    });
+
+    test("calls onChange with an empty value when X is clicked", async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(<Input clearable value="hello" onChange={onChange} />);
+
+      await user.click(screen.getByLabelText("Clear input"));
+
+      expect(onChange).toHaveBeenCalled();
+      expect(onChange.mock.calls.at(-1)?.[0].target.value).toBe("");
+    });
+
+    test("applies clear padding when clear button is visible", () => {
+      render(<Input clearable defaultValue="hello" />);
+
+      expect(screen.getByTestId("ipa_input")).toHaveClass(styles.withClear);
+    });
+
+    test("does not show clear button for textarea", () => {
+      render(<Input clearable textarea defaultValue="hello" />);
+
+      expect(screen.queryByTestId("ipa_input_clear")).not.toBeInTheDocument();
+    });
+
+    test("does not show clear button when disabled", () => {
+      render(<Input clearable defaultValue="hello" disabled />);
+
+      expect(screen.queryByTestId("ipa_input_clear")).not.toBeInTheDocument();
+    });
+
+    test("shows clear button when typing in an uncontrolled input", async () => {
+      const user = userEvent.setup();
+      render(<Input clearable placeholder="Search" />);
+
+      expect(screen.queryByTestId("ipa_input_clear")).not.toBeInTheDocument();
+      await user.type(screen.getByTestId("ipa_input"), "Ada");
+
+      expect(screen.getByTestId("ipa_input_clear")).toBeInTheDocument();
+    });
+
+    test("shows clear button to the left of the password toggle", () => {
+      render(<Input clearable password defaultValue="secret" />);
+
+      expect(screen.getByTestId("ipa_input_clear")).toBeInTheDocument();
+      expect(screen.getByLabelText("Show password")).toBeInTheDocument();
+      expect(screen.getByTestId("ipa_input")).toHaveClass(
+        styles.withPassword,
+        styles.withClear
+      );
+    });
+
+    test("clears password input when X is clicked", async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(
+        <Input clearable password defaultValue="secret" onChange={onChange} />
+      );
+
+      await user.click(screen.getByLabelText("Clear input"));
+
+      expect(onChange).toHaveBeenCalled();
+      expect(onChange.mock.calls.at(-1)?.[0].target.value).toBe("");
     });
   });
 });

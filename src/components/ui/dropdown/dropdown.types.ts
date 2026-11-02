@@ -13,4 +13,6 @@ export interface DropdownProps {
   variant?: 'single' | 'multiselect' | 'filter';
   placeholder?: string;
   maxDisplayBadges?: number;
+  /** Passed through to SingleSelect / MultiSelect when supported. */
+  openOnFocus?: boolean;
 }

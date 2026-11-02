@@ -3,6 +3,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 18px;
+  text-decoration: none;
   transition: color 0.15s ease;
 }
 
@@ -20,6 +21,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  text-decoration: none;
 }
 
 .link[data-variant="default"]:not([data-disabled="true"]):hover {

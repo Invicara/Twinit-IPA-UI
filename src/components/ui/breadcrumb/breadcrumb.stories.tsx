@@ -1,5 +1,5 @@
 import React from "react"
-import { StoryFn, Meta } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,38 +8,50 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "./breadcrumb"
+import { styleOverridesArgType } from "@storybook/argTypes"
 
-export default {
+const meta = {
   title: "ui/Breadcrumb",
   component: Breadcrumb,
   argTypes: {
     className: {
-      control: "text",
-      description: "Additional CSS classes for the nav",
+      control: { type: "text" },
+      description: "CSS class for the outermost container of the component.",
+      table: {
+        type: { summary: "string | undefined" },
+        defaultValue: { summary: "undefined" },
+      },
     },
+    styleOverrides: styleOverridesArgType(),
   },
   parameters: {
     layout: "centered",
   },
-} as Meta<typeof Breadcrumb>
+  render: (args) => (
+    <Breadcrumb {...args}>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  ),
+} satisfies Meta<typeof Breadcrumb>
 
-const Template: StoryFn<React.ComponentProps<typeof Breadcrumb>> = (args) => (
-  <Breadcrumb {...args}>
-    <BreadcrumbList>
-      <BreadcrumbItem>
-        <BreadcrumbLink href="/">Home</BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbLink href="/components">Components</BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbSeparator />
-      <BreadcrumbItem>
-        <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-      </BreadcrumbItem>
-    </BreadcrumbList>
-  </Breadcrumb>
-)
+export default meta
 
-export const Default = Template.bind({})
-Default.args = {}
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {
+  args: {
+    styleOverrides: {},
+  },
+}

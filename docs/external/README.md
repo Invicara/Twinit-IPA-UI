@@ -7,7 +7,7 @@ This folder is for **external contributors** who want to work on `@dtplatform/ip
 | Doc | Description |
 |-----|-------------|
 | [contributing.md](contributing.md) | How to contribute: fork, branch naming, opening a PR, and what to expect after review. |
-| [dialog-animations.md](dialog-animations.md) | Why Dialog uses custom keyframes and CSS attribute selectors instead of Tailwind animation utilities. |
+| [dialog-animations.md](dialog-animations.md) | Why Dialog uses custom keyframes and CSS modules instead of animation utility classes in JSX. |
 
 ---
 
@@ -23,7 +23,7 @@ npm run build          # Build the library
 npm test               # Run tests
 npm run testv          # Verbose tests
 npm run test-watch     # Watch mode
-npm run tailwind-dev   # Watch Tailwind (globals.css → output.css)
+npm run watch:css   # Watch global CSS (globals.css → output.css)
 ```
 
 ### Codebase layout

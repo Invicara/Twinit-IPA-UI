@@ -1,5 +1,9 @@
 import * as React from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
+import type {
+  AccordionMultipleProps,
+  AccordionSingleProps,
+} from "@radix-ui/react-accordion"
 import { ChevronDownIcon } from "lucide-react"
 
 import { cn, mergeStyles } from "../../../lib/utils"
@@ -75,19 +79,35 @@ const AccordionContent = React.forwardRef<
 })
 AccordionContent.displayName = "AccordionContent"
 
+/** Radix: `collapsible` applies only when `type="single"`; it is stripped for `type="multiple"`. */
 const Accordion = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Root>,
   AccordionProps
->(({ className, styleOverrides, ...props }, ref) => {
+>(({ className, styleOverrides, type, ...props }, ref) => {
   const s = mergeStyles(styles, styleOverrides)
+  const { collapsible, ...rest } = props as typeof props & {
+    collapsible?: boolean
+  }
   return (
     <AccordionStylesContext.Provider value={s}>
-      <AccordionPrimitive.Root
-        ref={ref}
-        data-testid="ipa_accordion"
-        className={cn(s.accordion, className)}
-        {...props}
-      />
+      {type === "multiple" ? (
+        <AccordionPrimitive.Root
+          ref={ref}
+          data-testid="ipa_accordion"
+          className={cn(s.accordion, className)}
+          type="multiple"
+          {...(rest as Omit<AccordionMultipleProps, "type" | "className">)}
+        />
+      ) : (
+        <AccordionPrimitive.Root
+          ref={ref}
+          data-testid="ipa_accordion"
+          className={cn(s.accordion, className)}
+          type="single"
+          collapsible={collapsible}
+          {...(rest as Omit<AccordionSingleProps, "type" | "className" | "collapsible">)}
+        />
+      )}
     </AccordionStylesContext.Provider>
   )
 })

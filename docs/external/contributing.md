@@ -42,6 +42,7 @@ git checkout -b feature/your-change
 ### 3. Make your changes
 
 - Follow existing code and documentation patterns (see [README.md](README.md) for component architecture).
+- When adding UI primitives, prefer **Radix UI** wrappers first; if Radix has no equivalent, port from **shadcn/ui** (see [component sources](../internal/component-sources.md)).
 - Add or update tests and Storybook stories when relevant.
 - Update the [component docs](../) (e.g. `docs/accordion.md`) if you change a component’s API or behavior.
 

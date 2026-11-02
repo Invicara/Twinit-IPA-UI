@@ -32,11 +32,30 @@
   cursor: text;
 }
 
-.triggerIconContainer {
+/* Hit target for chevron: must capture clicks (not pass-through to input) so toggle matches MultiSelect */
+.triggerIconButton {
   position: absolute;
-  right: 12px;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.singleSelect[data-disabled="true"] .triggerIconButton {
+  cursor: not-allowed;
+  opacity: 0.6;
   pointer-events: none;
 }
 
@@ -83,10 +102,6 @@
 }
 
 [data-focused="true"] .itemContentEllipsisIndicator {
-  background-color: var(--brand-1);
-}
-
-.itemContentEllipsisIndicatorHover {
   background-color: var(--brand-1);
 }
 

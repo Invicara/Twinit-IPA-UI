@@ -1,8 +1,10 @@
 import * as React from "react"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, X } from "lucide-react"
 
 import { cn, mergeStyles } from "../../../lib/utils"
 import styles from "./input.module.css"
+
+export type InputSize = "default" | "sm" | "lg"
 
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement>, "size"> {
@@ -10,11 +12,17 @@ export interface InputProps
   label?: string
   helperText?: string
   state?: "default" | "error" | "success" | "warning" | "readonly"
+  size?: InputSize
 
   // Feature Toggles
   password?: boolean
   textarea?: boolean
   icon?: React.ReactNode
+  /** When true, shows an X control inside the field to clear the current value. */
+  clearable?: boolean
+
+  /** When true, outer wrapper uses fit-content width instead of 100%. */
+  fitContent?: boolean
 
   /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
   styleOverrides?: Record<string, string>
@@ -26,13 +34,20 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
     {
       className,
       state = "default",
+      size = "default",
       label,
       helperText,
       password = false,
       textarea = false,
       icon,
+      clearable = false,
+      fitContent = false,
       styleOverrides,
       disabled,
+      type,
+      value,
+      defaultValue,
+      onChange,
       ...props
     },
     ref
@@ -41,13 +56,79 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
     const inputId = React.useId()
     const helperId = React.useId()
     const [showPassword, setShowPassword] = React.useState(false)
+    const inputRef = React.useRef<HTMLInputElement | HTMLTextAreaElement>(null)
+    const isControlled = value !== undefined
+    const [uncontrolledValue, setUncontrolledValue] = React.useState(
+      String(defaultValue ?? "")
+    )
 
-    const inputType = password && !showPassword ? "password" : props.type || "text"
+    React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement & HTMLTextAreaElement)
+
+    const currentValue = isControlled ? String(value ?? "") : uncontrolledValue
+    const showClearButton =
+      clearable &&
+      !textarea &&
+      !disabled &&
+      state !== "readonly" &&
+      currentValue.length > 0
+
+    const showPasswordToggle = password && !textarea
+    const inputValueProps = isControlled
+      ? { value }
+      : defaultValue !== undefined
+        ? { defaultValue }
+        : {}
+
+    const inputType =
+      password && !showPassword ? "password" : type ?? "text"
     const Component = textarea ? "textarea" : "input"
+
+    const handleChange = (
+      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+      if (!isControlled) {
+        setUncontrolledValue(event.target.value)
+      }
+      onChange?.(event)
+    }
+
+    const setInputRef = React.useCallback(
+      (node: HTMLInputElement | HTMLTextAreaElement | null) => {
+        inputRef.current = node
+      },
+      []
+    )
+
+    const handleClear = () => {
+      if (disabled || !inputRef.current) return
+
+      const input = inputRef.current
+      const prototype = textarea
+        ? window.HTMLTextAreaElement.prototype
+        : window.HTMLInputElement.prototype
+      const valueSetter = Object.getOwnPropertyDescriptor(prototype, "value")?.set
+
+      valueSetter?.call(input, "")
+      if (!isControlled) {
+        setUncontrolledValue("")
+      }
+
+      onChange?.({
+        target: { ...input, value: "" },
+        currentTarget: input,
+      } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)
+
+      input.focus()
+    }
 
     return (
       <div
-        className={s.input}
+        className={cn(
+          s.input,
+          fitContent && s.inputFitContent,
+          className
+        )}
+        data-fit-content={fitContent || undefined}
         data-state={state}
       >
         {label && (
@@ -70,22 +151,44 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
               s.inputBox,
               textarea ? s.variantTextarea : s.variantInput,
               icon != null && s.withIcon,
-              password && s.withPassword,
-              className
+              showPasswordToggle && s.withPassword,
+              showClearButton && s.withClear
             )}
             data-state={state}
+            data-size={size}
             data-disabled={!!disabled}
-            {...(textarea ? {} : { type: inputType })}
             id={inputId}
             data-testid="ipa_input"
-            ref={ref as any}
+            ref={setInputRef as React.Ref<HTMLInputElement & HTMLTextAreaElement>}
             aria-describedby={helperText ? helperId : undefined}
             aria-invalid={state === "error"}
             readOnly={state === "readonly"}
             disabled={disabled}
+            onChange={handleChange}
+            {...inputValueProps}
             {...props}
+            {...(textarea ? {} : { type: inputType })}
           />
-          {password && (
+          {showClearButton && (
+            <button
+              className={cn(
+                s.clearButton,
+                showPasswordToggle && s.clearButtonWithPassword
+              )}
+              type="button"
+              data-size={size}
+              onClick={(event) => {
+                event.preventDefault()
+                handleClear()
+              }}
+              tabIndex={-1}
+              aria-label="Clear input"
+              data-testid="ipa_input_clear"
+            >
+              <X className={s.clearButtonIcon} aria-hidden strokeWidth={2} />
+            </button>
+          )}
+          {showPasswordToggle && (
             <button
               className={s.passwordToggle}
               type="button"
@@ -99,7 +202,7 @@ const Input = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProp
               ) : (
                 <EyeOff className={s.passwordToggleIcon} />
               )}
-            </button>     
+            </button>
           )}
         </div>
         {helperText && (

@@ -14,6 +14,8 @@ export interface SliderProps
   maxLabel?: string
   disabled?: boolean
   range?: boolean // When true, use two thumbs for range selection
+  /** When false, hide the built-in number inputs (e.g. a parent already shows them). */
+  showValueInputs?: boolean
 
   /** Style overrides: object mapping slot names to class names. Plain object or CSS module. */
   styleOverrides?: Record<string, string>
@@ -31,6 +33,7 @@ const Slider = React.forwardRef<
       maxLabel = "100",
       range = false,
       disabled = false,
+      showValueInputs = true,
       styleOverrides,
       value,
       defaultValue,
@@ -84,9 +87,7 @@ const Slider = React.forwardRef<
         )}
 
         <div className={s.controls}>
-          <span className={s.minLabel}>
-            {minLabel}
-          </span>
+          {minLabel ? <span className={s.minLabel}>{minLabel}</span> : null}
 
           <div
             className={s.sliderContainer}
@@ -101,6 +102,7 @@ const Slider = React.forwardRef<
               step={step}
               disabled={disabled}
               data-disabled={disabled}
+              data-range={range || undefined}
               aria-labelledby={label ? sliderId : undefined}
               data-testid="ipa_slider"
               {...props}
@@ -122,50 +124,50 @@ const Slider = React.forwardRef<
             </SliderPrimitive.Root>
           </div>
 
-          <span className={s.maxLabel}>
-            {maxLabel}
-          </span>
+          {maxLabel ? <span className={s.maxLabel}>{maxLabel}</span> : null}
         </div>
 
-        <div className={s.inputs}>
-          {range ? (
-            <>
-              <input
-                type="number"
-                value={currentValue[0]}
-                onChange={(e) => handleInputChange(0, e.target.value)}
-                disabled={disabled}
-                min={min}
-                max={max}
-                step={step}
-                className={s.inputBox}
-              />
-              <input
-                type="number"
-                value={currentValue[1]}
-                onChange={(e) => handleInputChange(1, e.target.value)}
-                disabled={disabled}
-                min={min}
-                max={max}
-                step={step}
-                className={s.inputBox}
-              />
-            </>
-          ) : (
-            <div className={s.inputContainer}>
-              <input
-                type="number"
-                value={currentValue[0]}
-                onChange={(e) => handleInputChange(0, e.target.value)}
-                disabled={disabled}
-                min={min}
-                max={max}
-                step={step}
-                className={s.inputBox}
-              />
-            </div>
-          )}
-        </div>
+        {showValueInputs ? (
+          <div className={s.inputs}>
+            {range ? (
+              <>
+                <input
+                  type="number"
+                  value={currentValue[0]}
+                  onChange={(e) => handleInputChange(0, e.target.value)}
+                  disabled={disabled}
+                  min={min}
+                  max={max}
+                  step={step}
+                  className={s.inputBox}
+                />
+                <input
+                  type="number"
+                  value={currentValue[1]}
+                  onChange={(e) => handleInputChange(1, e.target.value)}
+                  disabled={disabled}
+                  min={min}
+                  max={max}
+                  step={step}
+                  className={s.inputBox}
+                />
+              </>
+            ) : (
+              <div className={s.inputContainer}>
+                <input
+                  type="number"
+                  value={currentValue[0]}
+                  onChange={(e) => handleInputChange(0, e.target.value)}
+                  disabled={disabled}
+                  min={min}
+                  max={max}
+                  step={step}
+                  className={s.inputBox}
+                />
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     )
   }

@@ -68,22 +68,27 @@
   background-color: var(--neutral-0);
 }
 
-/* Indicator dot */
+/* Indicator dot — absolute center avoids flex shrinking the ::after into a thin bar */
 .indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  position: relative;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .indicator::after {
   content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: block;
+  box-sizing: border-box;
   width: 8px;
   height: 8px;
-  border-radius: 9999px;
+  min-width: 8px;
+  min-height: 8px;
+  border: none;
+  border-radius: 50%;
 }
 
 .radio:disabled .indicator::after {

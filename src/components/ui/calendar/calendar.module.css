@@ -1,0 +1,626 @@
+.calendar {
+  --cell-size: 1.75rem;
+  padding: 8px;
+  border: 1px solid var(--neutral-2);
+  border-radius: 8px;
+  background-color: var(--neutral-0);
+  color: var(--neutral-9);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.root {
+  width: fit-content;
+}
+
+.months {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calendarNavBar .months {
+  position: relative;
+}
+
+.month {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* navLayout="around": prev / dropdowns / next are siblings inside .month */
+.monthInlineNavHeader {
+  display: grid;
+  grid-template-columns: var(--cell-size) minmax(0, 1fr) var(--cell-size);
+  align-items: center;
+  column-gap: 4px;
+  row-gap: 8px;
+}
+
+.monthInlineNavHeader > .navButton:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.monthInlineNavHeader > .monthCaption {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  width: 100%;
+}
+
+.monthInlineNavHeader > .navButton:nth-child(3) {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.monthInlineNavHeader > .monthGrid {
+  grid-column: 1 / -1;
+}
+
+.nav {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--neutral-8);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.navButton:hover:not(:disabled) {
+  background: var(--neutral-1);
+  color: var(--neutral-9);
+}
+
+.navButton:focus-visible {
+  outline: none;
+  border-color: var(--neutral-3);
+  box-shadow: none;
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chevronIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.chevronIconSmall {
+  width: 12px;
+  height: 12px;
+}
+
+.monthCaption {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.monthCaptionInlineNav {
+  height: var(--cell-size);
+  justify-content: center;
+  gap: 4px;
+}
+
+.monthCaptionBarNav {
+  height: var(--cell-size);
+  justify-content: center;
+  padding-inline: var(--cell-size);
+}
+
+.dropdowns {
+  display: flex;
+  height: var(--cell-size);
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dropdownRoot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: calc(var(--cell-size) - 2px);
+  border: 1px solid var(--neutral-2);
+  border-radius: 6px;
+  background: var(--neutral-0);
+  box-shadow: none;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.dropdownRoot:focus-within {
+  border-color: var(--neutral-3);
+  box-shadow: none;
+  outline: none;
+}
+
+.dropdown {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  opacity: 0;
+  outline: none;
+  box-shadow: none;
+}
+
+.dropdown:focus,
+.dropdown:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.captionLabel {
+  user-select: none;
+  font-weight: 500;
+}
+
+.captionLabelText {
+  font-size: 13px;
+}
+
+.captionLabelDropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding-inline: 6px;
+  font-size: 13px;
+  color: var(--neutral-9);
+  pointer-events: none;
+}
+
+.monthGrid {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.weekdays {
+  display: flex;
+}
+
+.weekday {
+  flex: 1;
+  width: var(--cell-size);
+  max-width: var(--cell-size);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--neutral-6);
+  text-align: center;
+  user-select: none;
+}
+
+.week {
+  display: flex;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.weekNumberHeader {
+  width: var(--cell-size);
+  user-select: none;
+}
+
+.weekNumber {
+  font-size: 11px;
+  color: var(--neutral-6);
+  user-select: none;
+}
+
+.day {
+  position: relative;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  padding: 0;
+  text-align: center;
+  user-select: none;
+}
+
+.rangeStart {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  background: var(--brand-1);
+}
+
+.rangeMiddle {
+  border-radius: 0;
+  background: var(--brand-1);
+}
+
+.rangeEnd {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  background: var(--brand-1);
+}
+
+.today {
+  border-radius: 6px;
+}
+
+.outside {
+  color: var(--neutral-4);
+}
+
+.disabled {
+  color: var(--neutral-4);
+  opacity: 0.5;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.dayButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--neutral-9);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.dayButtonOutside {
+  color: var(--neutral-4);
+}
+
+.dayButton:hover:not(:disabled):not([data-selected-single="true"]):not([data-range-start="true"]):not([data-range-end="true"]):not([data-range-middle="true"]) {
+  background: var(--neutral-1);
+  color: var(--neutral-9);
+}
+
+.dayButtonOutside:hover:not(:disabled) {
+  color: var(--neutral-5);
+}
+
+.dayButton[data-today="true"]:not([data-selected-single="true"]):not([data-range-start="true"]):not([data-range-end="true"]):not([data-range-middle="true"]) {
+  background: var(--neutral-05);
+}
+
+.dayButton[data-focused="true"] {
+  position: relative;
+  z-index: 1;
+  outline: none;
+  box-shadow: none;
+}
+
+.dayButton[data-selected-single="true"],
+.dayButton[data-range-start="true"],
+.dayButton[data-range-end="true"] {
+  background: var(--brand-8);
+  color: var(--neutral-0);
+}
+
+.dayButton[data-selected-single="true"]:hover:not(:disabled),
+.dayButton[data-range-start="true"]:hover:not(:disabled),
+.dayButton[data-range-end="true"]:hover:not(:disabled) {
+  background: var(--brand-7);
+  color: var(--neutral-0);
+}
+
+.dayButton[data-range-middle="true"] {
+  border-radius: 0;
+  background: var(--brand-1);
+  color: var(--brand-9);
+}
+
+.dayButton[data-range-middle="true"]:hover:not(:disabled) {
+  background: var(--brand-2);
+  color: var(--brand-9);
+}
+
+.dayButton[data-range-start="true"] {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.dayButton[data-range-end="true"] {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.dayButton[data-selected-single="true"] {
+  border-radius: 6px;
+}
+
+.dayButton:disabled {
+  color: var(--neutral-4);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dayButton:focus-visible {
+  outline: none;
+}
+
+.datePickerTrigger {
+  justify-content: space-between;
+  min-width: 212px;
+  text-align: left;
+  font-weight: 400;
+}
+
+.datePickerTriggerCompact {
+  justify-content: flex-start;
+  min-width: auto;
+  text-align: left;
+  font-weight: 400;
+}
+
+.datePickerTriggerLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clearTriggerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.clearTriggerIcon svg {
+  display: block;
+}
+
+.clearTriggerDestructive {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  box-sizing: border-box;
+}
+
+.clearTriggerDestructive svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.clearTriggerDestructive:hover,
+.clearTriggerDestructive:focus-visible {
+  background: var(--alert-7);
+  border-color: var(--alert-7);
+  color: var(--neutral-0) !important;
+  outline: none;
+}
+
+.clearTriggerDestructive:hover svg,
+.clearTriggerDestructive:focus-visible svg {
+  color: var(--neutral-0) !important;
+}
+
+.datePickerTrigger[data-empty="true"] {
+  color: var(--neutral-6);
+}
+
+.datePickerContent {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  padding: 4px 0 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.datePickerClose {
+  position: absolute;
+  top: 6px;
+  right: 3px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--neutral-5);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.datePickerClose:hover,
+.datePickerClose:focus-visible {
+  color: var(--neutral-7);
+  background: var(--neutral-2);
+  outline: none;
+}
+
+.datePickerContent .calendar {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  padding: 12px;
+  width: fit-content;
+}
+
+.datePickerContent .month {
+  width: calc(var(--cell-size) * 7);
+}
+
+.datePickerContent .monthInlineNavHeader {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  column-gap: 1px;
+  row-gap: 8px;
+  width: calc(var(--cell-size) * 7);
+  max-width: calc(var(--cell-size) * 7);
+}
+
+.datePickerContent .monthInlineNavHeader > .navButton:first-child,
+.datePickerContent .monthInlineNavHeader > .monthCaption,
+.datePickerContent .monthInlineNavHeader > .navButton:nth-child(3) {
+  grid-column: auto;
+  grid-row: auto;
+  flex: 0 0 auto;
+}
+
+.datePickerContent .monthInlineNavHeader > .navButton {
+  width: 20px;
+  min-width: 20px;
+  padding: 0 3px;
+}
+
+.datePickerContent .monthInlineNavHeader > .monthCaption {
+  width: max-content;
+  justify-self: center;
+}
+
+.datePickerContent .monthInlineNavHeader > .monthGrid {
+  flex: 0 0 100%;
+  width: calc(var(--cell-size) * 7);
+  margin-inline: 0;
+}
+
+.datePickerContent .dropdowns {
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+.datePickerContent .monthGrid,
+.datePickerContent .weekdays,
+.datePickerContent .week {
+  width: calc(var(--cell-size) * 7);
+}
+
+.relativeDateRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 0;
+  min-width: 100%;
+  padding: 0 12px 12px;
+}
+
+.relativeDateButton[data-size="sm"] {
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 14px;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.relativeDateButton[data-active="true"] {
+  background-color: var(--brand-9);
+}
+
+.datePickerResetRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px 6px;
+}
+
+.datePickerClear[data-variant="secondary"],
+.datePickerClear[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.datePickerClear[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.datePickerClear[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  margin-right: auto;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--neutral-4) !important;
+  background: var(--neutral-0) !important;
+  color: var(--neutral-7) !important;
+  box-shadow: none !important;
+  outline-color: var(--neutral-4) !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+}
+
+.datePickerClear[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.datePickerClear[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  background: var(--neutral-1) !important;
+  border-color: var(--neutral-5) !important;
+  color: var(--neutral-8) !important;
+}
+
+.datePickerClear[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  background: var(--neutral-2) !important;
+  border-color: var(--neutral-5) !important;
+  color: var(--neutral-8) !important;
+}
+
+.datePickerReset[data-variant="secondary"],
+.datePickerReset[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.datePickerReset[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible,
+.datePickerReset[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--alert-7) !important;
+  background: var(--neutral-0) !important;
+  color: var(--alert-7) !important;
+  box-shadow: none !important;
+  outline-color: var(--alert-7) !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+}
+
+.datePickerReset[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):hover,
+.datePickerReset[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):focus-visible {
+  background: var(--alert-1) !important;
+  border-color: var(--alert-7) !important;
+  color: var(--alert-7) !important;
+}
+
+.datePickerReset[data-variant="secondary"]:not(:disabled):not([data-disabled="true"]):active {
+  background: var(--alert-2) !important;
+  border-color: var(--alert-7) !important;
+  color: var(--alert-7) !important;
+}

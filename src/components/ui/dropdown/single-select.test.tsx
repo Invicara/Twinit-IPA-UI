@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import util from "util";
 import { SingleSelect } from "./single-select";
@@ -174,21 +174,187 @@ describe("SingleSelect", () => {
       });
     });
 
-    test("clears search query after selection and closes dropdown", async () => {
+    test("keeps selected label in the input after selection and closes dropdown", async () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<SingleSelect options={defaultOptions} filter onChange={onChange} value="" />);
-      
+
       const input = screen.getByPlaceholderText("Type to search...") as HTMLInputElement;
       await user.type(input, "Option 2");
       await user.click(screen.getByText(/Option 2/));
-      
+
       expect(onChange).toHaveBeenCalledWith("option2");
-      
+
       await waitFor(() => {
-        expect(screen.queryByText(/Option 1/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/^Option 1$/)).not.toBeInTheDocument();
+      });
+      expect(input.value).toBe("Option 2");
+    });
+
+    test("filter: mouse selection closes list and refocus does not reopen by default", async () => {
+      const user = userEvent.setup();
+      function Harness() {
+        const [value, setValue] = React.useState("");
+        return (
+          <SingleSelect
+            options={defaultOptions}
+            filter
+            value={value}
+            onChange={setValue}
+          />
+        );
+      }
+      render(<Harness />);
+      const input = screen.getByPlaceholderText("Type to search...") as HTMLInputElement;
+      await user.click(input);
+      await user.type(input, "Option 2");
+      await user.click(screen.getByText(/Option 2/));
+      await waitFor(() => {
+        expect(screen.queryByText(/^Option 1$/)).not.toBeInTheDocument();
+      });
+      fireEvent.blur(input);
+      fireEvent.focus(input);
+      await waitFor(() => {
+        expect(screen.queryByText(/^Option 1$/)).not.toBeInTheDocument();
       });
     });
+
+    test("filter: openOnFocus opens when focusing input with non-empty query", async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <SingleSelect
+            options={defaultOptions}
+            filter
+            value="option2"
+            onChange={() => {}}
+            openOnFocus
+          />
+          <button type="button">outside</button>
+        </>
+      );
+      const input = screen.getByPlaceholderText("Type to search...");
+      await user.click(input);
+      await user.click(screen.getByRole("button", { name: "outside" }));
+      await waitFor(() => {
+        expect(screen.queryByText(/^Option 1$/)).not.toBeInTheDocument();
+      });
+      fireEvent.focus(input);
+      await waitFor(() => {
+        expect(screen.getByRole("listbox")).toBeInTheDocument();
+        expect(
+          screen.getByRole("button", { name: /^Option 2$/ })
+        ).toBeInTheDocument();
+      });
+    });
+
+    test("filter: Enter with empty query clears selection", async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(
+        <SingleSelect
+          options={defaultOptions}
+          filter
+          value="option1"
+          onChange={onChange}
+        />
+      );
+      const input = screen.getByPlaceholderText("Type to search...");
+      await user.click(input);
+      await user.clear(input);
+      await user.keyboard("{Enter}");
+      expect(onChange).toHaveBeenCalledWith("");
+    });
+
+    test("filter: Space with empty open list clears selection", async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(
+        <SingleSelect
+          options={defaultOptions}
+          filter
+          value="option1"
+          onChange={onChange}
+        />
+      );
+      const input = screen.getByPlaceholderText("Type to search...");
+      await user.click(input);
+      await user.clear(input);
+      await user.keyboard(" ");
+      expect(onChange).toHaveBeenCalledWith("");
+    });
+
+    test("filter: backspacing to empty shows placeholder; blur restores committed label", async () => {
+      const user = userEvent.setup();
+      render(
+        <SingleSelect
+          options={defaultOptions}
+          filter
+          value="option2"
+          onChange={() => {}}
+        />
+      );
+      const input = screen.getByPlaceholderText(
+        "Type to search..."
+      ) as HTMLInputElement;
+      await user.click(input);
+      expect(input.value).toContain("Option 2");
+      await user.clear(input);
+      expect(input.value).toBe("");
+      fireEvent.blur(input);
+      await waitFor(() => {
+        expect(input.value).toBe("Option 2");
+      });
+    });
+
+    test("filter: after Enter pick, backspacing to empty shows placeholder (input stayed focused)", async () => {
+      const user = userEvent.setup();
+      function Harness() {
+        const [value, setValue] = React.useState("");
+        return (
+          <SingleSelect
+            options={defaultOptions}
+            filter
+            value={value}
+            onChange={setValue}
+          />
+        );
+      }
+      render(<Harness />);
+      const input = screen.getByPlaceholderText(
+        "Type to search..."
+      ) as HTMLInputElement;
+      await user.click(input);
+      await user.keyboard("{ArrowDown}{Enter}");
+      await waitFor(() => {
+        expect(input.value).toBe("Option 1");
+      });
+      await user.clear(input);
+      expect(input.value).toBe("");
+    });
+
+    test("filter: clearing input removes row highlight; Enter commits empty selection", async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(
+        <SingleSelect
+          options={defaultOptions}
+          filter
+          value="option1"
+          onChange={onChange}
+        />
+      );
+      const input = screen.getByPlaceholderText("Type to search...");
+      await user.click(input);
+      await user.keyboard("{ArrowDown}");
+      const opt1 = screen.getByRole("button", { name: /^Option 1$/ });
+      expect(opt1).toHaveAttribute("data-focused", "true");
+      await user.clear(input);
+      expect(opt1).not.toHaveAttribute("data-focused");
+      await user.keyboard("{Enter}");
+      expect(onChange).toHaveBeenCalledWith("");
+    });
+
   });
 
   describe("Keyboard Navigation", () => {
@@ -245,7 +411,7 @@ describe("SingleSelect", () => {
         expect(screen.queryByText("Option 1")).not.toBeInTheDocument();
       });
       
-      // Refocus input then Enter to reopen (focus opens dropdown; Enter also opens when closed)
+      // Refocus input then click to reopen (same as MultiSelect: focus alone does not open)
       await user.click(input);
       await waitFor(() => {
         expect(screen.getByText("Option 1")).toBeInTheDocument();
@@ -255,13 +421,68 @@ describe("SingleSelect", () => {
     test("respects disableKeyboardNavigation prop", async () => {
       const user = userEvent.setup();
       render(<SingleSelect options={defaultOptions} disableKeyboardNavigation />);
-      
-      const input = screen.getByPlaceholderText("Select an option");
-      await user.click(input);
+
+      const input = screen.getByPlaceholderText("Select an option") as HTMLInputElement;
+      input.focus();
       await user.keyboard("{ArrowDown}");
-      
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+
+      await user.click(input);
       const firstOption = screen.getByText("Option 1").closest("button");
-      expect(firstOption).not.toHaveAttribute("data-focused");
+      expect(firstOption).not.toHaveAttribute("data-focused", "true");
+
+      await user.keyboard("{ArrowDown}");
+      expect(firstOption).not.toHaveAttribute("data-focused", "true");
+    });
+
+    test("disableKeyboardNavigation ignores Enter on a highlighted option", async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(
+        <SingleSelect
+          options={defaultOptions}
+          disableKeyboardNavigation
+          onChange={onChange}
+        />
+      );
+
+      await user.click(screen.getByPlaceholderText("Select an option"));
+      await user.hover(screen.getByText("Option 2"));
+      await user.keyboard("{Enter}");
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole("listbox")).toBeInTheDocument();
+    });
+
+    test("disableKeyboardNavigation cancels arrow keys on the list scrollbar", async () => {
+      const user = userEvent.setup();
+      const scrollIntoView = jest.spyOn(HTMLElement.prototype, "scrollIntoView").mockImplementation(() => {});
+      render(
+        <SingleSelect
+          options={defaultOptions}
+          disableKeyboardNavigation
+          maxVisibleOptions={2}
+        />
+      );
+
+      await user.click(screen.getByPlaceholderText("Select an option"));
+      const scroller = document.querySelector("[data-block-arrow-keys='true']");
+      expect(scroller).toBeTruthy();
+      scroller!.scrollTop = 40;
+
+      await user.hover(screen.getByText("Option 4"));
+      scrollIntoView.mockClear();
+      const event = new KeyboardEvent("keydown", {
+        key: "ArrowDown",
+        bubbles: true,
+        cancelable: true,
+      });
+      scroller!.dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(scroller!.scrollTop).toBe(40);
+      expect(scrollIntoView).not.toHaveBeenCalled();
+      scrollIntoView.mockRestore();
     });
 
     test("handles rapid keyboard navigation without exceeding bounds", async () => {
@@ -416,7 +637,7 @@ describe("SingleSelect", () => {
       
       if (propName === 'disableIconAnimation') {
         const icon = container.querySelector("svg");
-        expect(icon).not.toHaveClass("triggerIconRotate180");
+        expect(icon).not.toHaveClass("triggerIconTransition");
       }
       // For enableLongTextAnimation, just verify it renders without error
       expect(screen.getByText(longTextOptions[0].label)).toBeInTheDocument();
@@ -439,13 +660,13 @@ describe("SingleSelect", () => {
       );
     });
 
-    test("maxVisibleOptions defaults to 10 rows for scroll max-height", async () => {
+    test("maxVisibleOptions defaults to 8 rows for scroll max-height", async () => {
       const user = userEvent.setup();
       render(<SingleSelect options={defaultOptions} />);
       const input = screen.getByPlaceholderText("Select an option");
       await user.click(input);
       const scroll = screen.getByRole("listbox").querySelector(".scrollContent") as HTMLElement;
-      expect(scroll.style.maxHeight).toBe("350px");
+      expect(scroll.style.maxHeight).toBe("280px");
     });
 
     test("maxVisibleOptions false omits scroll max-height cap", async () => {
@@ -466,11 +687,11 @@ describe("SingleSelect", () => {
       expect(scroll.style.maxHeight).toBe("105px");
     });
 
-    test("disableCloseOnOutsideClick keeps dropdown open", async () => {
+    test("disableClickOutside keeps dropdown open", async () => {
       const user = userEvent.setup();
       render(
         <>
-          <SingleSelect options={defaultOptions} disableCloseOnOutsideClick />
+          <SingleSelect options={defaultOptions} disableClickOutside />
           <div data-testid="outside">Outside</div>
         </>
       );
@@ -483,13 +704,26 @@ describe("SingleSelect", () => {
       expect(screen.getByText("Option 1")).toBeInTheDocument();
     });
 
-    test("closeOnInputClick prop is accepted without errors", () => {
-      render(<SingleSelect options={defaultOptions} closeOnInputClick filter />);
-      
-      const input = screen.getByPlaceholderText("Type to search...");
-      expect(input).toBeInTheDocument();
-      expect(input).not.toBeDisabled();
+    test("disableClickOutside string 'false' still closes on outside click", async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <SingleSelect
+            options={defaultOptions}
+            disableClickOutside={"false" as unknown as boolean}
+          />
+          <div data-testid="outside">Outside</div>
+        </>
+      );
+      const input = screen.getByPlaceholderText("Select an option");
+      await user.click(input);
+      expect(screen.getByText("Option 1")).toBeInTheDocument();
+      await user.click(screen.getByTestId("outside"));
+      await waitFor(() => {
+        expect(screen.queryByText("Option 1")).not.toBeInTheDocument();
+      });
     });
+
   });
 
   describe("Combined Props", () => {

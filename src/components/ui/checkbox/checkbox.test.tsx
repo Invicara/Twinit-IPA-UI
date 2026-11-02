@@ -33,6 +33,13 @@ describe("Checkbox", () => {
     expect(checkbox).toHaveAttribute("data-state", "indeterminate")
   })
 
+  it("renders indeterminate when indeterminate is true and defaultChecked is omitted", () => {
+    render(<Checkbox aria-label="Check" indeterminate />)
+
+    const checkbox = screen.getByRole("checkbox")
+    expect(checkbox).toHaveAttribute("data-state", "indeterminate")
+  })
+
   it("applies root styles", () => {
     render(<Checkbox aria-label="Check" />)
 
@@ -54,6 +61,26 @@ describe("Checkbox", () => {
     await user.click(checkbox)
 
     expect(checkbox).toHaveAttribute("data-state", "unchecked")
+  })
+
+  it("cycles indeterminate → checked → unchecked → indeterminate (tri-state loop)", async () => {
+    render(<Checkbox aria-label="Mixed" indeterminate />)
+
+    const checkbox = screen.getByRole("checkbox", { name: /mixed/i })
+    expect(checkbox).toHaveAttribute("data-state", "indeterminate")
+
+    const user = userEvent.setup()
+    await user.click(checkbox)
+    expect(checkbox).toHaveAttribute("data-state", "checked")
+
+    await user.click(checkbox)
+    expect(checkbox).toHaveAttribute("data-state", "unchecked")
+
+    await user.click(checkbox)
+    expect(checkbox).toHaveAttribute("data-state", "indeterminate")
+
+    await user.click(checkbox)
+    expect(checkbox).toHaveAttribute("data-state", "checked")
   })
 
   it("calls onCheckedChange when toggled", async () => {

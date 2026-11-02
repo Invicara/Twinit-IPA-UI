@@ -159,7 +159,3 @@
 [data-focused="true"] .itemContentEllipsisIndicator {
   background-color: var(--brand-1);
 }
-
-.itemContentEllipsisIndicatorHover {
-  background-color: var(--brand-1);
-}

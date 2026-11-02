@@ -137,9 +137,15 @@ describe('Slider', () => {
     expect(slider).toHaveClass('custom-class')
   })
 
-  it('renders with data-testid', () => {
-    render(<Slider label="Select Amount" defaultValue={[50]} />)
-    const slider = screen.getByTestId('ipa_slider')
-    expect(slider).toBeInTheDocument()
+  it('hides built-in value inputs when showValueInputs is false', () => {
+    render(
+      <Slider
+        label="Select Amount"
+        defaultValue={[50]}
+        showValueInputs={false}
+      />
+    )
+
+    expect(screen.queryByDisplayValue('50')).not.toBeInTheDocument()
   })
 })

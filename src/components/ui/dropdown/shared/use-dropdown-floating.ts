@@ -21,11 +21,14 @@ export function useDropdownFloating({
   preferTop,
   portalContainer,
   floatingZIndex = 1200,
+  /** When set, popup max-height is min(viewport, this) so the list does not stretch to the full viewport. */
+  maxPopupHeightPx,
 }: {
   open: boolean;
   preferTop: boolean;
   portalContainer?: HTMLElement | null;
   floatingZIndex?: number;
+  maxPopupHeightPx?: number;
 }) {
   const { refs, floatingStyles, placement, update } = useFloating({
     open,
@@ -37,8 +40,14 @@ export function useDropdownFloating({
       shift({ padding: 8 }),
       size({
         apply({ availableHeight, rects, elements }) {
+          const cap =
+            maxPopupHeightPx != null &&
+              maxPopupHeightPx > 0 &&
+              availableHeight > 0
+              ? Math.min(availableHeight, maxPopupHeightPx)
+              : availableHeight;
           Object.assign(elements.floating.style, {
-            maxHeight: availableHeight > 0 ? `${availableHeight}px` : '',
+            maxHeight: cap > 0 ? `${cap}px` : '',
             width: `${rects.reference.width}px`,
           });
         },

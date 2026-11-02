@@ -1,6 +1,6 @@
-## Dialog Animations Strategy
+## Dialog animations strategy
 
-This document explains why the `Dialog` component uses a **custom animation strategy** instead of the standard Tailwind + `data-[state=...]` pattern used elsewhere in the library.
+This document explains why the `Dialog` component uses **custom keyframes and plain CSS** in its module instead of shipping **animation utility class names** in JSX (the pattern some Radix + shadcn examples use with utility-first CSS).
 
 It is intended for **library developers** working on `@dtplatform/ipa-ui`, not for consumers of the package.
 
@@ -8,190 +8,43 @@ It is intended for **library developers** working on `@dtplatform/ipa-ui`, not f
 
 ### Background
 
-Radix UI's `Dialog` primitive exposes its open/closed state via the `data-state` attribute:
+Radix UI's `Dialog` primitive exposes open/closed state via `data-state` (`open` | `closed`).
 
-- `data-state="open"`
-- `data-state="closed"`
+Many app-level examples compose the dialog with **utility classes** in `className` for enter/leave animations. That works in app code, but for a **distributed UI library** it has drawbacks:
 
-The original shadcn/Radix pattern typically uses Tailwind's `data-[state=open]:...` variants and animation utilities in the component JSX, for example:
+1. **Public class names:** Third-party utility names can appear in the DOM and clash with the host app’s CSS or leak implementation choices.
+2. **Transforms:** Centering often uses `translate(-50%, -50%)`. Enter/leave animations that also animate `transform` must be authored so they **do not fight** the centering transform.
 
-```tsx
-<DialogPrimitive.Content
-  className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]
-             data-[state=open]:animate-in data-[state=closed]:animate-out
-             data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95"
-/>
-```
-
-This works well in app code, but it has two problems for a **distributed UI library**:
-
-1. **Public class names:** Tailwind utility names (e.g. `animate-in`, `zoom-in-95`) appear in the host app's DOM. They can theoretically clash with other frameworks (e.g. Bootstrap) or leak implementation details we want to keep internal.
-2. **Transform conflicts:** The dialog is centered using `left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]`. Tailwind's animation utilities also manipulate `transform`, which can override or fight with the centering transform when combined incorrectly.
-
-To avoid both issues, the dialog now uses **library-owned keyframes** and **plain CSS attribute selectors**, while still relying on Radix's `data-state` attribute to drive the animations.
+ipa-ui styles Dialog with a **CSS module** and **library-owned `@keyframes`**, driven by Radix’s `data-state`.
 
 ---
 
 ### Goals
 
-For the `Dialog` component we specifically want:
-
-1. **No Tailwind animation utility class names exposed** to consuming apps.
-2. **No transform conflicts** between centering and animations.
-3. **Radix-driven state** (via `data-state="open" | "closed"`) to remain the single source of truth.
-4. **Consistent behavior** with or without a dark overlay.
+1. **No animation utility class names** from the design system in public `className` / DOM for this component.
+2. **Stable centering** while animating open/close.
+3. **Radix `data-state`** remains the single source of truth for animation hooks.
 
 ---
 
-### Implementation Overview
+### Implementation overview
 
-The dialog's styling is split into:
+See `src/components/ui/dialog/dialog.module.css`.
 
-- **Base layout & appearance** – defined in the CSS module using `@apply` (for BEM-style classes such as `dialog`, `content`, `header`, `footer`, etc.).
-- **Open/close animations** – implemented as custom keyframes (`ipa-dialog-*`) wired to Radix's `data-state` attribute using standard CSS attribute selectors.
+- **Overlay** (`.dialog`): fixed full-screen; fade in/out via `ipa-dialog-overlay-*` keyed off `[data-state]`.
+- **Content** (`.content`): fixed, centered with `transform: translate(-50%, -50%)`; open/close uses `ipa-dialog-content-*` keyframes that include **opacity and transform** in a controlled way so centering stays coherent.
 
-#### 1. Base styles (CSS module)
+#### JSX
 
-```css
-.dialog {
-  @apply fixed inset-0 z-50 bg-neutral-10/75;
-}
-
-.content {
-  @apply fixed left-[50%] top-[50%] z-50 grid w-full
-         translate-x-[-50%] translate-y-[-50%]
-         gap-0 border-0 bg-neutral-0 shadow-[0_4px_24px_rgba(0,0,0,0.15)]
-         transition-all duration-200 rounded-[8px];
-}
-```
-
-Here we let Tailwind handle:
-
-- Centering (`left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]`)
-- Sizing, background, borders, shadow, radius, etc.
-
-These classes are baked into the **CSS module**, not exposed as raw Tailwind class names in the consuming app.
-
-#### 2. Custom keyframes
-
-```css
-@keyframes ipa-dialog-overlay-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes ipa-dialog-overlay-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
-}
-
-@keyframes ipa-dialog-content-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes ipa-dialog-content-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
-}
-```
-
-Key points:
-
-- We use **namespaced keyframe names** (`ipa-dialog-*`) to avoid collisions.
-- We **do not animate `transform`**; centering is handled entirely by the base `.content` class.
-- Animations are simple fade-in/fade-out for now; if we want zoom/slide later, we must be careful not to break centering (see below).
-
-#### 3. Attribute selectors wired to Radix `data-state`
-
-```css
-.dialog[data-state="open"] {
-  animation: ipa-dialog-overlay-in 150ms ease-out forwards;
-}
-
-.dialog[data-state="closed"] {
-  animation: ipa-dialog-overlay-out 150ms ease-in forwards;
-}
-
-.content[data-state="open"] {
-  animation: ipa-dialog-content-in 150ms ease-out forwards;
-}
-
-.content[data-state="closed"] {
-  animation: ipa-dialog-content-out 150ms ease-in forwards;
-}
-```
-
-This is pure CSS – **no Tailwind variants** here. Radix is responsible for setting:
-
-- `data-state="open"` when the dialog opens.
-- `data-state="closed"` when the dialog closes.
-
-The CSS module reacts to those attributes and plays the correct keyframes.
-
-#### 4. JSX stays clean and library-friendly
-
-In `dialog.tsx`, we only apply **CSS module classes** merged with optional overrides via `styleOverrides` (using `mergeStyles(styles, styleOverrides)` to get `s`, then `s.dialog`, `s.content`, etc.):
-
-```tsx
-<DialogPrimitive.Overlay className={s.dialog} />;
-
-<DialogPrimitive.Content
-  ref={ref}
-  className={cn(s.content, hideOverlay && s.contentPointerEventsAuto, className)}
-  onInteractOutside={(e) => {
-    if (disableClickOutside) e.preventDefault();
-  }}
-  onEscapeKeyDown={(e) => {
-    if (disableEscapeKey) e.preventDefault();
-  }}
-  {...props}
->
-  {/* ... */}
-</DialogPrimitive.Content>;
-```
-
-There are **no Tailwind animation utilities** in the JSX. Consuming apps only see:
-
-- The CSS module class names (e.g. `dialog_module__content__abc123`).
-- Any extra classes provided via `styleOverrides` or `className`.
+`dialog.tsx` applies **CSS module classes** only (`s.dialog`, `s.content`, …) plus optional `styleOverrides` / `className`. Consumers see hashed module class names, not bundled third-party utility strings.
 
 ---
 
-### Why This Is Different from Other Components
+### Guidelines for future changes
 
-Other components (e.g. `Checkbox`, `RadioGroup`, `Accordion`, `Dropdown`) still use Tailwind's `data-[state=...]` variants inside `@apply`, for example:
+1. Prefer **opacity** for subtle transitions; if you animate `transform`, keep **centering** correct in `from`/`to` keyframes.
+2. Keep keyframe names **namespaced** (e.g. `ipa-dialog-*`).
+3. Drive animations from **Radix `data-state`** and CSS attribute selectors.
+4. Do not move dialog enter/leave animation back into **public** JSX as long strings of third-party utility class names.
 
-```css
-.root {
-  @apply border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground;
-}
-```
-
-This works fine because:
-
-1. These components mostly toggle **colors and borders**, not transforms.
-2. We are not trying to completely hide Tailwind's animation utilities for them.
-
-For `Dialog` specifically, we had **two extra constraints**:
-
-1. We need **transform-based centering** (`translate(-50%, -50%)`) to remain stable.
-2. We want to avoid exposing any Tailwind animation utility classes in the DOM of consuming apps.
-
-Mixing Tailwind's transform-based animation utilities (`zoom-in-95`, `slide-in-from-*`) with centering transforms made the dialog fragile. Moving to custom keyframes and attribute selectors in the CSS module solves this cleanly.
-
----
-
-### Guidelines for Future Work
-
-If you modify or extend dialog animations:
-
-1. **Prefer opacity-only animations** unless you have a strong reason to animate transforms.
-2. If you animate `transform`, make sure you:
-   - Preserve the centering transform (`translate(-50%, -50%)`) in both the base and animated states.
-   - Test on various viewport sizes.
-3. Keep animation keyframes and naming **namespaced** (e.g. `ipa-dialog-*`).
-4. Continue to use **Radix `data-state` attributes** as the single control point, and wire them via CSS attribute selectors.
-5. Avoid reintroducing Tailwind animation utilities such as `animate-in` / `animate-out` into the public `className` props of this component.
-
-If you need a different animation preset (e.g. more pronounced zoom/slide), add new `@keyframes` in this module and update the `[data-state]` rules accordingly, rather than switching back to raw Tailwind animation utilities.
+If you need a different preset, add or adjust `@keyframes` in the module and the matching `[data-state="open" | "closed"]` rules.

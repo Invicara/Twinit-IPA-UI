@@ -1,0 +1,49 @@
+.popoverContent {
+  z-index: 1200;
+  width: 288px;
+  border: 1px solid var(--neutral-3);
+  border-radius: 4px;
+  background-color: var(--neutral-0);
+  padding: 12px;
+  color: var(--neutral-9);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  outline: none;
+}
+
+.popoverContent[data-state="open"] {
+  animation: ipa-popover-in 150ms ease-out;
+}
+
+.popoverContent[data-state="closed"] {
+  animation: ipa-popover-out 150ms ease-in;
+}
+
+@keyframes ipa-popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ipa-popover-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.popoverArrow {
+  fill: var(--neutral-0);
+  stroke: var(--neutral-3);
+}
