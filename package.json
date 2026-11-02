@@ -1,10 +1,10 @@
 {
   "name": "@dtplatform/ipa-ui",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Invicara's design system implementation",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/types.d.ts",
   "style": "dist/output.css",
   "scripts": {
     "prepare": "husky || true",

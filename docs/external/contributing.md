@@ -17,9 +17,21 @@ git clone https://github.com/YOUR_USERNAME/Twinit-IPA-UI.git
 cd Twinit-IPA-UI
 ```
 
-### 2. Create a branch
+### 2. Set up
 
-Branch from the default branch (e.g. `main`). Use a **branch naming pattern** so maintainers can see the type of change:
+Use Node 22 (`.nvmrc` pins `22.23.4`; run `nvm use`), then:
+
+```bash
+npm install
+npm run build:css   # generates src/output.css, which Storybook imports
+npm run storybook
+```
+
+See [README.md](README.md#development) for all scripts.
+
+### 3. Create a branch
+
+The public repository's default branch is **`releases`**; branch from it. Use a **branch naming pattern** so maintainers can see the type of change:
 
 | Prefix   | Use for |
 |----------|---------|
@@ -34,36 +46,44 @@ Branch from the default branch (e.g. `main`). Use a **branch naming pattern** so
 - `docs/update-button-examples`
 
 ```bash
-git checkout main
-git pull origin main
-git checkout -b feature/your-change
+git remote add upstream https://github.com/Invicara/Twinit-IPA-UI.git
+git fetch upstream
+git checkout -b feature/your-change upstream/releases
 ```
 
-### 3. Make your changes
+### 4. Make your changes
 
-- Follow existing code and documentation patterns (see [README.md](README.md) for component architecture).
+- Follow existing code and documentation patterns (see [README.md](README.md) for component architecture):
+  - Styles go in a CSS module next to the component (`<component>.module.css`) using the design tokens. No Tailwind or utility classes.
+  - Compose class names with `cn()` from `src/lib/utils.tsx` (a `clsx` wrapper) and support `styleOverrides` via `mergeStyles()`.
 - When adding UI primitives, prefer **Radix UI** wrappers first; if Radix has no equivalent, port from **shadcn/ui** (see [component sources](../internal/component-sources.md)).
-- Add or update tests and Storybook stories when relevant.
-- Update the [component docs](../) (e.g. `docs/accordion.md`) if you change a component’s API or behavior.
+- Add or update tests (`<component>.test.tsx`, Jest + Testing Library) and Storybook stories (`<component>.stories.tsx`) when relevant.
+- Update the [component docs](../) (e.g. `docs/accordion.md`) if you change a component's API or behavior.
+- Run `npm test` and `npm run build` before pushing.
 
-### 4. Commit
+### 5. Commit
 
-We enforce **Conventional Commits** (commitlint runs on each commit). Use a type and short description (e.g. `feat: add tooltip`, `fix: dialog focus trap`, `docs: update button examples`). For breaking changes, use `feat!:` or `fix(scope)!:` in the subject, or add a `BREAKING CHANGE:` footer. Keep the first line short and clear.
+We enforce **Conventional Commits**: commitlint runs on each commit through a husky `commit-msg` hook (installed by `npm install`). Rules (see `commitlint.config.js`):
 
-### 5. Push and open a PR
+- **Allowed types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`. Other types (e.g. `build:`, `revert:`) are rejected; the default `Revert "..."` message from `git revert` is ignored.
+- **Subject** at most 72 characters, e.g. `feat: add tooltip`, `fix(dialog): focus trap`, `docs: update button examples`.
+- **Breaking changes:** use `feat!:` or `fix(scope)!:` in the subject, or add a `BREAKING CHANGE:` footer.
+- Merge commits (messages starting with `Merge `) are ignored.
 
-Push your branch to your fork and open a **Pull Request** against this repository’s default branch (e.g. `main`).
+### 6. Push and open a PR
+
+Push your branch to your fork and open a **Pull Request** against this repository's **`releases`** branch.
 
 - Describe what you changed and why.
 - Reference any related issues if applicable.
-- Ensure CI (if enabled) passes.
+- The repository has no CI workflow, so make sure `npm test` and `npm run build` pass locally.
 
 ## What happens next
 
 1. **Review** – Maintainers will review your PR, ask for changes if needed, and approve when ready.
 2. **Integration** – Approved changes are merged into the **internal** development branch and go through the internal release process (staging, QA, production).
 3. **Release** – When the next version is released, this public repo’s **releases** branch is updated with the release. Your change will be included in that release.
-4. **PR closure** – The maintainers will close your PR with a comment such as: *“Merged internally and included in v1.0.5. Thank you!”*
+4. **PR closure** – The maintainers will close your PR with a comment such as: *“Merged internally and included in v2.0.1. Thank you!”*
 
 You may not see a direct “merge” into the branch you targeted, because the actual merge happens in the private repo. Your contribution is still part of the next published release.
 

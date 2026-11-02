@@ -1,34 +1,24 @@
 # Icons
 
-`@dtplatform/ipa-ui` provides a small set of custom icons and documents how to use external icon libraries that are already dependencies of the package.
+`@dtplatform/ipa-ui` does not export any icon components. Components use icons from external libraries (bundled into the package) plus one internal custom icon. This page lists them so you can match the visuals in your app.
 
-## XIcon (custom)
+## XIcon (internal)
 
-A simple “X” (close) icon, e.g. for dialog close buttons or dismiss controls.
+A simple "X" (close) icon, 16×16, filled with `currentColor` so it inherits text color. It is **not exported** from the package in 2.0.x (`import { XIcon } from '@dtplatform/ipa-ui'` does not resolve); it is used internally as the default badge remove icon in **MultiSelect**.
 
-### Import
-
-```tsx
-import { XIcon } from '@dtplatform/ipa-ui';
-```
-
-### Usage
-
-```tsx
-<XIcon />
-<XIcon className={styles.iconLg} />
-```
-
-**Props:** Accepts `className` (and any SVG attributes passed through to the root `<svg>`). Size is 16×16 by default; override with `className` (e.g. your own CSS module or global utility classes). Color follows `currentColor` so it inherits text color.
+To change it, pass your own node through MultiSelect's `icons.badgeClose`, or hide it with `hideBadgeRemove`. To style the default one, use the `badgeRemoveIcon` slot of `styleOverrides` (see [Dropdown](dropdown.md#styling-styleoverrides)).
 
 ---
 
-## Other icon libraries
+## Icon libraries used by components
 
-The design system does not export icon sets; it uses these libraries internally and you can use them in your app for consistency:
+These libraries are regular `dependencies` of `@dtplatform/ipa-ui` and are bundled into its build, so you do **not** need to install them for the components to work. If you want to use the same icons in your own code, add the library to your app's dependencies yourself rather than relying on the copy installed with ipa-ui.
 
-- **[Lucide React](https://lucide.dev/)** – Used in many components (e.g. Accordion chevron, Input password toggle, Dialog close). Install in your app: `npm i lucide-react`. Use the same icon names as in Storybook for consistency.
-- **[Radix UI Icons](https://www.radix-ui.com/icons)** – Used in some components (e.g. Link pencil icon, Dropdown chevron). Install: `@radix-ui/react-icons`.
-- **[Remix Icon](https://remixicon.com/)** – Available via `remixicon-react`. Check the package’s peer dependencies if you use Remix icons.
+- **[Lucide React](https://lucide.dev/)** (`lucide-react`, ipa-ui uses `^0.477.0`): Accordion chevron, Checkbox check / indeterminate marks, Input password toggle and clear button, Dialog close, Breadcrumb separator and ellipsis, Calendar / DatePicker, Command search, DropdownMenu check, and Table filters, toolbar, column headers and pagination. Install: `npm i lucide-react`.
+- **[Radix UI Icons](https://www.radix-ui.com/icons)** (`@radix-ui/react-icons`): the chevron of **SingleSelect** and **MultiSelect** (trigger and list footer). Install: `npm i @radix-ui/react-icons`.
+
+`remixicon-react` is also listed in ipa-ui's dependencies, but no component uses it.
+
+Components that show a caller-supplied icon (e.g. Link `icon`, Input `icon`, SingleSelect / MultiSelect `icons`) accept any React node, so any icon library works there.
 
 When building UIs that match IPA components (e.g. custom buttons or inputs), prefer the same library and icon names as in the component stories so visuals stay consistent.

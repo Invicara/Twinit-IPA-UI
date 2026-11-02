@@ -5,8 +5,8 @@ A group of radio options with a single selection. Built on [Radix UI Radio Group
 ## Import
 
 ```tsx
-import { RadioGroup, radioGroupVariants } from '@dtplatform/ipa-ui';
-import type { RadioGroupOption } from '@dtplatform/ipa-ui';
+import { RadioGroup } from '@dtplatform/ipa-ui';
+import type { RadioGroupProps } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
@@ -28,25 +28,20 @@ const [value, setValue] = useState('a');
 
 ## API
 
-**RadioGroup** accepts Radix Radio Group props (e.g. `value`, `onValueChange`, `name`) with these additions/overrides:
+**RadioGroup** accepts Radix Radio Group Root props (e.g. `value`, `defaultValue`, `onValueChange`, `name`, `required`) except `children`, with these additions/overrides. Props and the ref go to the Radix Root, which sits inside an outer wrapper `<div>` that also holds the label.
 
 | Prop          | Type     | Default     | Description |
 |---------------|----------|-------------|-------------|
-| `options`     | `RadioGroupOption[]` | **required** | List of options. |
-| `label`       | `string` | —           | Group label shown above the radios. |
-| `orientation` | `'vertical'` \| `'horizontal'` | `'vertical'` | Layout of options. |
+| `options`     | `{ value: string; label: string; disabled?: boolean }[]` | **required** | List of options. |
+| `label`       | `string` | -           | Group label shown above the radios. |
+| `horizontal`  | `boolean`| `false`     | Lay options out in a row instead of a column. Sets `orientation` and `data-orientation` on the Radix Root; use this rather than Radix's `orientation` prop. |
 | `disabled`    | `boolean`| `false`     | Disable the entire group. |
-| `testIdPrefix`| `string` | —           | Sets `data-testid` on the root. |
-| `className`   | `string` | —           | Extra class on the group root. |
+| `styleOverrides` | `Record<string, string>` | - | Slot-to-class map merged with the defaults. Slots: `radioGroup` (outer wrapper), `label`, `group` (Radix Root), `item` (option row), `radio`, `indicator`, `itemContent`, `itemLabel`. Plain object or CSS module. |
+| `className`   | `string` | -           | Extra class on the Radix Root (`group` slot), not on the outer wrapper. |
 
-**RadioGroupOption**:
+**Option fields**: `value` (required), `label` (required), `disabled` (optional; disable this option only). There is no exported option type; use `RadioGroupProps['options'][number]` if you need one.
 
-| Field      | Type     | Description |
-|------------|----------|-------------|
-| `value`    | `string` | **required** Option value. |
-| `label`    | `string` | **required** Visible label. |
-| `disabled` | `boolean`| Optional; disable this option only. |
-| `helperText` | `string` | Optional; not all implementations may render it. |
+**Data attributes:** the Radix Root has `data-testid="ipa_radio_group"` and `data-orientation` (`vertical` \| `horizontal`). The outer wrapper and each option row carry `data-disabled` (`true` / `false`).
 
 ## Examples
 
@@ -67,7 +62,7 @@ const [value, setValue] = useState('a');
 
 ```tsx
 <RadioGroup
-  orientation="horizontal"
+  horizontal
   label="Size"
   options={[
     { value: 's', label: 'S' },
@@ -85,21 +80,12 @@ const [value, setValue] = useState('a');
 <RadioGroup disabled options={options} value={value} onValueChange={setValue} />
 ```
 
-## radioGroupVariants
-
-For custom layouts that match the design system:
-
-```tsx
-import { radioGroupVariants } from '@dtplatform/ipa-ui';
-<div className={radioGroupVariants({ orientation: 'horizontal' })}>
-  {/* custom radio markup */}
-</div>
-```
-
 ## Styling
 
-The component uses internal CSS modules for the group, each radio, and labels. Use `className` on the root to adjust spacing or alignment. Option-level styling is controlled by the library; override via theme/CSS variables if supported.
+The component uses internal CSS modules for the group, each radio, and labels. Use `className` on the Radix Root to adjust spacing or alignment, and `styleOverrides` for the wrapper, label and option-level parts.
 
 ## Accessibility
 
-Radix provides keyboard navigation and ARIA attributes. The group is associated with the optional `label` via `aria-labelledby`. Each option is a focusable radio with a visible label; individual `disabled` on options is respected.
+Radix provides the radio ARIA roles and attributes. The group is associated with the optional `label` via `aria-labelledby`. Each option is a focusable radio with a visible `<label>`; individual `disabled` on options is respected.
+
+Keyboard: every enabled option is in the tab order (disabled options get `tabIndex={-1}`); Space or Enter selects the focused option; arrow keys move focus to the previous/next enabled option (no wrap-around).

@@ -31,12 +31,14 @@ ipa-ui styles Dialog with a **CSS module** and **library-owned `@keyframes`**, d
 
 See `src/components/ui/dialog/dialog.module.css`.
 
-- **Overlay** (`.dialog`): fixed full-screen; fade in/out via `ipa-dialog-overlay-*` keyed off `[data-state]`.
-- **Content** (`.content`): fixed, centered with `transform: translate(-50%, -50%)`; open/close uses `ipa-dialog-content-*` keyframes that include **opacity and transform** in a controlled way so centering stays coherent.
+- **Overlay** (`.dialog`): fixed full-screen; fade in/out (150ms) via `ipa-dialog-overlay-in` / `ipa-dialog-overlay-out` keyed off `[data-state]`. Not rendered when `hideOverlay` is set.
+- **Content** (`.content`): fixed, centered with `transform: translate(-50%, -50%)`; open/close (150ms) uses `ipa-dialog-content-in` / `ipa-dialog-content-out`, which animate **opacity and a 0.95 to 1 scale** while keeping `translate(-50%, -50%)` in every frame so centering stays coherent.
+
+Like the class names, the `@keyframes` names are scoped by the CSS module build (emitted as e.g. `ipa-dialog-overlay-in_<hash>`).
 
 #### JSX
 
-`dialog.tsx` applies **CSS module classes** only (`s.dialog`, `s.content`, …) plus optional `styleOverrides` / `className`. Consumers see hashed module class names, not bundled third-party utility strings.
+`dialog.tsx` applies **CSS module classes** (`s.dialog`, `s.content`, …) plus optional `styleOverrides` / `className`. The only non-module class is the global `custom-scrollbar` on the body (scrollbar styling, not animation). Consumers see hashed module class names, not bundled third-party utility strings.
 
 ---
 

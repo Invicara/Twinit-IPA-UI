@@ -433,4 +433,88 @@ describe("applyFilterMenuValue", () => {
     expect(to.getDate()).toBe(3)
     expect(to.getTime()).not.toBe(from.getTime())
   })
+
+  it("expands a single range number into a same-value pair", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "4")
+    expect(column.setFilterValue).toHaveBeenCalledWith([4, 4])
+  })
+
+  it("expands a single negative number into a same-value pair", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "-8")
+    expect(column.setFilterValue).toHaveBeenCalledWith([-8, -8])
+  })
+
+  it("keeps a leading minus on a decimal range number", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "-4.5")
+    expect(column.setFilterValue).toHaveBeenCalledWith([-4.5, -4.5])
+  })
+
+  it("treats a hyphen with a gap on both sides as the range separator", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "-4 - 8")
+    expect(column.setFilterValue).toHaveBeenCalledWith([-4, 8])
+  })
+
+  it("drops a trailing dash and keeps the two numbers as a range", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "4-8-")
+    expect(column.setFilterValue).toHaveBeenCalledWith([4, 8])
+  })
+
+  it("drops an unspaced dash between two numbers", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "8-16")
+    expect(column.setFilterValue).toHaveBeenCalledWith([8, 16])
+  })
+
+  it("treats a hyphen with a gap on only one side as a minus sign", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "4 -8")
+    expect(column.setFilterValue).toHaveBeenCalledWith([4, -8])
+  })
+
+  it("accepts the word to as the range separator", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "-4 to 8")
+    expect(column.setFilterValue).toHaveBeenCalledWith([-4, 8])
+  })
+
+  it("accepts to glued between two numbers", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "-4to10")
+    expect(column.setFilterValue).toHaveBeenCalledWith([-4, 10])
+  })
+
+  it("parses a two-number range from the filter menu", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "8 - 16")
+    expect(column.setFilterValue).toHaveBeenCalledWith([8, 16])
+  })
+
+  it("parses a range that starts with a negative number", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "-8 - 16")
+    expect(column.setFilterValue).toHaveBeenCalledWith([-8, 16])
+  })
+
+  it("reads a hyphen glued to the following digits as a minus sign", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "8 - -16")
+    expect(column.setFilterValue).toHaveBeenCalledWith([8, -16])
+  })
+
+  it("parses a range of two negative numbers", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "-8 - -16")
+    expect(column.setFilterValue).toHaveBeenCalledWith([-8, -16])
+  })
+
+  it("parses a comma-separated range of negative numbers", () => {
+    const column = mockFilterColumn("range")
+    applyFilterMenuValue(column, "-8, -16")
+    expect(column.setFilterValue).toHaveBeenCalledWith([-8, -16])
+  })
 })

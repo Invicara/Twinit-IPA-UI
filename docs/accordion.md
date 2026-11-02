@@ -32,9 +32,11 @@ Compose `Accordion` (root), `AccordionItem`, `AccordionTrigger`, and `AccordionC
   - `collapsible`: when `type="single"`, allow closing the open item
   - `value` / `defaultValue`: controlled or uncontrolled value(s)
   - `onValueChange`: callback when value changes
+  - `styleOverrides`: `Record<string, string>`, slot-to-class map merged with the defaults and shared with all subcomponents (see **Styling**)
+  - Renders `data-testid="ipa_accordion"` on the root element.
 - **AccordionItem** – Wraps each section. Requires `value` (string). Accepts `className` and other Radix Item props.
 - **AccordionTrigger** – Clickable header; toggles the section. Accepts `className` and Radix Trigger props. Renders a chevron icon automatically.
-- **AccordionContent** – Collapsible body. Accepts `className` and Radix Content props.
+- **AccordionContent** – Collapsible body. Accepts Radix Content props. `className` is applied to the inner content wrapper (`contentInner` slot), not to the animated Radix Content element.
 
 ## Examples
 
@@ -58,7 +60,15 @@ const [open, setOpen] = useState<string | undefined>('item-1');
 
 ## Styling
 
-Use `className` on `AccordionItem`, `AccordionTrigger`, and `AccordionContent` to align with your theme. The component uses internal CSS modules for layout and the trigger chevron.
+Use `className` on `Accordion`, `AccordionItem`, `AccordionTrigger`, and `AccordionContent` to align with your theme. The component uses internal CSS modules for layout and the trigger chevron.
+
+For deeper overrides, pass `styleOverrides` to the `Accordion` root. Slot keys: `accordion` (root), `item`, `header` (Radix Header wrapping the trigger), `trigger`, `icon` (chevron), `content` (animated Radix Content), `contentInner` (inner wrapper of the content).
+
+```tsx
+<Accordion type="single" collapsible styleOverrides={{ trigger: 'my-trigger', icon: 'my-chevron' }}>
+  {/* ... */}
+</Accordion>
+```
 
 ## Accessibility
 

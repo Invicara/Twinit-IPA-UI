@@ -38,13 +38,13 @@ import {
 
 ## API
 
-- **Breadcrumb** – Root `<nav aria-label="breadcrumb">`. Accepts standard `nav` props.
+- **Breadcrumb** – Root `<nav aria-label="breadcrumb">` with `data-testid="ipa_breadcrumb"`. Accepts standard `nav` props plus `styleOverrides` (`Record<string, string>`, see **Styling**).
 - **BreadcrumbList** – `<ol>` wrapper. Accepts `className` and `ol` props.
 - **BreadcrumbItem** – `<li>` wrapper for each segment. Accepts `className` and `li` props.
 - **BreadcrumbLink** – Link segment. Pass `href` and optional `asChild` to render a custom element (e.g. React Router’s `Link`) as the link.
-- **BreadcrumbPage** – Current page (non-clickable). Renders a `<span>` with `aria-current="page"`. Use for the last item.
-- **BreadcrumbSeparator** – Between items. Renders a chevron by default; pass `children` to use a custom character or icon.
-- **BreadcrumbEllipsis** – For truncated middle segments (e.g. “…”). Includes a “More” screen-reader label.
+- **BreadcrumbPage** – Current page (non-clickable). Renders a `<span>` with `role="link"`, `aria-disabled="true"` and `aria-current="page"`. Use for the last item.
+- **BreadcrumbSeparator** – Between items. Renders an `<li role="presentation">` (place it directly inside `BreadcrumbList`, not inside a `BreadcrumbItem`) with a chevron by default; pass `children` to use a custom character or icon.
+- **BreadcrumbEllipsis** – For truncated middle segments (e.g. “…”). Renders a `<span>` with a "more" icon. The whole element is `aria-hidden`, so its visually hidden "More" text is not announced; give the surrounding control its own label if the ellipsis is interactive.
 
 ## Examples
 
@@ -80,7 +80,15 @@ import {
 
 ## Styling
 
-Apply `className` to `BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, and `BreadcrumbPage` to match your design system. The component uses internal CSS modules for base layout and typography.
+Apply `className` to any part (`Breadcrumb`, `BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbPage`, `BreadcrumbSeparator`, `BreadcrumbEllipsis`) to match your design system. The component uses internal CSS modules for base layout and typography.
+
+For deeper overrides, pass `styleOverrides` to the `Breadcrumb` root; it is shared with all subcomponents. Slot keys: `breadcrumb` (nav), `list`, `item`, `link`, `page`, `separator`, `ellipsis`, `ellipsisIcon`, `srOnly`.
+
+```tsx
+<Breadcrumb styleOverrides={{ link: 'my-link', separator: 'my-separator' }}>
+  {/* ... */}
+</Breadcrumb>
+```
 
 ## Accessibility
 

@@ -31,15 +31,19 @@ const [checked, setChecked] = useState(false);
 | Prop              | Type                     | Description |
 |-------------------|--------------------------|-------------|
 | `checked`         | `boolean` \| `'indeterminate'` | Controlled checked state. |
-| `defaultChecked`  | `boolean`                | Uncontrolled initial state. |
+| `defaultChecked`  | `boolean` \| `'indeterminate'` | Uncontrolled initial state. `'indeterminate'` also turns on the tri-state click loop (see `indeterminate`). |
 | `onCheckedChange` | `(checked: boolean \| 'indeterminate') => void` | Called when state changes. |
-| `disabled`        | `boolean`                | Disables the checkbox. |
+| `disabled`        | `boolean`                | Disables the checkbox. Default `false`. |
+| `indeterminate`   | `boolean`                | Uncontrolled only. When `true`, the initial state is indeterminate if `defaultChecked` is omitted, and clicks cycle indeterminate → checked → unchecked → indeterminate. Default `false` (plain on/off toggle; an indeterminate state steps to checked). Ignored when `checked` is passed. |
 | `required`        | `boolean`                | HTML required. |
 | `name`            | `string`                 | Form field name. |
 | `value`           | `string`                 | Form value when checked. |
-| `className`       | `string`                 | Extra CSS classes. |
+| `className`       | `string`                 | Extra CSS classes on the root. |
+| `styleOverrides`  | `Record<string, string>` | Slot-to-class map merged with the defaults. Slots: `checkbox` (root), `indicator`, `icon` (both icons), `iconCheck`, `iconIndeterminate`. Plain object or CSS module. |
 
-The component renders a check icon (Lucide) inside the box when checked. Indeterminate state is supported via Radix.
+The component renders a check icon (Lucide) inside the box when checked and a minus icon when indeterminate. In controlled mode (`checked` passed), state changes are handled by Radix and reported through `onCheckedChange`; clicking an indeterminate box reports `true`.
+
+The root renders `data-testid="ipa_checkbox"`, `data-state` (`checked` \| `unchecked` \| `indeterminate`) and `data-disabled` (`"true"` or `"false"`).
 
 ## Examples
 
@@ -56,6 +60,12 @@ The component renders a check icon (Lucide) inside the box when checked. Indeter
   checked={indeterminate ? 'indeterminate' : allSelected}
   onCheckedChange={handleSelectAll}
 />
+```
+
+**Uncontrolled tri-state**
+
+```tsx
+<Checkbox indeterminate onCheckedChange={(state) => console.log(state)} />
 ```
 
 **With label and aria**

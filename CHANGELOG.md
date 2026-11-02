@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-11-02
+
+### Fixed
+
+- **TypeScript types**: `package.json` `types` pointed at `dist/index.d.ts`, which has never been built, so consumers got no type declarations (TS7016 under `strict`). It now points at `dist/types.d.ts`. Apps that compiled against an implicit `any` may see new, correct type errors.
+- **Table filter menu**: typed range values accept negative numbers, a single value (becomes a same-value range), "to" as a separator, and stray dashes again. The fix shipped in 2.0.0 was lost in a merge before release, along with its tests; both are restored.
+
+### Docs
+
+- README: removed the beta disclaimer; documented peer dependencies, the real styling model (CSS modules and `styleOverrides` on every component, no CVA, no Tailwind) and when override CSS wins the cascade.
+- New component docs: Badge, Command, DropdownMenu, Popover, Separator.
+- Rewrote the Table doc for the 2.0 API (compound parts, feature slices, server mode, URL sync).
+- Corrected props, defaults, slots and examples across Accordion, Breadcrumb, Button, Calendar, Checkbox, Dialog, Dropdown, Input, Link, RadioGroup, Slider, icons and data attributes. Several documented props and exports did not exist (`variant` on Link and Slider, `orientation` on RadioGroup, `*Variants` helpers, `testIdPrefix`, an exported `XIcon`).
+- Contributor and internal docs updated to match the scripts, remotes and release flow.
+- 2.0.0-0 changelog entry: Table server mode does not build OData queries; corrected.
+
+
 ## [2.0.0] - 2026-11-02
 
 First stable 2.x release. It contains everything listed under [2.0.0-0] and [2.0.0-1] below (including the breaking Dropdown prop changes and the Tailwind removal), plus the fixes from the release-candidate QA round.
@@ -50,7 +67,7 @@ First stable 2.x release. It contains everything listed under [2.0.0-0] and [2.0
 
 - **Table**: new component built on TanStack Table - sorting, advanced multi-sort with drag & drop, column drag/resize/ordering, row selection, pagination, loading skeleton.
 - **Table**: filter set - checkbox, faceted, date, rating and slider filters, plus a filter menu and reset control.
-- **Table**: server mode with OData query building and URL search-param parsing/state sync.
+- **Table**: server mode that exposes typed query params (sorting, filters, pagination) for your own fetch, with optional URL search-param parsing/state sync.
 - **Table**: composable feature hooks (`withSorting`, `withFiltering`, `withPagination`, `withSelection`, `withResizing`, `withColumnOrder`, client/server mode) and control hooks.
 - New components: **Badge**, **Calendar** / date picker, **Command**, **Dropdown Menu**, **Popover**, **Separator**.
 - Docs for the table and calendar components, plus internal component-source notes.

@@ -24,16 +24,22 @@ Also accepts standard [`<button>` HTML attributes](https://developer.mozilla.org
 |------|------|---------|-------------|
 | `variant` | `'default'` \| `'secondary'` \| `'tertiary'` \| `'danger'` | `'default'` | Visual style. |
 | `size` | `'default'` \| `'sm'` \| `'icon'` | `'default'` | Dimensions; use `icon` for icon-only buttons. |
-| `disabled` | `boolean` | `false` | Blocks clicks and shows disabled styling. |
+| `disabled` | `boolean` | `false` | Blocks clicks and shows disabled styling. With `asChild`, the native `disabled` attribute is not passed to the child; only `data-disabled="true"` (styling) is set, so prevent navigation/clicks yourself. |
 | `asChild` | `boolean` | `false` | Apply button styles to the single child (e.g. a link). |
-| `children` | `string \| ReactNode` | — | Label or content (string or React node). |
-| `styleOverrides` | `Record<string, string>` | — | Extra classes per slot key (`button`), merged with defaults. |
+| `children` | `string \| ReactNode` | - | Label or content (string or React node). |
+| `styleOverrides` | `Record<string, string>` | - | Extra classes per slot key (`button`), merged with defaults. |
+
+## Data attributes
+
+The rendered element carries `data-testid="ipa_button"`, `data-variant` (the `variant` value), `data-size` (the `size` value) and `data-disabled` (`"true"` or `"false"`). Use them for test selectors or styling hooks.
 
 ## Examples
 
 **Icon button**
 
 ```tsx
+import { XIcon } from 'lucide-react';
+
 <Button size="icon" aria-label="Close">
   <XIcon />
 </Button>

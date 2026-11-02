@@ -1,18 +1,18 @@
 # Link
 
-Styled link (anchor) with optional default icon, inline variant, and disabled state. Use for navigation; when disabled, the link does not navigate and click is suppressed.
+Styled link (anchor) with optional leading icon, inline variant, and disabled state. Use for navigation; when disabled, the link does not navigate and click is suppressed.
 
 ## Import
 
 ```tsx
-import { Link, linkVariants } from '@dtplatform/ipa-ui';
+import { Link } from '@dtplatform/ipa-ui';
 ```
 
 ## Basic usage
 
 ```tsx
 <Link href="/docs">Documentation</Link>
-<Link href="/edit" variant="inline">Edit</Link>
+<Link href="/edit" inline>Edit</Link>
 <Link href="/page" disabled>Disabled link</Link>
 ```
 
@@ -22,13 +22,16 @@ import { Link, linkVariants } from '@dtplatform/ipa-ui';
 
 | Prop       | Type     | Default     | Description |
 |------------|----------|-------------|-------------|
-| `variant`  | `'default'` \| `'inline'` | `'default'` | Visual style. Default variant shows an icon (pencil). |
-| `disabled` | `boolean` | `false`     | When `true`, `href` is not applied and click is prevented; link looks disabled. |
-| `testIdPrefix` | `string` | —       | Sets `data-testid` for tests. |
-| `className`| `string` | —           | Extra CSS classes. |
+| `inline`   | `boolean` | `false`     | Inline text style: underlined (underline removed on hover) and laid out inline. When `false`, the default style is a non-underlined flex row (icon + text). Exposed as `data-variant` (`"inline"` or `"default"`). Only the inline variant is underlined. |
+| `icon`     | `ReactNode` | -         | Optional leading icon element, rendered before `children` in a 14px slot. No icon is rendered by default. |
+| `disabled` | `boolean` | `false`     | When `true`, `href` is not applied and click is prevented (your `onClick` is not called); link looks disabled. |
+| `styleOverrides` | `Record<string, string>` | - | Slot-to-class map merged with the defaults. Slots: `link` (anchor), `icon` (icon wrapper), `withIcon` (added on inline links that have an icon). Plain object or CSS module. |
+| `className`| `string` | -           | Extra CSS classes. |
 | `children` | `ReactNode` | **required** | Link content. |
 
-If `href` is missing or falsy, the link is treated as disabled (no navigation, `aria-disabled`).
+The anchor renders `data-testid="ipa_link"`, `data-variant` (`"default"` \| `"inline"`), `data-disabled` and `aria-disabled` (`true` / `false`).
+
+If `href` is missing or falsy, the link is treated as disabled (no navigation, `aria-disabled="true"`).
 
 ## Examples
 
@@ -43,7 +46,7 @@ If `href` is missing or falsy, the link is treated as disabled (no navigation, `
 **Inline (e.g. in paragraph)**
 
 ```tsx
-<p>See our <Link href="/guide" variant="inline">guide</Link> for details.</p>
+<p>See our <Link href="/guide" inline>guide</Link> for details.</p>
 ```
 
 **Conditionally disabled**
@@ -54,17 +57,12 @@ If `href` is missing or falsy, the link is treated as disabled (no navigation, `
 </Link>
 ```
 
-## linkVariants
-
-Use `linkVariants` to style a different element (e.g. React Router `Link`) like the design-system link:
+**With icon**
 
 ```tsx
-import { linkVariants } from '@dtplatform/ipa-ui';
-import { Link as RouterLink } from 'react-router-dom';
+import { Pencil } from 'lucide-react';
 
-<RouterLink to="/docs" className={linkVariants({ variant: 'default' })}>
-  Docs
-</RouterLink>
+<Link href="/edit" icon={<Pencil />}>Edit</Link>
 ```
 
 ## Styling
@@ -73,5 +71,5 @@ Styles come from internal CSS modules. Use `className` to override. Disabled sta
 
 ## Accessibility
 
-- Use `href` for real navigation; when disabled, the link doesn’t navigate and handles `onClick` to prevent default.
+- Use `href` for real navigation; when disabled, the link doesn’t navigate: its click handler calls `preventDefault()` and `stopPropagation()`.
 - For external links, include `rel="noopener noreferrer"` and consider indicating “opens in new window” in the text or with `aria-label`.

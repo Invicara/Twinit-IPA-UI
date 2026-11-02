@@ -162,15 +162,7 @@ export function applyFilterMenuValue<TData>(
   }
 
   if (variant === "range") {
-    const parts = trimmed.split(/[,–-]/).map((part) => part.trim()).filter(Boolean)
-    if (
-      parts.length === 2 &&
-      parts.every((part) => /^-?\d+(\.\d+)?$/.test(part))
-    ) {
-      column.setFilterValue([Number(parts[0]), Number(parts[1])])
-      return
-    }
-    column.setFilterValue(trimmed)
+    column.setFilterValue(parseRangeMenuValue(trimmed) ?? trimmed)
     return
   }
 
